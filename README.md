@@ -1,3 +1,5 @@
+[![Build](https://github.com/NessieCircuits/Riotee_Runtime/actions/workflows/make.yml/badge.svg)](https://github.com/NessieCircuits/Riotee_Runtime/actions/workflows/make.yml)
+
 # A battery-free runtime for the Riotee platform
 
 The code in this repository allows executing user-code on the battery-free Riotee module. 
