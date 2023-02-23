@@ -1,0 +1,9 @@
+[submodule "CMSIS_5"]
+	path = CMSIS_5
+	url = https://github.com/ARM-software/CMSIS_5.git
+[submodule "freertos"]
+	path = freertos
+	url = https://github.com/FreeRTOS/FreeRTOS-Kernel
+[submodule "nrfx"]
+	path = nrfx
+	url = https://github.com/NordicSemiconductor/nrfx

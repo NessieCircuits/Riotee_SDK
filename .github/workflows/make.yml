@@ -1,0 +1,19 @@
+name: Make build
+
+on:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: true
+
+    - name: Install arm-none-eabi toolchain
+      run: sudo apt update && sudo apt install -y gcc-arm-none-eabi
+
+    - name: Build code
+      run: make clean all
