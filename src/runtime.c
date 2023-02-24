@@ -10,7 +10,6 @@
 #include "printf.h"
 #include "riotee_module_pins.h"
 #include "uart.h"
-#include "arduino.h"
 #include "nvm.h"
 #include "runtime.h"
 
