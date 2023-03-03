@@ -15,7 +15,9 @@
 
 ble_ll_addr_t adv_address = {.addr_bytes = {0xBE, 0xEF, 0xDE, 0xAD, 0x00, 0x01}};
 
-static struct { uint32_t counter; } ble_data;
+static struct {
+  uint32_t counter;
+} ble_data;
 
 static void led_blink(unsigned int us) {
   taskENTER_CRITICAL();
@@ -26,12 +28,12 @@ static void led_blink(unsigned int us) {
 }
 
 /* This gets called one time after flashing new firmware */
-void bootstrap(void) {
+void bootstrap_callback(void) {
   printf("All new!");
 }
 
 /* This gets called after every reset */
-void setup(void) {
+void reset_callback(void) {
   nrf_gpio_cfg_output(PIN_LED_CTRL);
 
   ble_init();

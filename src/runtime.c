@@ -204,7 +204,7 @@ static void sys_task(void *pvParameter) {
 
   if (check_fresh_start()) {
     initialize_retained();
-    bootstrap();
+    bootstrap_callback();
   } else {
     if (taskstore_get(&usr_task_store) == 0)
       /* Unblock the user task */
@@ -212,11 +212,11 @@ static void sys_task(void *pvParameter) {
     else {
       initialize_retained();
       /* Call user bootstrap code */
-      bootstrap();
+      bootstrap_callback();
     }
   }
 
-  setup();
+  reset_callback();
 
   vTaskResume(usr_task_handle);
 

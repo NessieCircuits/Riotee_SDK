@@ -4,6 +4,9 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
+#define UNUSED_VARIABLE(X) ((void)(X))
+#define UNUSED_PARAMETER(X) UNUSED_VARIABLE(X)
+
 int runtime_init(void);
 void runtime_start(void);
 
@@ -17,14 +20,19 @@ enum { USR_EVT_RESET = 0xF000, USR_EVT_RTC = 0xF001, USR_EVT_BLE = 0xF002 };
 
 extern TaskHandle_t usr_task_handle;
 
+#if defined __cplusplus
+extern "C" {
+#endif
+
 /* This gets called one time after flashing new firmware */
-void bootstrap(void);
+void bootstrap_callback(void);
 /* This gets called after every reset */
-void setup(void);
+void reset_callback(void);
 /* This is the FreeRTOS task running user code*/
 void user_task(void *pvParameter);
 
-#define UNUSED_VARIABLE(X) ((void)(X))
-#define UNUSED_PARAMETER(X) UNUSED_VARIABLE(X)
+#if defined __cplusplus
+}
+#endif
 
 #endif /* __RUNTIME_H_ */
