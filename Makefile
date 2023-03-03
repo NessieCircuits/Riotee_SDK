@@ -32,8 +32,8 @@ LIB_SRC_FILES += \
 APP_SRC_FILES += \
   $(SRC_DIR)/main.c
 
-APP_OBJS = $(addprefix $(OUTPUT_DIR)/, $(APP_SRC_FILES:c=o))
-LIB_OBJS = $(addprefix $(OUTPUT_DIR)/, $(LIB_SRC_FILES:c=o))
+APP_OBJS = $(addprefix $(OUTPUT_DIR)/, $(addsuffix .o, $(APP_SRC_FILES)))
+LIB_OBJS = $(addprefix $(OUTPUT_DIR)/, $(addsuffix .o, $(LIB_SRC_FILES)))
 
 # Include folders common to all targets
 INC_FOLDERS += \
@@ -99,12 +99,12 @@ lib: ${OUTPUT_DIR}/libriotee.a
 app: ${OUTPUT_DIR}/build.hex
 
 
-${OUTPUT_DIR}/%.o: %.c
+${OUTPUT_DIR}/%.c.o: %.c
 	@mkdir -p $(@D)
 	@${PREFIX}gcc ${CFLAGS} -c $< -o $@
 	@echo "CC $<"
 
-${OUTPUT_DIR}/%.o: %.cpp
+${OUTPUT_DIR}/%.c.o: %.cpp
 	@mkdir -p $(@D)
 	@${PREFIX}c++ ${CPPFLAGS} -c $< -o $@
 	@echo "CC $<"
