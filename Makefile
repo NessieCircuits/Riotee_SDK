@@ -63,7 +63,6 @@ CFLAGS += -mabi=aapcs
 CFLAGS += -mfloat-abi=hard
 CFLAGS += -mfpu=fpv4-sp-d16
 CFLAGS += -fsingle-precision-constant
-CFLAGS += -fno-math-errno
 CFLAGS += -ffunction-sections
 CFLAGS += -fdata-sections
 
@@ -85,7 +84,7 @@ LDFLAGS += -L$(OUTPUT_DIR)
 # let linker dump unused sections
 LDFLAGS += -Wl,--gc-sections,-Map=${OUTPUT_DIR}/build.map
 # use newlib in nano version and system call stubs
-LDFLAGS += --specs=nosys.specs
+LDFLAGS += --specs=nano.specs
 
 LIB_FILES += -lm -lriotee
 
@@ -114,12 +113,12 @@ ${OUTPUT_DIR}/build.elf: $(APP_OBJS) ${OUTPUT_DIR}/libriotee.a
 	@${PREFIX}size $@
 
 ${OUTPUT_DIR}/libriotee.a: $(LIB_OBJS)
-	@${PREFIX}ar ${ARFLAGS} $@ $^
 	@echo "Preparing $@"
+	@${PREFIX}ar ${ARFLAGS} $@ $^
 
 ${OUTPUT_DIR}/build.hex: ${OUTPUT_DIR}/build.elf
-	@${PREFIX}objcopy -O ihex $< $@
 	@echo "Preparing $@"
+	@${PREFIX}objcopy -O ihex $< $@
 
 
 clean:
