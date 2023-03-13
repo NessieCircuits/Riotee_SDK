@@ -2,9 +2,13 @@
 #include "nrf.h"
 #include "nrf_gpio.h"
 
+#include "FreeRTOS.h"
+#include "runtime.h"
 #include "gpint.h"
 
 static GPINT_CALLBACK registry[32] = {0};
+/* This points to the task currently blocking on GPINT event */
+static TaskHandle_t waiting_task;
 
 void GPIOTE_IRQHandler(void) {
   if (NRF_GPIOTE->EVENTS_PORT == 1) {
@@ -33,7 +37,7 @@ int gpint_init(void) {
   return 0;
 }
 
-int gpint_register(uint32_t pin, gpint_level_t level, GPINT_CALLBACK cb) {
+int gpint_register(uint32_t pin, gpint_level_t level, gpint_pin_pull_t pull, GPINT_CALLBACK cb) {
   NRF_GPIO_Type *reg = nrf_gpio_pin_port_decode(&pin);
 
   if (pin > 31)
@@ -43,14 +47,13 @@ int gpint_register(uint32_t pin, gpint_level_t level, GPINT_CALLBACK cb) {
     return -2;
   registry[pin] = cb;
 
+  reg->PIN_CNF[pin] = (GPIO_PIN_CNF_INPUT_Connect << GPIO_PIN_CNF_INPUT_Pos) | (pull << GPIO_PIN_CNF_PULL_Pos);
   reg->LATCH |= (1 << pin);
 
   /* Order is important, see nrf52833 errata 210*/
   if (level == GPINT_LEVEL_HIGH) {
-    reg->PIN_CNF[pin] = (GPIO_PIN_CNF_INPUT_Connect << GPIO_PIN_CNF_INPUT_Pos);
     reg->PIN_CNF[pin] |= (GPIO_PIN_CNF_SENSE_High << GPIO_PIN_CNF_SENSE_Pos);
   } else {
-    reg->PIN_CNF[pin] = (GPIO_PIN_CNF_INPUT_Connect << GPIO_PIN_CNF_INPUT_Pos);
     reg->PIN_CNF[pin] |= (GPIO_PIN_CNF_SENSE_Low << GPIO_PIN_CNF_SENSE_Pos);
   }
   return 0;
@@ -59,9 +62,25 @@ int gpint_register(uint32_t pin, gpint_level_t level, GPINT_CALLBACK cb) {
 int gpint_unregister(uint32_t pin) {
   NRF_GPIO_Type *reg = nrf_gpio_pin_port_decode(&pin);
 
-  reg->PIN_CNF[pin] = (GPIO_PIN_CNF_INPUT_Disconnect << GPIO_PIN_CNF_INPUT_Pos) |
-                      (GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos);
+  reg->PIN_CNF[pin] |= (GPIO_PIN_CNF_INPUT_Disconnect << GPIO_PIN_CNF_INPUT_Pos);
+  reg->PIN_CNF[pin] &= ~GPIO_PIN_CNF_SENSE_Msk;
 
   registry[pin] = NULL;
+  return 0;
+}
+
+static void wait_callback(unsigned int pin_no) {
+  BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+
+  xTaskNotifyIndexedFromISR(waiting_task, 1, USR_EVT_GPINT, eSetValueWithOverwrite, &xHigherPriorityTaskWoken);
+}
+
+int gpint_wait(uint32_t pin, gpint_level_t level, gpint_pin_pull_t pull) {
+  unsigned long notification_value;
+  waiting_task = xTaskGetCurrentTaskHandle();
+  gpint_register(pin, level, pull, wait_callback);
+  xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
+  if (notification_value != USR_EVT_GPINT)
+    return -1;
   return 0;
 }

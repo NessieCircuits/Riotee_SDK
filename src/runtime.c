@@ -167,7 +167,7 @@ static void threshold_callback(unsigned int pin_no) {
     vTaskNotifyGiveIndexedFromISR(sys_task_handle, 1, &xHigherPriorityTaskWoken);
   } else if (pin_no == PIN_PWRGD_H) {
     xHigherPriorityTaskWoken = xTaskResumeFromISR(usr_task_handle);
-    gpint_register(PIN_PWRGD_L, GPINT_LEVEL_LOW, threshold_callback);
+    gpint_register(PIN_PWRGD_L, GPINT_LEVEL_LOW, GPIO_PIN_CNF_PULL_Disabled, threshold_callback);
   }
   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
   return;
@@ -199,7 +199,7 @@ static void sys_task(void *pvParameter) {
   vTaskSuspend(usr_task_handle);
 
   /* Make sure we are fully charged here */
-  gpint_register(PIN_PWRGD_H, GPINT_LEVEL_HIGH, initialhigh_callback);
+  gpint_register(PIN_PWRGD_H, GPINT_LEVEL_HIGH, GPIO_PIN_CNF_PULL_Disabled, initialhigh_callback);
   ulTaskNotifyTakeIndexed(1, pdTRUE, portMAX_DELAY);
 
   if (check_fresh_start()) {
@@ -220,12 +220,12 @@ static void sys_task(void *pvParameter) {
 
   vTaskResume(usr_task_handle);
 
-  gpint_register(PIN_PWRGD_L, GPINT_LEVEL_LOW, threshold_callback);
+  gpint_register(PIN_PWRGD_L, GPINT_LEVEL_LOW, GPIO_PIN_CNF_PULL_Disabled, threshold_callback);
   for (;;) {
     ulTaskNotifyTakeIndexed(1, pdTRUE, portMAX_DELAY);
     vTaskSuspend(usr_task_handle);
     taskstore_write(&usr_task_store);
-    gpint_register(PIN_PWRGD_H, GPINT_LEVEL_HIGH, threshold_callback);
+    gpint_register(PIN_PWRGD_H, GPINT_LEVEL_HIGH, GPIO_PIN_CNF_PULL_Disabled, threshold_callback);
   }
 }
 
