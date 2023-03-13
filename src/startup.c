@@ -4,6 +4,7 @@
 #include "nrf_gpio.h"
 #include "riotee_module_pins.h"
 #include "thresholds.h"
+#include "runtime.h"
 
 #define STACK_TOP 0x20018000
 
@@ -186,6 +187,10 @@ void wait_for_high(void) {
 
 void __libc_init_array(void);
 
+__attribute__((weak)) void startup_callback(void){
+
+};
+
 void c_startup(void) {
   volatile unsigned long *src, *dst;
 
@@ -231,6 +236,7 @@ void c_startup(void) {
   /* This must happen soon to avoid max20361 cutting power */
   i2c_init(PIN_SYS_SDA, PIN_SYS_SCL);
   max20361_init();
+  startup_callback();
 
   wait_for_high();
 

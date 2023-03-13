@@ -24,6 +24,8 @@ extern TaskHandle_t usr_task_handle;
 extern "C" {
 #endif
 
+/* This gets called right after startup */
+void startup_callback(void);
 /* This gets called one time after flashing new firmware */
 void bootstrap_callback(void);
 /* This gets called after every reset */
