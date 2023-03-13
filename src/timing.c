@@ -4,13 +4,16 @@
 
 #include "runtime.h"
 
+/* This points to the task currently blocking on GPINT event */
+static TaskHandle_t waiting_task;
+
 void RTC0_IRQHandler(void) {
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
   if (NRF_RTC0->EVENTS_COMPARE[0] == 1) {
     NRF_RTC0->EVENTS_COMPARE[0] = 0;
 
-    xTaskNotifyIndexedFromISR(usr_task_handle, 1, USR_EVT_RTC, eSetValueWithOverwrite, &xHigherPriorityTaskWoken);
+    xTaskNotifyIndexedFromISR(waiting_task, 1, USR_EVT_RTC, eSetValueWithOverwrite, &xHigherPriorityTaskWoken);
   }
 
   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
@@ -20,6 +23,7 @@ void delay(unsigned int ms) {
   unsigned long notification_value;
   NRF_RTC0->CC[0] = (NRF_RTC0->COUNTER + ms) % (1 << 24);
   NRF_RTC0->EVTENSET = RTC_EVTENSET_COMPARE0_Msk;
+  waiting_task = xTaskGetCurrentTaskHandle();
   xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
 }
 
