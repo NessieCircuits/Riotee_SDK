@@ -125,7 +125,6 @@ static int taskstore_get(task_store_t *task_str) {
 
   /* Check the signature to avoid loading garbage */
   if (hdr.signature != NVM_SIG_VALID) {
-    printf("E%08X", hdr.signature);
     nvm_stop();
     return -1;
   }
@@ -173,14 +172,6 @@ static void threshold_callback(unsigned int pin_no) {
   return;
 }
 
-/* This is just used once after reset */
-static void initialhigh_callback(unsigned int pin_no) {
-  BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-  vTaskNotifyGiveIndexedFromISR(sys_task_handle, 1, &xHigherPriorityTaskWoken);
-
-  portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-};
-
 /* Initializes 'retained' section */
 static void initialize_retained(void) {
   volatile unsigned long *src, *dst;
@@ -199,8 +190,7 @@ static void sys_task(void *pvParameter) {
   vTaskSuspend(usr_task_handle);
 
   /* Make sure we are fully charged here */
-  gpint_register(PIN_PWRGD_H, GPINT_LEVEL_HIGH, GPIO_PIN_CNF_PULL_Disabled, initialhigh_callback);
-  ulTaskNotifyTakeIndexed(1, pdTRUE, portMAX_DELAY);
+  gpint_wait(PIN_PWRGD_H, GPINT_LEVEL_HIGH, GPIO_PIN_CNF_PULL_Disabled);
 
   if (check_fresh_start()) {
     initialize_retained();
