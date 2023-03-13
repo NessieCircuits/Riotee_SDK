@@ -17,6 +17,7 @@ LIB_SRC_FILES += \
   $(SRC_DIR)/ble.c \
   $(SRC_DIR)/i2c.c \
   $(SRC_DIR)/max20361.c \
+  $(SRC_DIR)/am1805.c \
   $(SRC_DIR)/timing.c \
   $(SRC_DIR)/gpint.c \
   $(SRC_DIR)/uart.c \
