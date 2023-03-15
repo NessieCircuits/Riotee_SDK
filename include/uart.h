@@ -8,6 +8,7 @@ extern "C" {
 #endif
 
 int uart_init(uint32_t pseltxd);
+void _putchar(char character);
 
 #ifdef __cplusplus
 }
