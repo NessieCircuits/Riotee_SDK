@@ -5,7 +5,7 @@
 #include "thresholds.h"
 
 /* Having NFC pins in different state may increase leakage (see PS v1.5 6.13.3). PIN_THRCTL_H0 is NFC1, so we need to
- * synchronized PIN_NFC2.
+ * synchronize pin PIN_NFC2.
  */
 #define PIN_NFC2 10
 
@@ -19,7 +19,7 @@ static int gpio_set(uint32_t pin, gpio_state_t gpio_state) {
   NRF_GPIO_Type *reg = nrf_gpio_pin_port_decode(&pin);
 
   if (gpio_state == Z) {
-    reg->PIN_CNF[pin] = (GPIO_PIN_CNF_INPUT_Disconnect << GPIO_PIN_CNF_DIR_Pos);
+    reg->PIN_CNF[pin] = (GPIO_PIN_CNF_INPUT_Disconnect << GPIO_PIN_CNF_INPUT_Pos);
   } else {
     if (gpio_state == LOW)
       reg->OUTCLR = (1 << pin);
