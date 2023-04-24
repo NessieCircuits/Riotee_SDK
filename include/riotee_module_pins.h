@@ -4,17 +4,17 @@
 #define PIN_SYS_SCL 40
 #define PIN_SYS_SDA 6
 
-#define PIN_GPIO0 12
-#define PIN_GPIO1 16
-#define PIN_GPIO2 13
-#define PIN_GPIO3 11
-#define PIN_GPIO4 41
-#define PIN_GPIO5 21
-#define PIN_GPIO6 8
-#define PIN_GPIO7 4
-#define PIN_GPIO8 5
-#define PIN_GPIO9 35
-#define PIN_GPIO10 26
+#define PIN_D0 21
+#define PIN_D1 8
+#define PIN_D2 4
+#define PIN_D3 5
+#define PIN_D4 41
+#define PIN_D5 26
+#define PIN_D6 35
+#define PIN_D7 11
+#define PIN_D8 13
+#define PIN_D9 16
+#define PIN_D10 12
 
 #define PIN_THRCTL_H1 34
 #define PIN_THRCTL_L1 36
