@@ -210,20 +210,20 @@ void c_startup(void) {
   nrf_gpio_cfg_input(PIN_C2C_CS, NRF_GPIO_PIN_PULLDOWN);
   nrf_gpio_cfg_input(PIN_C2C_MISO, NRF_GPIO_PIN_PULLDOWN);
 
-  thresholds_low_set(THR_LOW_3V64);
-  thresholds_high_set(THR_HIGH_4V61);
+  thresholds_low_set(THR_LOW_2V9);
+  thresholds_high_set(THR_HIGH_4V6);
 
-  nrf_gpio_cfg_input(PIN_GPIO0, NRF_GPIO_PIN_PULLDOWN);
-  nrf_gpio_cfg_input(PIN_GPIO1, NRF_GPIO_PIN_PULLDOWN);
-  nrf_gpio_cfg_input(PIN_GPIO2, NRF_GPIO_PIN_PULLDOWN);
-  nrf_gpio_cfg_input(PIN_GPIO3, NRF_GPIO_PIN_PULLDOWN);
-  nrf_gpio_cfg_input(PIN_GPIO4, NRF_GPIO_PIN_PULLDOWN);
-  nrf_gpio_cfg_input(PIN_GPIO5, NRF_GPIO_PIN_PULLDOWN);
-  nrf_gpio_cfg_input(PIN_GPIO6, NRF_GPIO_PIN_PULLDOWN);
-  nrf_gpio_cfg_input(PIN_GPIO7, NRF_GPIO_PIN_PULLDOWN);
-  nrf_gpio_cfg_input(PIN_GPIO8, NRF_GPIO_PIN_PULLDOWN);
-  nrf_gpio_cfg_input(PIN_GPIO9, NRF_GPIO_PIN_PULLDOWN);
-  nrf_gpio_cfg_input(PIN_GPIO10, NRF_GPIO_PIN_PULLDOWN);
+  nrf_gpio_cfg_input(PIN_D0, NRF_GPIO_PIN_PULLDOWN);
+  nrf_gpio_cfg_input(PIN_D1, NRF_GPIO_PIN_PULLDOWN);
+  nrf_gpio_cfg_input(PIN_D2, NRF_GPIO_PIN_PULLDOWN);
+  nrf_gpio_cfg_input(PIN_D3, NRF_GPIO_PIN_PULLDOWN);
+  nrf_gpio_cfg_input(PIN_D4, NRF_GPIO_PIN_PULLDOWN);
+  nrf_gpio_cfg_input(PIN_D5, NRF_GPIO_PIN_PULLDOWN);
+  nrf_gpio_cfg_input(PIN_D6, NRF_GPIO_PIN_PULLDOWN);
+  nrf_gpio_cfg_input(PIN_D7, NRF_GPIO_PIN_PULLDOWN);
+  nrf_gpio_cfg_input(PIN_D8, NRF_GPIO_PIN_PULLDOWN);
+  nrf_gpio_cfg_input(PIN_D9, NRF_GPIO_PIN_PULLDOWN);
+  nrf_gpio_cfg_input(PIN_D10, NRF_GPIO_PIN_PULLDOWN);
   nrf_gpio_cfg_input(PIN_LED_CTRL, NRF_GPIO_PIN_PULLDOWN);
   nrf_gpio_cfg_input(PIN_MAX_INT, NRF_GPIO_PIN_PULLDOWN);
   nrf_gpio_cfg_input(PIN_RTC_INT, NRF_GPIO_PIN_PULLDOWN);
