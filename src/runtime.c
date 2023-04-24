@@ -220,7 +220,7 @@ static void sys_task(void *pvParameter) {
 }
 
 void runtime_start(void) {
-  uart_init(PIN_GPIO5);
+  uart_init(PIN_D1);
 
   gpint_init();
   timing_init();
