@@ -22,7 +22,7 @@ static struct {
 static void led_blink(unsigned int us) {
   taskENTER_CRITICAL();
   nrf_gpio_pin_set(PIN_LED_CTRL);
-  nrf_delay_us(100);
+  nrf_delay_us(us);
   nrf_gpio_pin_clear(PIN_LED_CTRL);
   taskEXIT_CRITICAL();
 }
