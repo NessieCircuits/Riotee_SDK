@@ -23,7 +23,6 @@ LIB_SRC_FILES += \
   $(SRC_DIR)/uart.c \
   $(SRC_DIR)/runtime.c \
 	$(SRC_DIR)/nvm.c \
-  $(SRC_DIR)/main.c \
   $(RTOS_DIR)/queue.c \
   $(RTOS_DIR)/list.c \
   $(RTOS_DIR)/tasks.c \
