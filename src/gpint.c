@@ -41,10 +41,10 @@ int gpint_register(uint32_t pin, gpint_level_t level, gpint_pin_pull_t pull, GPI
   NRF_GPIO_Type *reg = nrf_gpio_pin_port_decode(&pin);
 
   if (pin > 31)
-    return -1;
+    return GPINT_ERR_UNSUPPORTED;
 
   if (registry[pin] != NULL)
-    return -2;
+    return GPINT_ERR_BUSY;
   registry[pin] = cb;
 
   reg->PIN_CNF[pin] = (GPIO_PIN_CNF_INPUT_Connect << GPIO_PIN_CNF_INPUT_Pos) | (pull << GPIO_PIN_CNF_PULL_Pos);
@@ -56,17 +56,20 @@ int gpint_register(uint32_t pin, gpint_level_t level, gpint_pin_pull_t pull, GPI
   } else {
     reg->PIN_CNF[pin] |= (GPIO_PIN_CNF_SENSE_Low << GPIO_PIN_CNF_SENSE_Pos);
   }
-  return 0;
+  return GPINT_ERR_OK;
 }
 
 int gpint_unregister(uint32_t pin) {
+  if (registry[pin] == NULL)
+    return GPINT_ERR_GENERIC;
+
   NRF_GPIO_Type *reg = nrf_gpio_pin_port_decode(&pin);
 
   reg->PIN_CNF[pin] |= (GPIO_PIN_CNF_INPUT_Disconnect << GPIO_PIN_CNF_INPUT_Pos);
   reg->PIN_CNF[pin] &= ~GPIO_PIN_CNF_SENSE_Msk;
 
   registry[pin] = NULL;
-  return 0;
+  return GPINT_ERR_OK;
 }
 
 static void wait_callback(unsigned int pin_no) {

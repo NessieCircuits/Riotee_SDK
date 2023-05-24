@@ -5,6 +5,7 @@
 #include "nrf_gpio.h"
 
 typedef enum { GPINT_LEVEL_LOW = 0, GPINT_LEVEL_HIGH = 1 } gpint_level_t;
+enum { GPINT_ERR_OK = 0, GPINT_ERR_GENERIC = 1, GPINT_ERR_BUSY = 2, GPINT_ERR_UNSUPPORTED = 3 };
 
 typedef void (*GPINT_CALLBACK)(unsigned int);
 typedef nrf_gpio_pin_pull_t gpint_pin_pull_t;

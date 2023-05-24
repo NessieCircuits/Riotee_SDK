@@ -155,7 +155,7 @@ void Default_Handler(void) {
   }
 }
 
-void wait_for_high(void) {
+static void wait_for_high(void) {
   NRF_P0->DETECTMODE = GPIO_DETECTMODE_DETECTMODE_LDETECT;
   NRF_GPIOTE->EVENTS_PORT = 0;
   NRF_GPIOTE->INTENSET = GPIOTE_INTENSET_PORT_Msk;
