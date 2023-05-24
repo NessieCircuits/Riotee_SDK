@@ -25,7 +25,13 @@
 #define PIN_PWRGD_H 7
 
 #define PIN_VCAP_SENSE 29
-#define CH_VCAP_SENSE 5
+
+/* Buffered VCAP is on AIN5 */
+#define AIN_VCAP_SENSE 5
+/* A0 is on AIN2 */
+#define AIN_A0 2
+/* A1 is on AIN3 */
+#define AIN_A1 3
 
 #define PIN_RTC_INT 30
 #define PIN_MAX_INT 25
