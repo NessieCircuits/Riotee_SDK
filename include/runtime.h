@@ -16,9 +16,19 @@ __attribute__((always_inline)) static inline void enter_low_power(void) {
   __WFE();
 }
 
-enum { USR_EVT_RESET = 0xF000, USR_EVT_RTC = 0xF001, USR_EVT_BLE = 0xF002, USR_EVT_GPINT = 0xF003 };
+enum {
+  USR_EVT_RESET = 0xF000,
+  USR_EVT_RTC = 0xF001,
+  USR_EVT_BLE = 0xF002,
+  USR_EVT_GPINT = 0xF003,
+  USR_EVT_ADC = 0xF004,
+  SYS_EVT_PWRGD_L = 0xA000,
+  SYS_EVT_PWRGD_H = 0xA001,
+  SYS_EVT_RTC = 0xA002,
+};
 
 extern TaskHandle_t usr_task_handle;
+extern TaskHandle_t sys_task_handle;
 
 #if defined __cplusplus
 extern "C" {

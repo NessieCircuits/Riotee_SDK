@@ -12,6 +12,7 @@
 #include "uart.h"
 #include "nvm.h"
 #include "runtime.h"
+#include "thresholds.h"
 
 #define USR_STACK_SIZE (configMINIMAL_STACK_SIZE + 2048)
 #define SYS_STACK_SIZE (configMINIMAL_STACK_SIZE + 2048)
@@ -83,6 +84,7 @@ typedef struct {
 enum { NVM_SIG_VALID = 0x0D15EA5E, NVM_SIG_INVALID = 0x8BADF00D };
 
 static int taskstore_write(task_store_t *task_str) {
+  /* Why is this here? */
   NRF_NVMC->CONFIG |= NVMC_CONFIG_WEN_Msk;
 
   snapshot_header_t hdr;
@@ -164,14 +166,13 @@ void vApplicationGetIdleTaskMemory(StaticTask_t **ppxIdleTaskTCBBuffer, StackTyp
   *pulIdleTaskStackSize = configMINIMAL_STACK_SIZE;
 }
 
-/* This is the critical callback that suspends the user task */
 static void threshold_callback(unsigned int pin_no) {
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+
   if (pin_no == PIN_PWRGD_L) {
-    vTaskNotifyGiveIndexedFromISR(sys_task_handle, 1, &xHigherPriorityTaskWoken);
+    xTaskNotifyIndexedFromISR(sys_task_handle, 1, SYS_EVT_PWRGD_L, eSetValueWithOverwrite, &xHigherPriorityTaskWoken);
   } else if (pin_no == PIN_PWRGD_H) {
-    xHigherPriorityTaskWoken = xTaskResumeFromISR(usr_task_handle);
-    gpint_register(PIN_PWRGD_L, GPINT_LEVEL_LOW, GPIO_PIN_CNF_PULL_Disabled, threshold_callback);
+    xTaskNotifyIndexedFromISR(sys_task_handle, 1, SYS_EVT_PWRGD_H, eSetValueWithOverwrite, &xHigherPriorityTaskWoken);
   }
   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
   return;
@@ -197,6 +198,8 @@ int wait_until_charged(void) {
 static void sys_task(void *pvParameter) {
   UNUSED_PARAMETER(pvParameter);
 
+  unsigned long notification_value;
+
   /* Make sure that the user task does not yet start */
   vTaskSuspend(usr_task_handle);
 
@@ -218,19 +221,51 @@ static void sys_task(void *pvParameter) {
 
   reset_callback();
 
-  vTaskResume(usr_task_handle);
-
-  gpint_register(PIN_PWRGD_L, GPINT_LEVEL_LOW, GPIO_PIN_CNF_PULL_Disabled, threshold_callback);
   for (;;) {
-    ulTaskNotifyTakeIndexed(1, pdTRUE, portMAX_DELAY);
+    vTaskResume(usr_task_handle);
+    /* Wait until capacitor voltage falls below the 'low' threshold */
+    gpint_wait(PIN_PWRGD_L, GPINT_LEVEL_LOW, GPIO_PIN_CNF_PULL_Disabled);
+    /* Give the application an opportunity to switch off power-hungry devices */
     turnoff_callback();
     vTaskSuspend(usr_task_handle);
-    taskstore_write(&usr_task_store);
-    /* If the user task was already waiting on high threshold, we have to unlock it here */
+
+    /* Set a high threshold - upon reaching this threshold, execution continues */
+    /* If the user task was already waiting on high threshold, we have to notify it here */
     if (gpint_unregister(PIN_PWRGD_H) == GPINT_ERR_OK)
       xTaskNotifyIndexed(usr_task_handle, 1, USR_EVT_GPINT, eSetValueWithOverwrite);
-
     gpint_register(PIN_PWRGD_H, GPINT_LEVEL_HIGH, GPIO_PIN_CNF_PULL_Disabled, threshold_callback);
+
+    /* Set a 10ms timer*/
+    sys_setup_timer(8333);
+    /* Wait until capacitor is recharged or timer expires */
+    xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
+    /* Recharged? */
+    if (notification_value == SYS_EVT_PWRGD_H) {
+      sys_cancel_timer();
+      xTaskNotifyStateClear(xTaskGetCurrentTaskHandle());
+      continue;
+    }
+
+    /* Timer has expired. Is capacitor voltage still below threshold? */
+    if ((NRF_P0->IN & (1 << PIN_PWRGD_L)) == 0) {
+      /* Take the snapshot */
+      taskstore_write(&usr_task_store);
+    } else {
+      /* Monitor for capacitor voltage to drop below threshold again */
+      gpint_register(PIN_PWRGD_L, GPINT_LEVEL_LOW, GPIO_PIN_CNF_PULL_Disabled, threshold_callback);
+    }
+
+    /* Wait until capacitor is recharged or discharged below the crtitical threshold again */
+    xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
+    /* Recharged? */
+    if (notification_value == SYS_EVT_PWRGD_H) {
+      gpint_unregister(PIN_PWRGD_L);
+      continue;
+    }
+    /* Dropped below the threshold again -> take a snapshot */
+    taskstore_write(&usr_task_store);
+    /* Wait until capacitor is recharged */
+    xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
   }
 }
 
