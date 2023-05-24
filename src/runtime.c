@@ -183,6 +183,10 @@ static void initialize_retained(void) {
   while (src < &__bss_retained_end__) *(src++) = 0;
 }
 
+__attribute__((weak)) void turnoff_callback(void){
+
+};
+
 static void sys_task(void *pvParameter) {
   UNUSED_PARAMETER(pvParameter);
 
@@ -213,6 +217,7 @@ static void sys_task(void *pvParameter) {
   gpint_register(PIN_PWRGD_L, GPINT_LEVEL_LOW, GPIO_PIN_CNF_PULL_Disabled, threshold_callback);
   for (;;) {
     ulTaskNotifyTakeIndexed(1, pdTRUE, portMAX_DELAY);
+    turnoff_callback();
     vTaskSuspend(usr_task_handle);
     taskstore_write(&usr_task_store);
     gpint_register(PIN_PWRGD_H, GPINT_LEVEL_HIGH, GPIO_PIN_CNF_PULL_Disabled, threshold_callback);

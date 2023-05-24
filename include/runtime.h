@@ -30,6 +30,8 @@ void startup_callback(void);
 void bootstrap_callback(void);
 /* This gets called after every reset */
 void reset_callback(void);
+/* This gets called right before user code is suspended */
+void turnoff_callback(void);
 /* This is the FreeRTOS task running user code*/
 void user_task(void *pvParameter);
 
