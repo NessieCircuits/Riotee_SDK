@@ -44,6 +44,19 @@ StackType_t uxSystemTaskStack[SYS_STACK_SIZE];
 TaskHandle_t sys_task_handle;
 TaskHandle_t usr_task_handle;
 
+/* Dummy callback to be called when low capacitor voltage is detected. Can be overwritten by the user. */
+__attribute__((weak)) void turnoff_callback(void){};
+
+/* Checks if a certain value is found in flash memory to determine if this is the first boot after programming. */
+static bool check_fresh_start() {
+  /* If the marker is what we expect it, this is a fresh reset */
+  if (fresh_marker == 0x8BADF00D) {
+    return true;
+  }
+  return false;
+}
+
+/* Overwrites a value in flash memory that indicates if the current boot is the first boot after programming.*/
 static void overwrite_marker() {
   /* Get LMA of marker. Compare to linkerscript to understand this calculation */
   unsigned long *marker_nvm_addr = &__etext + (&fresh_marker - &__data_start__);
@@ -57,15 +70,6 @@ static void overwrite_marker() {
   __DMB();
   /* Disable write to flash */
   NRF_NVMC->CONFIG &= ~NVMC_CONFIG_WEN_Msk;
-}
-
-static bool check_fresh_start() {
-  /* If the marker is what we expect it, this is a fresh reset */
-  if (fresh_marker == 0x8BADF00D) {
-    /* Overwrite the marker in flash, so next time we know that it's not a fresh start */
-    return true;
-  }
-  return false;
 }
 
 typedef struct {
@@ -152,6 +156,7 @@ void vApplicationIdleHook(void) {
   return;
 }
 
+/* Assigns statically allocated memory for FreeRTOS idle task */
 void vApplicationGetIdleTaskMemory(StaticTask_t **ppxIdleTaskTCBBuffer, StackType_t **ppxIdleTaskStackBuffer,
                                    uint32_t *pulIdleTaskStackSize) {
   *ppxIdleTaskTCBBuffer = &xIdleTaskTCB;
@@ -183,18 +188,19 @@ static void initialize_retained(void) {
   while (src < &__bss_retained_end__) *(src++) = 0;
 }
 
-__attribute__((weak)) void turnoff_callback(void){
+/* Waits until capacitor is fully charged as indicated by PWRGD_H pin */
+int wait_until_charged(void) {
+  return gpint_wait(PIN_PWRGD_H, GPINT_LEVEL_HIGH, GPIO_PIN_CNF_PULL_Disabled);
+}
 
-};
-
+/* High priority system task initializes runtime, and handles intermittent execution and checkpointing. */
 static void sys_task(void *pvParameter) {
   UNUSED_PARAMETER(pvParameter);
 
   /* Make sure that the user task does not yet start */
   vTaskSuspend(usr_task_handle);
 
-  /* Make sure we are fully charged here */
-  gpint_wait(PIN_PWRGD_H, GPINT_LEVEL_HIGH, GPIO_PIN_CNF_PULL_Disabled);
+  wait_until_charged();
 
   if (check_fresh_start()) {
     initialize_retained();
@@ -220,6 +226,10 @@ static void sys_task(void *pvParameter) {
     turnoff_callback();
     vTaskSuspend(usr_task_handle);
     taskstore_write(&usr_task_store);
+    /* If the user task was already waiting on high threshold, we have to unlock it here */
+    if (gpint_unregister(PIN_PWRGD_H) == GPINT_ERR_OK)
+      xTaskNotifyIndexed(usr_task_handle, 1, USR_EVT_GPINT, eSetValueWithOverwrite);
+
     gpint_register(PIN_PWRGD_H, GPINT_LEVEL_HIGH, GPIO_PIN_CNF_PULL_Disabled, threshold_callback);
   }
 }

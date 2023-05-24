@@ -35,6 +35,9 @@ void turnoff_callback(void);
 /* This is the FreeRTOS task running user code*/
 void user_task(void *pvParameter);
 
+/* Waits until capacitor is fully charged as indicated by PWRGD_H pin */
+int wait_until_charged(void);
+
 #if defined __cplusplus
 }
 #endif
