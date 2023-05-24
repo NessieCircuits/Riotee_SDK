@@ -65,7 +65,6 @@ int gpint_unregister(uint32_t pin) {
 
   NRF_GPIO_Type *reg = nrf_gpio_pin_port_decode(&pin);
 
-  reg->PIN_CNF[pin] |= (GPIO_PIN_CNF_INPUT_Disconnect << GPIO_PIN_CNF_INPUT_Pos);
   reg->PIN_CNF[pin] &= ~GPIO_PIN_CNF_SENSE_Msk;
 
   registry[pin] = NULL;
