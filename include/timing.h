@@ -21,8 +21,13 @@ static inline void nrf_delay_ms(uint32_t ms_time) {
   } while (--ms_time);
 }
 
-void delay(unsigned int ms);
 int timing_init(void);
+
+void sleep_ticks(unsigned int ticks);
+void sleep_ms(unsigned int ms);
+
+void sys_setup_timer(unsigned int ticks);
+void sys_cancel_timer(void);
 
 #ifdef __cplusplus
 }

@@ -67,7 +67,7 @@ static int wait_for_alarm_ok() {
     read_register(&check, AM1805_SECOND_ALARM_REG);
     if (check == 0x55)
       return 0;
-    delay(RETRY_DELAY_MS);
+    sleep_ms(RETRY_DELAY_MS);
   } while (retries > 0);
   return -1;
 }
@@ -81,7 +81,7 @@ int am1805_init(void) {
       if (id != 0x1805) {
         return 0;
       }
-    delay(RETRY_DELAY_MS);
+    sleep_ms(RETRY_DELAY_MS);
   } while (retries > 0);
   return -1;
 }
