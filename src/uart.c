@@ -8,7 +8,7 @@
 #include "uart.h"
 
 int uart_init(uint32_t pseltxd) {
-  NRF_UART0->CONFIG = NRF_UART0->PSEL.TXD = pseltxd;
+  NRF_UART0->PSEL.TXD = pseltxd;
   NRF_UART0->BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud1M;
   nrf_gpio_cfg_input(pseltxd, NRF_GPIO_PIN_PULLUP);
   return 0;
