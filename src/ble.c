@@ -79,6 +79,7 @@ int ble_prepare_adv(ble_ll_addr_t *adv_addr, const char adv_name[], size_t name_
   return 0;
 }
 
+/* Configure the radio for the given BLE channel index */
 static inline int ble_set_channel(unsigned int adv_ch_idx) {
   NRF_RADIO->FREQUENCY = ch2freq(adv_chs[adv_ch_idx]);
   /* Whitening initialization see Bluetooth Core Spec 5.2 Section 3.2 */
@@ -101,7 +102,6 @@ int ble_advertise(void *data, adv_ch_t ch) {
   ble_set_channel(current_adv_ch_idx);
 
   memcpy(adv_data_address, data, adv_data_len);
-  NRF_RADIO->PACKETPTR = (uint32_t)&adv_pkt;
   radio_start();
 
   xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
@@ -111,16 +111,17 @@ int ble_advertise(void *data, adv_ch_t ch) {
   return 0;
 }
 
+/* Gets called after a single packet has been transmitted and the radio has been disabled (via short) */
 void radio_disabled_callback() {
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
-  if (current_adv_ch_idx == 0) {
-    NRF_CLOCK->TASKS_HFCLKSTOP = 1;
-    xTaskNotifyIndexedFromISR(usr_task_handle, 1, USR_EVT_BLE, eSetValueWithOverwrite, &xHigherPriorityTaskWoken);
-
-  } else {
+  /* If we still have channels to advertise on */
+  if (current_adv_ch_idx > 0) {
     ble_set_channel(--current_adv_ch_idx);
     NRF_RADIO->TASKS_TXEN = 1;
+  } else {
+    NRF_CLOCK->TASKS_HFCLKSTOP = 1;
+    xTaskNotifyIndexedFromISR(usr_task_handle, 1, USR_EVT_BLE, eSetValueWithOverwrite, &xHigherPriorityTaskWoken);
   }
   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
@@ -163,9 +164,14 @@ int ble_init() {
   /* Set default shorts */
   NRF_RADIO->SHORTS = NRF_RADIO_SHORT_READY_START_MASK | NRF_RADIO_SHORT_END_DISABLE_MASK;
 
+  /* Always transmit packet from the same memory address, just replace the payload there */
+  NRF_RADIO->PACKETPTR = (uint32_t)&adv_pkt;
+
   radio_cb_register(RADIO_EVT_DISABLED, radio_disabled_callback);
 
   radio_init();
+
+  /* This channel starts radio transmissions as soon as HFCLK is running*/
   NRF_PPI->CHENSET = PPI_CHEN_CH18_Msk;
 
   return 0;

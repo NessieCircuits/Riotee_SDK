@@ -4,8 +4,6 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#define RADIO_NO_GPIO 32
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -41,7 +39,10 @@ typedef struct {
   uint8_t payload[31];
 } __attribute__((__packed__)) adv_pck_t;
 
+/* Setup the internal packet buffer for advertisting with given name, address and payload size */
 int ble_prepare_adv(ble_ll_addr_t *adv_addr, const char adv_name[], size_t name_len, size_t data_len);
+
+/* Advertise the given payload on the selected channel(s) */
 int ble_advertise(void *data, adv_ch_t ch);
 
 int ble_init();

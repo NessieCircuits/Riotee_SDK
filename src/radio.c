@@ -4,23 +4,25 @@
 #include "radio.h"
 
 RADIO_CALLBACK cb_disabled = NULL;
-RADIO_CALLBACK cb_ready = NULL;
+RADIO_CALLBACK cb_txready = NULL;
+RADIO_CALLBACK cb_rxready = NULL;
 RADIO_CALLBACK cb_crcok = NULL;
 
 int radio_init() {
   NRF_PPI->CH[18].EEP = (uint32_t)&NRF_CLOCK->EVENTS_HFCLKSTARTED;
   NRF_PPI->CH[18].TEP = (uint32_t)&NRF_RADIO->TASKS_TXEN;
 
-  NRF_PPI->CH[19].EEP = (uint32_t)&NRF_RADIO->EVENTS_DISABLED;
-  NRF_PPI->CH[19].TEP = (uint32_t)&NRF_CLOCK->TASKS_HFCLKSTOP;
-
   NVIC_EnableIRQ(RADIO_IRQn);
   return 0;
 }
 
-int radio_start() {
+void radio_start() {
   NRF_CLOCK->TASKS_HFCLKSTART = 1;
-  return 0;
+}
+
+void radio_stop() {
+  NRF_RADIO->TASKS_DISABLE = 1;
+  NRF_CLOCK->TASKS_HFCLKSTOP = 1;
 }
 
 int radio_cb_register(radio_evt_t evt, RADIO_CALLBACK cb) {
@@ -29,10 +31,13 @@ int radio_cb_register(radio_evt_t evt, RADIO_CALLBACK cb) {
       cb_disabled = cb;
       NRF_RADIO->INTENSET = RADIO_INTENSET_DISABLED_Msk;
       break;
-    case RADIO_EVT_READY:
-      cb_ready = cb;
-      NRF_RADIO->INTENSET = RADIO_INTENSET_READY_Msk;
+    case RADIO_EVT_RXREADY:
+      cb_rxready = cb;
+      NRF_RADIO->INTENSET = RADIO_INTENSET_RXREADY_Msk;
       break;
+    case RADIO_EVT_TXREADY:
+      cb_txready = cb;
+      NRF_RADIO->INTENSET = RADIO_INTENSET_TXREADY_Msk;
       break;
     case RADIO_EVT_CRCOK:
       cb_crcok = cb;
@@ -50,10 +55,13 @@ int radio_cb_unregister(radio_evt_t evt) {
       cb_disabled = NULL;
       NRF_RADIO->INTENCLR = RADIO_INTENCLR_DISABLED_Msk;
       break;
-    case RADIO_EVT_READY:
-      cb_ready = NULL;
-      NRF_RADIO->INTENCLR = RADIO_INTENCLR_READY_Msk;
+    case RADIO_EVT_RXREADY:
+      cb_rxready = NULL;
+      NRF_RADIO->INTENCLR = RADIO_INTENCLR_RXREADY_Msk;
       break;
+    case RADIO_EVT_TXREADY:
+      cb_txready = NULL;
+      NRF_RADIO->INTENCLR = RADIO_INTENCLR_TXREADY_Msk;
       break;
     case RADIO_EVT_CRCOK:
       cb_crcok = NULL;
@@ -71,10 +79,15 @@ void RADIO_IRQHandler(void) {
     if (cb_disabled != NULL)
       cb_disabled();
   }
-  if (NRF_RADIO->EVENTS_READY == 1) {
-    NRF_RADIO->EVENTS_READY = 0;
-    if (cb_ready != NULL)
-      cb_ready();
+  if (NRF_RADIO->EVENTS_RXREADY == 1) {
+    NRF_RADIO->EVENTS_RXREADY = 0;
+    if (cb_rxready != NULL)
+      cb_rxready();
+  }
+  if (NRF_RADIO->EVENTS_TXREADY == 1) {
+    NRF_RADIO->EVENTS_TXREADY = 0;
+    if (cb_txready != NULL)
+      cb_txready();
   }
   if (NRF_RADIO->EVENTS_CRCOK == 1) {
     NRF_RADIO->EVENTS_CRCOK = 0;
