@@ -24,6 +24,7 @@ LIB_SRC_FILES += \
   $(SRC_DIR)/runtime.c \
 	$(SRC_DIR)/nvm.c \
 	$(SRC_DIR)/adc.c \
+	$(SRC_DIR)/stella.c \
   $(RTOS_DIR)/queue.c \
   $(RTOS_DIR)/list.c \
   $(RTOS_DIR)/tasks.c \
