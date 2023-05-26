@@ -89,6 +89,8 @@ static inline int ble_set_channel(unsigned int adv_ch_idx) {
 
 int ble_advertise(void *data, adv_ch_t ch) {
   unsigned long notification_value;
+
+  taskENTER_CRITICAL();
   if (ch == ADV_CH_ALL) {
     adv_chs[0] = 39;
     adv_chs[1] = 38;
@@ -103,7 +105,8 @@ int ble_advertise(void *data, adv_ch_t ch) {
 
   memcpy(adv_data_address, data, adv_data_len);
   radio_start();
-
+  xTaskNotifyStateClear(usr_task_handle);
+  taskEXIT_CRITICAL();
   xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
   if (notification_value != USR_EVT_BLE)
     return -1;
