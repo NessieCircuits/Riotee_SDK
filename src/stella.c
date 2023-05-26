@@ -84,7 +84,8 @@ int stella_init() {
   /* And send on uplink logical address */
   NRF_RADIO->TXADDRESS = LA_UPLINK_IDX;
   /* No S0, LEN and S1 fields */
-  NRF_RADIO->PCNF0 = (0 << RADIO_PCNF0_S1LEN_Pos) | (0 << RADIO_PCNF0_S0LEN_Pos) | (8 << RADIO_PCNF0_LFLEN_Pos);
+  NRF_RADIO->PCNF0 = (0 << RADIO_PCNF0_S1LEN_Pos) | (0 << RADIO_PCNF0_S0LEN_Pos) | (8 << RADIO_PCNF0_LFLEN_Pos) |
+                     (RADIO_PCNF0_PLEN_8bit << RADIO_PCNF0_PLEN_Pos);
 
   /* No whitening, little endian, 2B base address, 4B payload */
   NRF_RADIO->PCNF1 = (RADIO_PCNF1_WHITEEN_Disabled << RADIO_PCNF1_WHITEEN_Pos) |
@@ -92,7 +93,7 @@ int stella_init() {
                      (0 << RADIO_PCNF1_STATLEN_Pos) | (255 << RADIO_PCNF1_MAXLEN_Pos);
 
   /* One byte CRC */
-  NRF_RADIO->CRCCNF = (RADIO_CRCCNF_LEN_One << RADIO_CRCCNF_LEN_Pos);
+  NRF_RADIO->CRCCNF = (RADIO_CRCCNF_LEN_Three << RADIO_CRCCNF_LEN_Pos);
   NRF_RADIO->CRCINIT = 0xABUL;
   NRF_RADIO->CRCPOLY = 0x108UL;
 
