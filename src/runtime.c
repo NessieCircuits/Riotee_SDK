@@ -203,7 +203,8 @@ static void sys_task(void *pvParameter) {
   /* Make sure that the user task does not yet start */
   vTaskSuspend(usr_task_handle);
 
-  wait_until_charged();
+  gpint_register(PIN_PWRGD_H, GPINT_LEVEL_HIGH, GPIO_PIN_CNF_PULL_Disabled, threshold_callback);
+  xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
 
   if (check_fresh_start()) {
     initialize_retained();
@@ -224,7 +225,10 @@ static void sys_task(void *pvParameter) {
   for (;;) {
     vTaskResume(usr_task_handle);
     /* Wait until capacitor voltage falls below the 'low' threshold */
-    gpint_wait(PIN_PWRGD_L, GPINT_LEVEL_LOW, GPIO_PIN_CNF_PULL_Disabled);
+
+    gpint_register(PIN_PWRGD_L, GPINT_LEVEL_LOW, GPIO_PIN_CNF_PULL_Disabled, threshold_callback);
+    xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
+
     /* Give the application an opportunity to switch off power-hungry devices */
     turnoff_callback();
     vTaskSuspend(usr_task_handle);

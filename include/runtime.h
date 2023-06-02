@@ -50,6 +50,9 @@ void user_task(void *pvParameter);
 /* Waits until capacitor is fully charged as indicated by PWRGD_H pin */
 int wait_until_charged(void);
 
+#define __VOLATILE_INITIALIZED __attribute__((section(".volatile.data")))
+#define __VOLATILE_UNINITIALIZED __attribute__((section(".volatile.bss")))
+
 #if defined __cplusplus
 }
 #endif

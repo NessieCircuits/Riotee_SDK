@@ -7,8 +7,6 @@
 #include "gpint.h"
 
 static GPINT_CALLBACK registry[32] = {0};
-/* This points to the task currently blocking on GPINT event */
-static TaskHandle_t waiting_task;
 
 void GPIOTE_IRQHandler(void) {
   if (NRF_GPIOTE->EVENTS_PORT == 1) {
@@ -73,15 +71,14 @@ int gpint_unregister(uint32_t pin) {
 
 static void wait_callback(unsigned int pin_no) {
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-  xTaskNotifyIndexedFromISR(waiting_task, 1, USR_EVT_GPINT, eSetValueWithOverwrite, &xHigherPriorityTaskWoken);
+  xTaskNotifyIndexedFromISR(usr_task_handle, 1, USR_EVT_GPINT, eSetValueWithOverwrite, &xHigherPriorityTaskWoken);
   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
 int gpint_wait(uint32_t pin, gpint_level_t level, gpint_pin_pull_t pull) {
   unsigned long notification_value;
   taskENTER_CRITICAL();
-  waiting_task = xTaskGetCurrentTaskHandle();
-  xTaskNotifyStateClear(waiting_task);
+  xTaskNotifyStateClear(usr_task_handle);
   gpint_register(pin, level, pull, wait_callback);
   taskEXIT_CRITICAL();
   xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
