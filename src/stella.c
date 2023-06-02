@@ -8,10 +8,10 @@
 #include "runtime.h"
 #include "printf.h"
 
-static pkt_t rx_buf;
-static pkt_t tx_buf;
+static stella_pkt_t rx_buf;
+static stella_pkt_t tx_buf;
 
-static pkt_t *rx_buf_ptr;
+static stella_pkt_t *rx_buf_ptr;
 
 /* Counts number of transmitted packets */
 static uint16_t pkt_counter = 0;
@@ -108,8 +108,6 @@ int stella_init() {
   radio_cb_register(RADIO_EVT_TXREADY, radio_txready);
   NRF_PPI->CHENSET = PPI_CHENSET_CH18_Msk;
 
-  tx_buf.dev_id = NRF_FICR->DEVICEADDR[0];
-
   return 0;
 }
 
@@ -125,12 +123,15 @@ void TIMER2_IRQHandler(void) {
   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
-int stella_transceive(pkt_t *rx_pkt, pkt_t *tx_pkt) {
+int stella_transceive(stella_pkt_t *rx_pkt, stella_pkt_t *tx_pkt) {
   unsigned long notification_value;
 
   taskENTER_CRITICAL();
   /* Packet transmission will start automatically when HFXO is running */
   NRF_CLOCK->TASKS_HFCLKSTART = 1;
+
+  /* Set correct device ID */
+  tx_pkt->hdr.dev_id = NRF_FICR->DEVICEADDR[0];
 
   rx_buf_ptr = rx_pkt;
   NRF_RADIO->SHORTS |= RADIO_SHORTS_DISABLED_RXEN_Msk;
@@ -147,7 +148,7 @@ int stella_transceive(pkt_t *rx_pkt, pkt_t *tx_pkt) {
   if (notification_value == USR_EVT_STELLA_TIMEOUT)
     return STELLA_ERR_NOACK;
 
-  if (rx_pkt->acknowledgement_id != tx_pkt->pkt_id)
+  if (rx_pkt->hdr.ack_id != tx_pkt->hdr.pkt_id)
     return STELLA_ERR_GENERIC;
 
   return STELLA_ERR_OK;
@@ -155,8 +156,8 @@ int stella_transceive(pkt_t *rx_pkt, pkt_t *tx_pkt) {
 
 int stella_send(uint8_t *data, size_t n) {
   memcpy(tx_buf.data, data, n);
-  /* Packet length is payload length plus eight byte header */
-  tx_buf.len = n + 8;
-  tx_buf.pkt_id = pkt_counter++;
+
+  tx_buf.len = sizeof(stella_pkt_header_t) + n;
+  tx_buf.hdr.pkt_id = pkt_counter++;
   return stella_transceive(&rx_buf, &tx_buf);
 }
