@@ -84,9 +84,6 @@ typedef struct {
 enum { NVM_SIG_VALID = 0x0D15EA5E, NVM_SIG_INVALID = 0x8BADF00D };
 
 static int taskstore_write(task_store_t *task_str) {
-  /* Why is this here? */
-  NRF_NVMC->CONFIG |= NVMC_CONFIG_WEN_Msk;
-
   snapshot_header_t hdr;
 
   hdr.top_of_stack = *(uint32_t *)&task_str->tcb;
