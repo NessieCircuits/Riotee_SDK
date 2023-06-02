@@ -59,6 +59,7 @@ SECTIONS {
                 /* Exclude all system variables from retained data */
                 . = ALIGN(4);
                 __data_start__ = .;
+                *(.volatile.data)
                 *runtime.c.o(.data .data.*)
                 *tasks.c.o(.data .data.*)
                 *port.c.o(.data .data.*)
@@ -107,10 +108,11 @@ SECTIONS {
                 __data_retained_end__ = .;
         } >RAM
 
-        .bss : {
+        .bss (NOLOAD) : {
                 /* Exclude all system variables from retained data */
                 . = ALIGN(4);
                 __bss_start__ = .;
+                *(.volatile_bss)
                 *runtime.c.o(.bss .bss.*)
                 *tasks.c.o(.bss .bss.*)
                 *port.c.o(.bss .bss.*)
