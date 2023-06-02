@@ -44,9 +44,9 @@ void reset_callback(void) {
 void user_task(void *pvParameter) {
   UNUSED_PARAMETER(pvParameter);
   for (;;) {
-    delay(500);
+    sleep_ms(500);
     led_blink(250);
-    delay(500);
+    sleep_ms(500);
     ble_advertise(&ble_data, ADV_CH_ALL);
     ble_data.counter++;
   }
