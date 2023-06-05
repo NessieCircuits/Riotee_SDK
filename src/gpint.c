@@ -78,7 +78,7 @@ static void wait_callback(unsigned int pin_no) {
 int gpint_wait(uint32_t pin, gpint_level_t level, gpint_pin_pull_t pull) {
   unsigned long notification_value;
   taskENTER_CRITICAL();
-  xTaskNotifyStateClear(usr_task_handle);
+  xTaskNotifyStateClearIndexed(usr_task_handle, 1);
   gpint_register(pin, level, pull, wait_callback);
   taskEXIT_CRITICAL();
   xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);

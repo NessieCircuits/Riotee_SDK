@@ -105,7 +105,7 @@ int ble_advertise(void *data, adv_ch_t ch) {
 
   memcpy(adv_data_address, data, adv_data_len);
   radio_start();
-  xTaskNotifyStateClear(usr_task_handle);
+  xTaskNotifyStateClearIndexed(usr_task_handle, 1);
   taskEXIT_CRITICAL();
   xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
   if (notification_value != USR_EVT_BLE)

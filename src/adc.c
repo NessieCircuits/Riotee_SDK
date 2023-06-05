@@ -61,7 +61,7 @@ int adc_read(int16_t *dst, unsigned int analog_input) {
   NRF_SAADC->CH[0].PSELP = analog_input + 1;
   NRF_SAADC->RESULT.MAXCNT = 1;
   NRF_SAADC->RESULT.PTR = (uint32_t)dst;
-  xTaskNotifyStateClear(waiting_task);
+  xTaskNotifyStateClearIndexed(waiting_task, 1);
   NRF_SAADC->TASKS_START = 1;
   taskEXIT_CRITICAL();
 

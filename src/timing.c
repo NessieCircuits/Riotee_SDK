@@ -12,11 +12,13 @@ void RTC0_IRQHandler(void) {
 
   if (NRF_RTC0->EVENTS_COMPARE[0] == 1) {
     NRF_RTC0->EVENTS_COMPARE[0] = 0;
+    NRF_RTC0->EVTENCLR = RTC_EVTENCLR_COMPARE0_Msk;
 
     xTaskNotifyIndexedFromISR(waiting_task, 1, USR_EVT_RTC, eSetValueWithOverwrite, &xHigherPriorityTaskWoken);
   }
   if (NRF_RTC0->EVENTS_COMPARE[1] == 1) {
     NRF_RTC0->EVENTS_COMPARE[1] = 0;
+    NRF_RTC0->EVTENCLR = RTC_EVTENCLR_COMPARE1_Msk;
 
     xTaskNotifyIndexedFromISR(sys_task_handle, 1, SYS_EVT_RTC, eSetValueWithOverwrite, &xHigherPriorityTaskWoken);
   }
@@ -28,9 +30,11 @@ void sleep_ticks(unsigned int ticks) {
   unsigned long notification_value;
   taskENTER_CRITICAL();
   waiting_task = xTaskGetCurrentTaskHandle();
+  xTaskNotifyStateClearIndexed(waiting_task, 1);
   NRF_RTC0->CC[0] = (NRF_RTC0->COUNTER + ticks) % (1 << 24);
+
+  NRF_RTC0->EVENTS_COMPARE[0] = 0;
   NRF_RTC0->EVTENSET = RTC_EVTENSET_COMPARE0_Msk;
-  xTaskNotifyStateClear(waiting_task);
   taskEXIT_CRITICAL();
   xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
 }
