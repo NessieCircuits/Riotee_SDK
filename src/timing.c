@@ -1,24 +1,22 @@
 #include "nrf.h"
 #include "FreeRTOS.h"
 #include "task.h"
-
 #include "runtime.h"
-
-/* This points to the task currently blocking on GPINT event */
-static TaskHandle_t waiting_task;
 
 void RTC0_IRQHandler(void) {
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
-  if (NRF_RTC0->EVENTS_COMPARE[0] == 1) {
+  if ((NRF_RTC0->INTENSET & RTC_INTENSET_COMPARE0_Msk) && (NRF_RTC0->EVENTS_COMPARE[0] == 1)) {
     NRF_RTC0->EVENTS_COMPARE[0] = 0;
     NRF_RTC0->EVTENCLR = RTC_EVTENCLR_COMPARE0_Msk;
+    NRF_RTC0->INTENCLR = RTC_INTENCLR_COMPARE0_Msk;
 
-    xTaskNotifyIndexedFromISR(waiting_task, 1, USR_EVT_RTC, eSetValueWithOverwrite, &xHigherPriorityTaskWoken);
+    xTaskNotifyIndexedFromISR(usr_task_handle, 1, USR_EVT_RTC, eSetValueWithOverwrite, &xHigherPriorityTaskWoken);
   }
-  if (NRF_RTC0->EVENTS_COMPARE[1] == 1) {
+  if ((NRF_RTC0->INTENSET & RTC_INTENSET_COMPARE1_Msk) && (NRF_RTC0->EVENTS_COMPARE[1] == 1)) {
     NRF_RTC0->EVENTS_COMPARE[1] = 0;
     NRF_RTC0->EVTENCLR = RTC_EVTENCLR_COMPARE1_Msk;
+    NRF_RTC0->INTENCLR = RTC_INTENCLR_COMPARE1_Msk;
 
     xTaskNotifyIndexedFromISR(sys_task_handle, 1, SYS_EVT_RTC, eSetValueWithOverwrite, &xHigherPriorityTaskWoken);
   }
@@ -29,12 +27,13 @@ void RTC0_IRQHandler(void) {
 void sleep_ticks(unsigned int ticks) {
   unsigned long notification_value;
   taskENTER_CRITICAL();
-  waiting_task = xTaskGetCurrentTaskHandle();
-  xTaskNotifyStateClearIndexed(waiting_task, 1);
+  xTaskNotifyStateClearIndexed(usr_task_handle, 1);
   NRF_RTC0->CC[0] = (NRF_RTC0->COUNTER + ticks) % (1 << 24);
 
   NRF_RTC0->EVENTS_COMPARE[0] = 0;
   NRF_RTC0->EVTENSET = RTC_EVTENSET_COMPARE0_Msk;
+  NRF_RTC0->INTENSET = RTC_INTENSET_COMPARE0_Msk;
+
   taskEXIT_CRITICAL();
   xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
 }
@@ -46,11 +45,16 @@ void sleep_ms(unsigned int ms) {
 
 void sys_setup_timer(unsigned int ticks) {
   NRF_RTC0->CC[1] = (NRF_RTC0->COUNTER + ticks) % (1 << 24);
+  NRF_RTC0->EVENTS_COMPARE[1] = 0;
   NRF_RTC0->EVTENSET = RTC_EVTENSET_COMPARE1_Msk;
+  NRF_RTC0->INTENSET = RTC_INTENSET_COMPARE1_Msk;
 }
 
 void sys_cancel_timer(void) {
   NRF_RTC0->EVTENCLR = RTC_EVTENSET_COMPARE1_Msk;
+  NRF_RTC0->INTENCLR = RTC_INTENCLR_COMPARE1_Msk;
+
+  NRF_RTC0->EVENTS_COMPARE[1] = 0;
 }
 
 int timing_init(void) {
@@ -58,7 +62,6 @@ int timing_init(void) {
 
   NRF_CLOCK->TASKS_LFCLKSTART = 1;
 
-  NRF_RTC0->INTENSET = RTC_INTENSET_COMPARE0_Msk | RTC_INTENSET_COMPARE1_Msk;
   NVIC_EnableIRQ(RTC0_IRQn);
 
   NRF_RTC0->PRESCALER = 0;
