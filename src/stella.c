@@ -30,24 +30,44 @@ enum {
   LA_DOWNLINK = 0xF7,
 };
 
+/* Valid acknowledgement received */
 static void radio_crc_ok(void) {
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
   radio_stop();
-  /* Stop the timeout timer */
-  NRF_TIMER2->TASKS_STOP = 1;
   xTaskNotifyIndexedFromISR(usr_task_handle, 1, USR_EVT_STELLA_RCVD, eSetValueWithOverwrite, &xHigherPriorityTaskWoken);
 
   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
+/* Invalid acknowledgement received */
+static void radio_crc_err(void) {
+  BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+
+  radio_stop();
+  xTaskNotifyIndexedFromISR(usr_task_handle, 1, USR_EVT_STELLA_CRCERR, eSetValueWithOverwrite,
+                            &xHigherPriorityTaskWoken);
+
+  portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+}
+/* Address received */
+static void radio_address(void) {
+  /* Stop the timeout timer */
+  NRF_TIMER2->TASKS_STOP = 1;
+  radio_cb_unregister(RADIO_EVT_ADDRESS);
+}
+
 static void radio_txready(void) {
   /* Now that radio is transmitting, point the double-buffered packet pointer to the rx buffer*/
   NRF_RADIO->PACKETPTR = (uint32_t)rx_buf_ptr;
 }
 
+/* Radio has ramped up for reception of an acknowledgement */
 static void radio_rxready(void) {
   NRF_RADIO->SHORTS &= ~(RADIO_SHORTS_DISABLED_RXEN_Msk);
 
+  /* Notify us when an address is received */
+  radio_cb_register(RADIO_EVT_ADDRESS, radio_address);
+  /* Set a timeout for reception of an address */
   NRF_TIMER2->TASKS_CLEAR = 1;
   NRF_TIMER2->TASKS_START = 1;
 }
@@ -56,7 +76,8 @@ static void radio_rxready(void) {
 static int timer_init(void) {
   /* 1us period */
   NRF_TIMER2->PRESCALER = 4;
-  NRF_TIMER2->CC[0] = 320;
+  /* 100us timeout for receiving the address of the acknowledgement */
+  NRF_TIMER2->CC[0] = 100;
   NRF_TIMER2->INTENSET |= TIMER_INTENSET_COMPARE0_Msk;
   NRF_TIMER2->SHORTS |= TIMER_SHORTS_COMPARE0_STOP_Msk;
   NVIC_EnableIRQ(TIMER2_IRQn);
@@ -104,18 +125,22 @@ int stella_init() {
   timer_init();
 
   radio_cb_register(RADIO_EVT_CRCOK, radio_crc_ok);
+  radio_cb_register(RADIO_EVT_CRCERR, radio_crc_err);
   radio_cb_register(RADIO_EVT_RXREADY, radio_rxready);
   radio_cb_register(RADIO_EVT_TXREADY, radio_txready);
+
   NRF_PPI->CHENSET = PPI_CHENSET_CH18_Msk;
 
   return 0;
 }
 
+/* Timeout for reception of the acknowledgement */
 void TIMER2_IRQHandler(void) {
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
   if (NRF_TIMER2->EVENTS_COMPARE[0] == 1) {
     NRF_TIMER2->EVENTS_COMPARE[0] = 0;
+    radio_cb_unregister(RADIO_EVT_ADDRESS);
     radio_stop();
     xTaskNotifyIndexedFromISR(usr_task_handle, 1, USR_EVT_STELLA_TIMEOUT, eSetValueWithOverwrite,
                               &xHigherPriorityTaskWoken);
@@ -137,18 +162,27 @@ int stella_transceive(stella_pkt_t *rx_pkt, stella_pkt_t *tx_pkt) {
   NRF_RADIO->SHORTS |= RADIO_SHORTS_DISABLED_RXEN_Msk;
   NRF_RADIO->PACKETPTR = (uint32_t)tx_pkt;
 
-  xTaskNotifyStateClear(usr_task_handle);
+  xTaskNotifyStateClearIndexed(usr_task_handle, 1);
   taskEXIT_CRITICAL();
 
+  /* Wait until acknowledgement is received/expired */
   xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
 
   if (notification_value == USR_EVT_RESET)
     return STELLA_ERR_RESET;
 
+  if (notification_value == USR_EVT_STELLA_CRCERR)
+    return STELLA_ERR_NOACK;
+
   if (notification_value == USR_EVT_STELLA_TIMEOUT)
     return STELLA_ERR_NOACK;
 
+  /* Acknowledgement ID must match packet ID */
   if (rx_pkt->hdr.ack_id != tx_pkt->hdr.pkt_id)
+    return STELLA_ERR_GENERIC;
+
+  /* Acknowledgement always contains device's ID */
+  if (rx_pkt->hdr.dev_id != tx_pkt->hdr.dev_id)
     return STELLA_ERR_GENERIC;
 
   return STELLA_ERR_OK;

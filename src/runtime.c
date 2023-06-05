@@ -243,7 +243,7 @@ static void sys_task(void *pvParameter) {
     /* Recharged? */
     if (notification_value == SYS_EVT_PWRGD_H) {
       sys_cancel_timer();
-      xTaskNotifyStateClear(xTaskGetCurrentTaskHandle());
+      xTaskNotifyStateClearIndexed(xTaskGetCurrentTaskHandle(), 1);
       continue;
     }
 
