@@ -7,7 +7,7 @@ EXTERN(vectors)
 
 MEMORY {
   FLASH (rx) : ORIGIN = 0x0, LENGTH = 512k
-  RAM (rwx) :  ORIGIN = 0x20000000, LENGTH = 256k
+  RAM (rwx) :  ORIGIN = 0x20000000, LENGTH = 128k
 }
 
 
