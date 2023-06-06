@@ -204,7 +204,6 @@ void c_startup(void) {
   NRF_NVMC->CONFIG = NVMC_CONFIG_WEN_Ren << NVMC_CONFIG_WEN_Pos;
 
   /* Set shared pins to a defined level to avoid leakage in MSP430 */
-  nrf_gpio_cfg_input(PIN_C2C_GPIO, NRF_GPIO_PIN_PULLDOWN);
   nrf_gpio_cfg_input(PIN_C2C_MOSI, NRF_GPIO_PIN_PULLDOWN);
   nrf_gpio_cfg_input(PIN_C2C_CLK, NRF_GPIO_PIN_PULLDOWN);
   nrf_gpio_cfg_input(PIN_C2C_CS, NRF_GPIO_PIN_PULLDOWN);
