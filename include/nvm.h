@@ -6,9 +6,6 @@
 
 #include "nrf.h"
 
-#include "FreeRTOS.h"
-#include "semphr.h"
-
 enum { NVM_WRITE = 0x800000, NVM_READ = 0x0 };
 typedef uint32_t nvm_transfer_type_t;
 

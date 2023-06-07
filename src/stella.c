@@ -2,7 +2,7 @@
 #include "nrfx.h"
 #include "FreeRTOS.h"
 
-#include "riotee_module_pins.h"
+#include "riotee.h"
 #include "stella.h"
 #include "radio.h"
 #include "runtime.h"

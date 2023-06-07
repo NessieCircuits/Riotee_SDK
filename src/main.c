@@ -7,7 +7,7 @@
 #include "timing.h"
 #include "gpint.h"
 #include "printf.h"
-#include "riotee_module_pins.h"
+#include "riotee.h"
 #include "runtime.h"
 #include "thresholds.h"
 #include "uart.h"

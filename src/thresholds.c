@@ -1,7 +1,7 @@
 #include "nrf.h"
 #include "nrf_gpio.h"
 
-#include "riotee_module_pins.h"
+#include "riotee.h"
 #include "thresholds.h"
 
 /* Having NFC pins in different state may increase leakage (see PS v1.5 6.13.3). PIN_THRCTL_H0 is NFC1, so we need to

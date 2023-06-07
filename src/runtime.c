@@ -8,7 +8,7 @@
 #include "timing.h"
 #include "gpint.h"
 #include "printf.h"
-#include "riotee_module_pins.h"
+#include "riotee.h"
 #include "uart.h"
 #include "nvm.h"
 #include "runtime.h"

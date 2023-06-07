@@ -44,4 +44,29 @@
 #define PIN_C2C_CS 22
 #define PIN_C2C_GPIO 15
 
+#if defined __cplusplus
+extern "C" {
+#endif
+
+/* This gets called right after startup */
+void startup_callback(void);
+/* This gets called one time after flashing new firmware */
+void bootstrap_callback(void);
+/* This gets called after every reset */
+void reset_callback(void);
+/* This gets called right before user code is suspended */
+void turnoff_callback(void);
+/* This is the FreeRTOS task running user code*/
+void user_task(void *pvParameter);
+
+/* Waits until capacitor is fully charged as indicated by PWRGD_H pin */
+int wait_until_charged(void);
+
+#define __VOLATILE_INITIALIZED __attribute__((section(".volatile.data")))
+#define __VOLATILE_UNINITIALIZED __attribute__((section(".volatile.bss")))
+
+#if defined __cplusplus
+}
+#endif
+
 #endif /* __BOARD_H_ */

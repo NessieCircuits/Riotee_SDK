@@ -1,6 +1,6 @@
 #include "nrf.h"
 #include "nrf_saadc.h"
-#include "riotee_module_pins.h"
+#include "riotee.h"
 #include "FreeRTOS.h"
 #include "task.h"
 #include "runtime.h"

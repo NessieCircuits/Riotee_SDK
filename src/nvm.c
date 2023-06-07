@@ -4,7 +4,7 @@
 #include "printf.h"
 
 #include "nvm.h"
-#include "riotee_module_pins.h"
+#include "riotee.h"
 #include "runtime.h"
 
 static volatile bool nvm_event = false;

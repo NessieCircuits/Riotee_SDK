@@ -2,7 +2,7 @@
 #include "max20361.h"
 #include "nrf.h"
 #include "nrf_gpio.h"
-#include "riotee_module_pins.h"
+#include "riotee.h"
 #include "thresholds.h"
 #include "runtime.h"
 

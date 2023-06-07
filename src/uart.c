@@ -1,7 +1,7 @@
 #include <stdint.h>
 #include "nrf.h"
 #include "nrf_gpio.h"
-#include "nrf_uart.h"
+
 #include "FreeRTOS.h"
 #include "task.h"
 
