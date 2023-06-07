@@ -83,7 +83,8 @@ typedef struct {
 
 enum { NVM_SIG_VALID = 0x0D15EA5E, NVM_SIG_INVALID = 0x8BADF00D };
 
-static int taskstore_write(task_store_t *task_str) {
+/* Stores task stack and static/global variables in non-volatile memory. */
+static int checkpoint_store(task_store_t *task_str) {
   snapshot_header_t hdr;
 
   hdr.top_of_stack = *(uint32_t *)&task_str->tcb;
@@ -94,7 +95,8 @@ static int taskstore_write(task_store_t *task_str) {
 
   hdr.bss_size = (unsigned int)&__bss_retained_end__ - (unsigned int)&__bss_retained_start__;
 
-  /* We will write the snapshot with an invalid signature first*/
+  /* We will write the snapshot with an invalid signature as the first value. This makes sure that no faulty snapshot is
+   * loaded. */
   hdr.signature = NVM_SIG_INVALID;
 
   nvm_start(NVM_WRITE, 0x0);
@@ -104,9 +106,8 @@ static int taskstore_write(task_store_t *task_str) {
   nvm_write((uint8_t *)&__bss_retained_start__, hdr.bss_size);
 
   nvm_stop();
-  nrf_delay_us(25);
 
-  /* Now that the snapshot was written, we can update the signature*/
+  /* Now that the snapshot was written successfully, we can update the signature */
   nvm_start(NVM_WRITE, 0x0);
   uint32_t signature = NVM_SIG_VALID;
   nvm_write((uint8_t *)&signature, sizeof(signature));
@@ -120,7 +121,8 @@ static int taskstore_write(task_store_t *task_str) {
   return 0;
 }
 
-static int taskstore_get(task_store_t *task_str) {
+/* Loads a snapshot from NVM into task stack and static/global variables. */
+static int checkpoint_load(task_store_t *task_str) {
   snapshot_header_t hdr;
 
   nvm_start(NVM_READ, 0x0);
@@ -175,7 +177,7 @@ static void threshold_callback(unsigned int pin_no) {
   return;
 }
 
-/* Initializes 'retained' section */
+/* Initializes 'retained' section when no checkpoint exists. */
 static void initialize_retained(void) {
   volatile unsigned long *src, *dst;
   src = &__etext + (&__data_retained_start__ - &__data_start__);
@@ -207,7 +209,7 @@ static void sys_task(void *pvParameter) {
     initialize_retained();
     bootstrap_callback();
   } else {
-    if (taskstore_get(&usr_task_store) == 0)
+    if (checkpoint_load(&usr_task_store) == 0)
       /* Unblock the user task */
       xTaskNotifyIndexed(usr_task_handle, 1, USR_EVT_RESET, eSetValueWithOverwrite);
     else {
@@ -221,8 +223,8 @@ static void sys_task(void *pvParameter) {
 
   for (;;) {
     vTaskResume(usr_task_handle);
-    /* Wait until capacitor voltage falls below the 'low' threshold */
 
+    /* Wait until capacitor voltage falls below the 'low' threshold */
     gpint_register(PIN_PWRGD_L, GPINT_LEVEL_LOW, GPIO_PIN_CNF_PULL_Disabled, threshold_callback);
     xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
 
@@ -250,7 +252,7 @@ static void sys_task(void *pvParameter) {
     /* Timer has expired. Is capacitor voltage still below threshold? */
     if ((NRF_P0->IN & (1 << PIN_PWRGD_L)) == 0) {
       /* Take the snapshot */
-      taskstore_write(&usr_task_store);
+      checkpoint_store(&usr_task_store);
     } else {
       /* Monitor for capacitor voltage to drop below threshold again */
       gpint_register(PIN_PWRGD_L, GPINT_LEVEL_LOW, GPIO_PIN_CNF_PULL_Disabled, threshold_callback);
@@ -264,7 +266,7 @@ static void sys_task(void *pvParameter) {
       continue;
     }
     /* Dropped below the threshold again -> take a snapshot */
-    taskstore_write(&usr_task_store);
+    checkpoint_store(&usr_task_store);
     /* Wait until capacitor is recharged */
     xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
   }
