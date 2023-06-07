@@ -1,7 +1,23 @@
-#include "nrf.h"
+#include "nrfx.h"
 #include "FreeRTOS.h"
 #include "task.h"
 #include "runtime.h"
+
+#include <soc/nrfx_coredep.h>
+
+void delay_us(unsigned int us) {
+  nrfx_coredep_delay_us(us);
+}
+
+void delay_ms(unsigned int ms) {
+  if (ms == 0) {
+    return;
+  }
+
+  do {
+    nrfx_coredep_delay_us(1000);
+  } while (--ms);
+}
 
 void RTC0_IRQHandler(void) {
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
