@@ -28,6 +28,9 @@ int stella_transceive(stella_pkt_t *rx_pkt, stella_pkt_t *tx_pkt);
 /* Wrapper function for simple uplink data. Returns STELLA_ERR_OK if acknowledgement is received. */
 int stella_send(uint8_t *data, size_t n);
 
+/* Set the ID that our device uses to identify to the nework */
+void stella_set_id(uint32_t dev_id);
+
 enum { STELLA_ERR_OK = 0, STELLA_ERR_GENERIC = -1, STELLA_ERR_RESET = -2, STELLA_ERR_NOACK = 1 };
 
 #endif /* __STELLA_H_ */

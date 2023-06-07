@@ -30,6 +30,8 @@ enum {
   LA_DOWNLINK = 0xF7,
 };
 
+static uint32_t _dev_id;
+
 /* Valid acknowledgement received */
 static void radio_crc_ok(void) {
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
@@ -121,6 +123,9 @@ int stella_init() {
   /* Set default shorts */
   NRF_RADIO->SHORTS = RADIO_SHORTS_READY_START_Msk | RADIO_SHORTS_END_DISABLE_Msk;
 
+  /* Set the default device ID */
+  stella_set_id(NRF_FICR->DEVICEADDR[0]);
+
   radio_init();
   timer_init();
 
@@ -156,7 +161,7 @@ int stella_transceive(stella_pkt_t *rx_pkt, stella_pkt_t *tx_pkt) {
   NRF_CLOCK->TASKS_HFCLKSTART = 1;
 
   /* Set correct device ID */
-  tx_pkt->hdr.dev_id = NRF_FICR->DEVICEADDR[0];
+  tx_pkt->hdr.dev_id = _dev_id;
 
   rx_buf_ptr = rx_pkt;
   NRF_RADIO->SHORTS |= RADIO_SHORTS_DISABLED_RXEN_Msk;
@@ -194,4 +199,8 @@ int stella_send(uint8_t *data, size_t n) {
   tx_buf.len = sizeof(stella_pkt_header_t) + n;
   tx_buf.hdr.pkt_id = pkt_counter++;
   return stella_transceive(&rx_buf, &tx_buf);
+}
+
+void stella_set_id(uint32_t dev_id) {
+  _dev_id = dev_id;
 }
