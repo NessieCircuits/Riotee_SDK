@@ -1,17 +1,7 @@
 #ifndef __THRESHOLDS_H_
 #define __THRESHOLDS_H_
 
-typedef enum {
-  THR_LOW_2V5 = 0,
-  THR_LOW_2V7 = 3,
-  THR_LOW_2V9 = 1,
-  THR_LOW_3V1 = 6,
-  THR_LOW_3V3 = 4,
-  THR_LOW_3V5 = 2,
-  THR_LOW_3V7 = 7,
-  THR_LOW_3V9 = 5,
-  THR_LOW_4V1 = 8
-} thr_low_t;
+typedef enum { THR_LOW_2V5 = 0, THR_LOW_3V1 = 6, THR_LOW_3V5 = 2, THR_LOW_4V1 = 8 } thr_low_t;
 
 typedef enum {
   THR_HIGH_3V0 = 0,

@@ -38,32 +38,12 @@ int thresholds_low_set(thr_low_t thr) {
       gpio_states[0] = LOW;
       gpio_states[1] = LOW;
       break;
-    case 1:
-      gpio_states[0] = Z;
-      gpio_states[1] = LOW;
-      break;
     case 2:
       gpio_states[0] = HIGH;
       gpio_states[1] = LOW;
       break;
-    case 3:
-      gpio_states[0] = LOW;
-      gpio_states[1] = Z;
-      break;
-    case 4:
-      gpio_states[0] = Z;
-      gpio_states[1] = Z;
-      break;
-    case 5:
-      gpio_states[0] = HIGH;
-      gpio_states[1] = Z;
-      break;
     case 6:
       gpio_states[0] = LOW;
-      gpio_states[1] = HIGH;
-      break;
-    case 7:
-      gpio_states[0] = Z;
       gpio_states[1] = HIGH;
       break;
     case 8:
