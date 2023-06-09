@@ -2,7 +2,9 @@
 #include <string.h>
 
 #include "nrf.h"
+#include "nrf_gpio.h"
 
+#include "riotee.h"
 #include "i2c.h"
 #include "printf.h"
 #include "runtime.h"
@@ -23,6 +25,10 @@ void SPIM1_SPIS1_TWIM1_TWIS1_SPI1_TWI1_IRQHandler(void) {
 int i2c_init(unsigned int pinSDA, unsigned int pinSCL) {
   NRF_TWIM1->PSEL.SCL = pinSCL;
   NRF_TWIM1->PSEL.SDA = pinSDA;
+
+  /* These should stay high when I2C is disabled */
+  nrf_gpio_cfg_input(PIN_SYS_SCL, NRF_GPIO_PIN_PULLUP);
+  nrf_gpio_cfg_input(PIN_SYS_SDA, NRF_GPIO_PIN_PULLUP);
 
   NRF_TWIM1->FREQUENCY = TWIM_FREQUENCY_FREQUENCY_K250 << TWIM_FREQUENCY_FREQUENCY_Pos;
   NRF_TWIM1->SHORTS = 0;
