@@ -7,6 +7,9 @@
 #include "riotee.h"
 #include "runtime.h"
 
+/* Minimum time between operations on the NVM */
+#define NVM_TEARDOWN_US 10
+
 static volatile bool nvm_event = false;
 static unsigned int _pin_cs;
 
@@ -45,7 +48,7 @@ int nvm_init(void) {
   NRF_TIMER4->CC[1] = 45;
 
   /* Minimum between the initialization or the end of one transaction and start of the next transaction */
-  NRF_TIMER4->CC[2] = 10;
+  NRF_TIMER4->CC[2] = NVM_TEARDOWN_US;
   NRF_TIMER4->SHORTS = TIMER_SHORTS_COMPARE2_STOP_Msk;
   NRF_TIMER4->TASKS_CLEAR = 1;
   NRF_TIMER4->TASKS_START = 1;
@@ -98,7 +101,7 @@ int nvm_start(nvm_transfer_type_t transfer_type, uint32_t address) {
   do {
     /* Capture current timer value into CC[3]. */
     NRF_TIMER4->TASKS_CAPTURE[3] = 1;
-  } while (NRF_TIMER4->CC[3] < 10);
+  } while (NRF_TIMER4->CC[3] < NVM_TEARDOWN_US);
 
   if ((rc = is_ready()) != 0)
     return rc;
@@ -111,6 +114,9 @@ int nvm_start(nvm_transfer_type_t transfer_type, uint32_t address) {
   nvm_event = false;
   /* Enable automatic start of transmission on CC[0] */
   NRF_PPI->CHENSET = PPI_CHENSET_CH0_Msk;
+  NRF_TIMER4->EVENTS_COMPARE[0] = 0;
+  NRF_TIMER4->EVENTS_COMPARE[1] = 0;
+
   NRF_TIMER4->INTENSET = TIMER_INTENSET_COMPARE1_Msk;
   NRF_TIMER4->SHORTS = TIMER_SHORTS_COMPARE1_STOP_Msk;
 
