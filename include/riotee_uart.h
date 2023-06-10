@@ -7,8 +7,9 @@
 extern "C" {
 #endif
 
-int uart_init(uint32_t pseltxd);
+int uart_init(uint32_t pseltxd, uint32_t baudrate);
 void _putchar(char character);
+int uart_set_baudrate(uint32_t baudrate);
 
 #ifdef __cplusplus
 }
