@@ -4,14 +4,15 @@
 #include "task.h"
 #include "semphr.h"
 
-#include "timing.h"
-#include "gpint.h"
+#include "riotee_timing.h"
+#include "riotee_gpint.h"
 #include "printf.h"
 #include "riotee.h"
 #include "runtime.h"
-#include "thresholds.h"
-#include "uart.h"
-#include "ble.h"
+#include "riotee_thresholds.h"
+#include "riotee_uart.h"
+#include "riotee_ble.h"
+#include "riotee_adc.h"
 
 ble_ll_addr_t adv_address = {.addr_bytes = {0xBE, 0xEF, 0xDE, 0xAD, 0x00, 0x01}};
 

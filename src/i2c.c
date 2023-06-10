@@ -5,7 +5,7 @@
 #include "nrf_gpio.h"
 
 #include "riotee.h"
-#include "i2c.h"
+#include "riotee_i2c.h"
 #include "printf.h"
 #include "runtime.h"
 

@@ -1,6 +1,6 @@
-#include "am1805.h"
-#include "i2c.h"
-#include "timing.h"
+#include "riotee_am1805.h"
+#include "riotee_i2c.h"
+#include "riotee_timing.h"
 #include <string.h>
 
 #define TX_BUF_SIZE 64

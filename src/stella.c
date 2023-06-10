@@ -3,7 +3,7 @@
 #include "FreeRTOS.h"
 
 #include "riotee.h"
-#include "stella.h"
+#include "riotee_stella.h"
 #include "radio.h"
 #include "runtime.h"
 #include "printf.h"

@@ -7,7 +7,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "ble.h"
+#include "riotee_ble.h"
 #include "radio.h"
 
 #include "FreeRTOS.h"

@@ -3,7 +3,7 @@
 
 #include "printf.h"
 
-#include "nvm.h"
+#include "riotee_nvm.h"
 #include "riotee.h"
 #include "runtime.h"
 

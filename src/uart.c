@@ -5,7 +5,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
-#include "uart.h"
+#include "riotee_uart.h"
 
 int uart_init(uint32_t pseltxd) {
   NRF_UART0->PSEL.TXD = pseltxd;

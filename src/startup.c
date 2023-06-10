@@ -1,9 +1,9 @@
-#include "i2c.h"
-#include "max20361.h"
+#include "riotee_i2c.h"
+#include "riotee_max20361.h"
 #include "nrf.h"
 #include "nrf_gpio.h"
 #include "riotee.h"
-#include "thresholds.h"
+#include "riotee_thresholds.h"
 #include "runtime.h"
 
 #define STACK_TOP 0x20018000

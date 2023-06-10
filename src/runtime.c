@@ -5,14 +5,14 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
-#include "timing.h"
-#include "gpint.h"
+#include "riotee_timing.h"
+#include "riotee_gpint.h"
 #include "printf.h"
 #include "riotee.h"
-#include "uart.h"
-#include "nvm.h"
+#include "riotee_uart.h"
+#include "riotee_nvm.h"
 #include "runtime.h"
-#include "thresholds.h"
+#include "riotee_thresholds.h"
 
 #define USR_STACK_SIZE (configMINIMAL_STACK_SIZE + 2048)
 #define SYS_STACK_SIZE (configMINIMAL_STACK_SIZE + 2048)

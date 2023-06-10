@@ -3,8 +3,8 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-#include "i2c.h"
-#include "max20361.h"
+#include "riotee_i2c.h"
+#include "riotee_max20361.h"
 
 #define I2C_DEVICE_ADDRESS (0x15)
 

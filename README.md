@@ -16,6 +16,8 @@ The code in this repository allows executing user-code on the battery-free Riote
  - I2C driver
  - UART driver
  - Driver for MAX20361 boost converter
+ - ADC driver
+ - Stella wireless protocol for bidirectional communication with a basestation
 
 ## Usage
 
