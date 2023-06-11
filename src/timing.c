@@ -27,14 +27,14 @@ void RTC0_IRQHandler(void) {
     NRF_RTC0->EVTENCLR = RTC_EVTENCLR_COMPARE0_Msk;
     NRF_RTC0->INTENCLR = RTC_INTENCLR_COMPARE0_Msk;
 
-    xTaskNotifyIndexedFromISR(usr_task_handle, 1, USR_EVT_RTC, eSetValueWithOverwrite, &xHigherPriorityTaskWoken);
+    xTaskNotifyIndexedFromISR(usr_task_handle, 1, EVT_RTC, eSetValueWithOverwrite, &xHigherPriorityTaskWoken);
   }
   if ((NRF_RTC0->INTENSET & RTC_INTENSET_COMPARE1_Msk) && (NRF_RTC0->EVENTS_COMPARE[1] == 1)) {
     NRF_RTC0->EVENTS_COMPARE[1] = 0;
     NRF_RTC0->EVTENCLR = RTC_EVTENCLR_COMPARE1_Msk;
     NRF_RTC0->INTENCLR = RTC_INTENCLR_COMPARE1_Msk;
 
-    xTaskNotifyIndexedFromISR(sys_task_handle, 1, SYS_EVT_RTC, eSetValueWithOverwrite, &xHigherPriorityTaskWoken);
+    xTaskNotifyIndexedFromISR(sys_task_handle, 1, EVT_RTC, eSetValueWithOverwrite, &xHigherPriorityTaskWoken);
   }
 
   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);

@@ -17,20 +17,23 @@ __attribute__((always_inline)) static inline void enter_low_power(void) {
 }
 
 enum {
-  USR_EVT_RESET = 0xF000,
-  USR_EVT_RTC = 0xF001,
-  USR_EVT_BLE = 0xF002,
-  USR_EVT_GPINT = 0xF003,
-  USR_EVT_ADC = 0xF004,
-  USR_EVT_STELLA_TIMEOUT = 0xF005,
-  USR_EVT_STELLA_RCVD = 0xF006,
-  USR_EVT_STELLA_CRCERR = 0xF007,
-  SYS_EVT_PWRGD_L = 0xA000,
-  SYS_EVT_PWRGD_H = 0xA001,
-  SYS_EVT_RTC = 0xA002,
+  EVT_TEARDOWN = (1UL << 31),
+  EVT_RESET = (1UL << 30),
+  EVT_RTC = (1UL << 0),
+  EVT_BLE = (1UL << 1),
+  EVT_GPINT = (1UL << 2),
+  EVT_ADC = (1UL << 3),
+  EVT_SPIC = (1UL << 4),
+  EVT_STELLA_TIMEOUT = (1UL << 5),
+  EVT_STELLA_RCVD = (1UL << 6),
+  EVT_STELLA_CRCERR = (1UL << 7),
+  EVT_PWRGD_L = 0xA000,
+  EVT_PWRGD_H = 0xA001,
 };
 
 extern TaskHandle_t usr_task_handle;
 extern TaskHandle_t sys_task_handle;
+
+#define TEARDOWN_FUN(x) void (*x)() __attribute__((section(".teardown")))
 
 #endif /* __RUNTIME_H_ */

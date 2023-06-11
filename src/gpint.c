@@ -71,7 +71,7 @@ int gpint_unregister(uint32_t pin) {
 
 static void wait_callback(unsigned int pin_no) {
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-  xTaskNotifyIndexedFromISR(usr_task_handle, 1, USR_EVT_GPINT, eSetValueWithOverwrite, &xHigherPriorityTaskWoken);
+  xTaskNotifyIndexedFromISR(usr_task_handle, 1, EVT_GPINT, eSetValueWithOverwrite, &xHigherPriorityTaskWoken);
   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
@@ -82,7 +82,7 @@ int gpint_wait(uint32_t pin, gpint_level_t level, gpint_pin_pull_t pull) {
   gpint_register(pin, level, pull, wait_callback);
   taskEXIT_CRITICAL();
   xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
-  if (notification_value != USR_EVT_GPINT)
+  if (notification_value != EVT_GPINT)
     return -1;
   return 0;
 }

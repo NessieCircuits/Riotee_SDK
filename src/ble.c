@@ -29,6 +29,8 @@ static size_t adv_data_len;
 static unsigned int adv_chs[] = {37, 38, 39};
 static unsigned int current_adv_ch_idx;
 
+TEARDOWN_FUN(teardown_ptr);
+
 static __inline int8_t ch2freq(uint8_t ch) {
   switch (ch) {
     case 37:
@@ -45,6 +47,12 @@ static __inline int8_t ch2freq(uint8_t ch) {
       else
         return 6 + (2 * ch);
   }
+}
+
+void teardown(void) {
+  radio_stop();
+  teardown_ptr = NULL;
+  xTaskNotifyIndexed(usr_task_handle, 1, EVT_TEARDOWN, eSetBits);
 }
 
 int ble_prepare_adv(ble_ll_addr_t *adv_addr, const char adv_name[], size_t name_len, size_t data_len) {
@@ -106,9 +114,12 @@ int ble_advertise(void *data, adv_ch_t ch) {
   memcpy(adv_data_address, data, adv_data_len);
   radio_start();
   xTaskNotifyStateClearIndexed(usr_task_handle, 1);
+
+  /* Register the teardown function */
+  teardown_ptr = teardown;
   taskEXIT_CRITICAL();
   xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
-  if (notification_value != USR_EVT_BLE)
+  if (notification_value != EVT_BLE)
     return -1;
 
   return 0;
@@ -124,7 +135,9 @@ void radio_disabled_callback() {
     NRF_RADIO->TASKS_TXEN = 1;
   } else {
     NRF_CLOCK->TASKS_HFCLKSTOP = 1;
-    xTaskNotifyIndexedFromISR(usr_task_handle, 1, USR_EVT_BLE, eSetValueWithOverwrite, &xHigherPriorityTaskWoken);
+    /* Unregister teardown function */
+    teardown_ptr = NULL;
+    xTaskNotifyIndexedFromISR(usr_task_handle, 1, EVT_BLE, eSetBits, &xHigherPriorityTaskWoken);
   }
   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }

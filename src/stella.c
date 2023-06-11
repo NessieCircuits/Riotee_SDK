@@ -32,12 +32,15 @@ enum {
 
 static uint32_t _dev_id;
 
+TEARDOWN_FUN(teardown_ptr);
+
 /* Valid acknowledgement received */
 static void radio_crc_ok(void) {
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
   radio_stop();
-  xTaskNotifyIndexedFromISR(usr_task_handle, 1, USR_EVT_STELLA_RCVD, eSetValueWithOverwrite, &xHigherPriorityTaskWoken);
+  teardown_ptr = NULL;
+  xTaskNotifyIndexedFromISR(usr_task_handle, 1, EVT_STELLA_RCVD, eSetValueWithOverwrite, &xHigherPriorityTaskWoken);
 
   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
@@ -46,8 +49,8 @@ static void radio_crc_err(void) {
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
   radio_stop();
-  xTaskNotifyIndexedFromISR(usr_task_handle, 1, USR_EVT_STELLA_CRCERR, eSetValueWithOverwrite,
-                            &xHigherPriorityTaskWoken);
+  teardown_ptr = NULL;
+  xTaskNotifyIndexedFromISR(usr_task_handle, 1, EVT_STELLA_CRCERR, eSetValueWithOverwrite, &xHigherPriorityTaskWoken);
 
   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
@@ -147,10 +150,19 @@ void TIMER2_IRQHandler(void) {
     NRF_TIMER2->EVENTS_COMPARE[0] = 0;
     radio_cb_unregister(RADIO_EVT_ADDRESS);
     radio_stop();
-    xTaskNotifyIndexedFromISR(usr_task_handle, 1, USR_EVT_STELLA_TIMEOUT, eSetValueWithOverwrite,
-                              &xHigherPriorityTaskWoken);
+    teardown_ptr = NULL;
+
+    xTaskNotifyIndexedFromISR(usr_task_handle, 1, EVT_STELLA_TIMEOUT, eSetBits, &xHigherPriorityTaskWoken);
   }
   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+}
+
+static void teardown(void) {
+  radio_stop();
+  radio_cb_unregister(RADIO_EVT_ADDRESS);
+  NRF_TIMER2->TASKS_STOP = 1;
+  xTaskNotifyIndexed(usr_task_handle, 1, EVT_TEARDOWN, eSetValueWithOverwrite);
+  teardown_ptr = NULL;
 }
 
 int stella_transceive(stella_pkt_t *rx_pkt, stella_pkt_t *tx_pkt) {
@@ -168,18 +180,19 @@ int stella_transceive(stella_pkt_t *rx_pkt, stella_pkt_t *tx_pkt) {
   NRF_RADIO->PACKETPTR = (uint32_t)tx_pkt;
 
   xTaskNotifyStateClearIndexed(usr_task_handle, 1);
+  teardown_ptr = teardown;
   taskEXIT_CRITICAL();
 
   /* Wait until acknowledgement is received/expired */
   xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
 
-  if (notification_value == USR_EVT_RESET)
+  if (notification_value == EVT_RESET)
     return STELLA_ERR_RESET;
 
-  if (notification_value == USR_EVT_STELLA_CRCERR)
+  if (notification_value == EVT_STELLA_CRCERR)
     return STELLA_ERR_NOACK;
 
-  if (notification_value == USR_EVT_STELLA_TIMEOUT)
+  if (notification_value == EVT_STELLA_TIMEOUT)
     return STELLA_ERR_NOACK;
 
   /* Acknowledgement ID must match packet ID */

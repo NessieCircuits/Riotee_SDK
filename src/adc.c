@@ -15,7 +15,7 @@ void SAADC_IRQHandler(void) {
 
   if (NRF_SAADC->EVENTS_END == 1) {
     NRF_SAADC->EVENTS_END = 0;
-    xTaskNotifyIndexedFromISR(waiting_task, 1, USR_EVT_ADC, eSetValueWithOverwrite, &xHigherPriorityTaskWoken);
+    xTaskNotifyIndexedFromISR(waiting_task, 1, EVT_ADC, eSetValueWithOverwrite, &xHigherPriorityTaskWoken);
   }
 
   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
@@ -66,7 +66,7 @@ int adc_read(int16_t *dst, unsigned int analog_input) {
   taskEXIT_CRITICAL();
 
   xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
-  if (notification_value == USR_EVT_ADC)
+  if (notification_value == EVT_ADC)
     return 0;
   else
     return -1;

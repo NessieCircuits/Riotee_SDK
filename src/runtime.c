@@ -25,6 +25,10 @@ extern unsigned long __data_retained_start__;
 extern unsigned long __data_retained_end__;
 extern unsigned long __data_start__;
 
+/* Linker section where drivers register their teardown functions */
+extern unsigned long __teardown_start__;
+extern unsigned long __teardown_end__;
+
 /* This marker is used to check if device has been reset before */
 unsigned long fresh_marker = 0x8BADF00D;
 
@@ -169,9 +173,9 @@ static void threshold_callback(unsigned int pin_no) {
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
   if (pin_no == PIN_PWRGD_L) {
-    xTaskNotifyIndexedFromISR(sys_task_handle, 1, SYS_EVT_PWRGD_L, eSetValueWithOverwrite, &xHigherPriorityTaskWoken);
+    xTaskNotifyIndexedFromISR(sys_task_handle, 1, EVT_PWRGD_L, eSetValueWithOverwrite, &xHigherPriorityTaskWoken);
   } else if (pin_no == PIN_PWRGD_H) {
-    xTaskNotifyIndexedFromISR(sys_task_handle, 1, SYS_EVT_PWRGD_H, eSetValueWithOverwrite, &xHigherPriorityTaskWoken);
+    xTaskNotifyIndexedFromISR(sys_task_handle, 1, EVT_PWRGD_H, eSetValueWithOverwrite, &xHigherPriorityTaskWoken);
   }
   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
   return;
@@ -193,6 +197,20 @@ int wait_until_charged(void) {
   return gpint_wait(PIN_PWRGD_H, GPINT_LEVEL_HIGH, GPIO_PIN_CNF_PULL_Disabled);
 }
 
+static void teardown(void) {
+  /* Call all registered teardown functions */
+  void (*fn_teardown)(void);
+  uint32_t *fn_addr;
+  for (fn_addr = &__teardown_start__; fn_addr < &__teardown_end__; fn_addr++) {
+    fn_teardown = (void (*)(void)) * fn_addr;
+    if (fn_teardown != NULL)
+      fn_teardown();
+  }
+
+  /* Give the application an opportunity to switch off power-hungry devices */
+  turnoff_callback();
+}
+
 /* High priority system task initializes runtime, and handles intermittent execution and checkpointing. */
 static void sys_task(void *pvParameter) {
   UNUSED_PARAMETER(pvParameter);
@@ -211,7 +229,7 @@ static void sys_task(void *pvParameter) {
   } else {
     if (checkpoint_load(&usr_task_store) == 0)
       /* Unblock the user task */
-      xTaskNotifyIndexed(usr_task_handle, 1, USR_EVT_RESET, eSetValueWithOverwrite);
+      xTaskNotifyIndexed(usr_task_handle, 1, EVT_RESET, eSetValueWithOverwrite);
     else {
       initialize_retained();
       /* Call user bootstrap code */
@@ -228,14 +246,12 @@ static void sys_task(void *pvParameter) {
     gpint_register(PIN_PWRGD_L, GPINT_LEVEL_LOW, GPIO_PIN_CNF_PULL_Disabled, threshold_callback);
     xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
 
-    /* Give the application an opportunity to switch off power-hungry devices */
-    turnoff_callback();
     vTaskSuspend(usr_task_handle);
 
     /* Set a high threshold - upon reaching this threshold, execution continues */
     /* If the user task was already waiting on high threshold, we have to notify it here */
     if (gpint_unregister(PIN_PWRGD_H) == GPINT_ERR_OK)
-      xTaskNotifyIndexed(usr_task_handle, 1, USR_EVT_GPINT, eSetValueWithOverwrite);
+      xTaskNotifyIndexed(usr_task_handle, 1, EVT_GPINT, eSetValueWithOverwrite);
     gpint_register(PIN_PWRGD_H, GPINT_LEVEL_HIGH, GPIO_PIN_CNF_PULL_Disabled, threshold_callback);
 
     /* Set a 10ms timer*/
@@ -243,7 +259,7 @@ static void sys_task(void *pvParameter) {
     /* Wait until capacitor is recharged or timer expires */
     xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
     /* Recharged? */
-    if (notification_value == SYS_EVT_PWRGD_H) {
+    if (notification_value == EVT_PWRGD_H) {
       sys_cancel_timer();
       xTaskNotifyStateClearIndexed(xTaskGetCurrentTaskHandle(), 1);
       continue;
@@ -261,7 +277,7 @@ static void sys_task(void *pvParameter) {
     /* Wait until capacitor is recharged or discharged below the crtitical threshold again */
     xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
     /* Recharged? */
-    if (notification_value == SYS_EVT_PWRGD_H) {
+    if (notification_value == EVT_PWRGD_H) {
       gpint_unregister(PIN_PWRGD_L);
       continue;
     }
@@ -273,7 +289,7 @@ static void sys_task(void *pvParameter) {
 }
 
 void runtime_start(void) {
-  uart_init(PIN_D1);
+  uart_init(PIN_D1, 1000000UL);
 
   gpint_init();
   timing_init();

@@ -127,6 +127,11 @@ SECTIONS {
                 *crtbegin.o(.bss .bss.*)
                 *lib_a-reent.o(.bss .bss.*)
                 *lib_a-lock.o(.bss .bss.*)
+                /* Stores pointers to teardown functions */
+               . = ALIGN(4);
+                __teardown_start__ = .;
+                *(.teardown)
+                __teardown_end__ = .;
                 __bss_end__ = .;
                 . = ALIGN(4);
                 __bss_retained_start__ = .;
