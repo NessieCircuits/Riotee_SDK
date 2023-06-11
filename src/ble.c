@@ -18,7 +18,7 @@
 /* Bluetooth Core Spec 5.2 Section 2.1.2 */
 #define ADV_CHANNEL_AA 0x8E89BED6
 
-static adv_pck_t adv_pkt;
+static riotee_adv_pck_t adv_pkt;
 
 /* pointer to custom user data within adv_pkt */
 static uint8_t *adv_data_address;
@@ -55,7 +55,7 @@ void teardown(void) {
   xTaskNotifyIndexed(usr_task_handle, 1, EVT_TEARDOWN, eSetBits);
 }
 
-int ble_prepare_adv(ble_ll_addr_t *adv_addr, const char adv_name[], size_t name_len, size_t data_len) {
+int riotee_ble_prepare_adv(riotee_ble_ll_addr_t *adv_addr, const char adv_name[], size_t name_len, size_t data_len) {
   adv_pkt.header.pdu_type = ADV_NONCONN_IND;
   adv_pkt.header.txadd = 1;
   memcpy((char *)&adv_pkt.adv_addr.addr_bytes, (char *)adv_addr->addr_bytes, 6);
@@ -82,20 +82,20 @@ int ble_prepare_adv(ble_ll_addr_t *adv_addr, const char adv_name[], size_t name_
   adv_data_address = &adv_pkt.payload[5 + name_len + 4];
   adv_data_len = data_len;
 
-  adv_pkt.header.len = sizeof(ble_ll_addr_t) + 5 + name_len + 4 + data_len;
+  adv_pkt.header.len = sizeof(riotee_ble_ll_addr_t) + 5 + name_len + 4 + data_len;
 
   return 0;
 }
 
 /* Configure the radio for the given BLE channel index */
-static inline int ble_set_channel(unsigned int adv_ch_idx) {
+static inline int set_channel(unsigned int adv_ch_idx) {
   NRF_RADIO->FREQUENCY = ch2freq(adv_chs[adv_ch_idx]);
   /* Whitening initialization see Bluetooth Core Spec 5.2 Section 3.2 */
   NRF_RADIO->DATAWHITEIV = adv_chs[adv_ch_idx] & 0x3F;
   return 0;
 }
 
-int ble_advertise(void *data, adv_ch_t ch) {
+int riotee_ble_advertise(void *data, riotee_adv_ch_t ch) {
   unsigned long notification_value;
 
   taskENTER_CRITICAL();
@@ -109,7 +109,7 @@ int ble_advertise(void *data, adv_ch_t ch) {
     current_adv_ch_idx = 0;
   }
 
-  ble_set_channel(current_adv_ch_idx);
+  set_channel(current_adv_ch_idx);
 
   memcpy(adv_data_address, data, adv_data_len);
   radio_start();
@@ -131,7 +131,7 @@ void radio_disabled_callback() {
 
   /* If we still have channels to advertise on */
   if (current_adv_ch_idx > 0) {
-    ble_set_channel(--current_adv_ch_idx);
+    set_channel(--current_adv_ch_idx);
     NRF_RADIO->TASKS_TXEN = 1;
   } else {
     NRF_CLOCK->TASKS_HFCLKSTOP = 1;
@@ -142,11 +142,9 @@ void radio_disabled_callback() {
   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
-int ble_init() {
-  /* 4dBm TX power */
+int riotee_ble_init() {
   NRF_RADIO->TXPOWER = (RADIO_TXPOWER_TXPOWER_Pos4dBm << RADIO_TXPOWER_TXPOWER_Pos);
 
-  /* BLE 1MBit */
   NRF_RADIO->MODE = (RADIO_MODE_MODE_Ble_1Mbit << RADIO_MODE_MODE_Pos);
   /* Fast radio rampup */
   NRF_RADIO->MODECNF0 = (RADIO_MODECNF0_RU_Fast << RADIO_MODECNF0_RU_Pos);

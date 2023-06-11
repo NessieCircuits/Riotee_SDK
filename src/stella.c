@@ -8,10 +8,10 @@
 #include "runtime.h"
 #include "printf.h"
 
-static stella_pkt_t rx_buf;
-static stella_pkt_t tx_buf;
+static riotee_stella_pkt_t rx_buf;
+static riotee_stella_pkt_t tx_buf;
 
-static stella_pkt_t *rx_buf_ptr;
+static riotee_stella_pkt_t *rx_buf_ptr;
 
 /* Counts number of transmitted packets */
 static uint16_t pkt_counter = 0;
@@ -89,7 +89,7 @@ static int timer_init(void) {
   return 0;
 }
 
-int stella_init() {
+int riotee_stella_init() {
   /* 0dBm TX power */
   NRF_RADIO->TXPOWER = (RADIO_TXPOWER_TXPOWER_0dBm << RADIO_TXPOWER_TXPOWER_Pos);
   /* 2476 MHz frequency */
@@ -127,7 +127,7 @@ int stella_init() {
   NRF_RADIO->SHORTS = RADIO_SHORTS_READY_START_Msk | RADIO_SHORTS_END_DISABLE_Msk;
 
   /* Set the default device ID */
-  stella_set_id(NRF_FICR->DEVICEADDR[0]);
+  riotee_stella_set_id(NRF_FICR->DEVICEADDR[0]);
 
   radio_init();
   timer_init();
@@ -165,7 +165,7 @@ static void teardown(void) {
   teardown_ptr = NULL;
 }
 
-int stella_transceive(stella_pkt_t *rx_pkt, stella_pkt_t *tx_pkt) {
+int riotee_stella_transceive(riotee_stella_pkt_t *rx_pkt, riotee_stella_pkt_t *tx_pkt) {
   unsigned long notification_value;
 
   taskENTER_CRITICAL();
@@ -206,14 +206,14 @@ int stella_transceive(stella_pkt_t *rx_pkt, stella_pkt_t *tx_pkt) {
   return STELLA_ERR_OK;
 }
 
-int stella_send(uint8_t *data, size_t n) {
+int riotee_stella_send(uint8_t *data, size_t n) {
   memcpy(tx_buf.data, data, n);
 
-  tx_buf.len = sizeof(stella_pkt_header_t) + n;
+  tx_buf.len = sizeof(riotee_stella_pkt_header_t) + n;
   tx_buf.hdr.pkt_id = pkt_counter++;
-  return stella_transceive(&rx_buf, &tx_buf);
+  return riotee_stella_transceive(&rx_buf, &tx_buf);
 }
 
-void stella_set_id(uint32_t dev_id) {
+void riotee_stella_set_id(uint32_t dev_id) {
   _dev_id = dev_id;
 }

@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-int adc_init();
-int adc_read(int16_t *dst, unsigned int analog_input);
+int riotee_adc_init();
+int riotee_adc_read(int16_t *dst, unsigned int analog_input);
 
 #endif

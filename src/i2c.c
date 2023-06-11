@@ -22,9 +22,9 @@ void SPIM1_SPIS1_TWIM1_TWIS1_SPI1_TWI1_IRQHandler(void) {
   }
 }
 
-int i2c_init(unsigned int pinSDA, unsigned int pinSCL) {
-  NRF_TWIM1->PSEL.SCL = pinSCL;
-  NRF_TWIM1->PSEL.SDA = pinSDA;
+int riotee_i2c_init(unsigned int pin_sda, unsigned int pin_scl) {
+  NRF_TWIM1->PSEL.SCL = pin_scl;
+  NRF_TWIM1->PSEL.SDA = pin_sda;
 
   /* These should stay high when I2C is disabled */
   nrf_gpio_cfg_input(PIN_SYS_SCL, NRF_GPIO_PIN_PULLUP);
@@ -38,7 +38,7 @@ int i2c_init(unsigned int pinSDA, unsigned int pinSCL) {
   return 0;
 }
 
-int i2c_write(uint8_t dev_addr, uint8_t *data, size_t n_data) {
+int riotee_i2c_write(uint8_t dev_addr, uint8_t *data, size_t n_data) {
   taskENTER_CRITICAL();
 
   NRF_TWIM1->ENABLE = TWIM_ENABLE_ENABLE_Enabled << TWIM_ENABLE_ENABLE_Pos;
@@ -64,7 +64,7 @@ int i2c_write(uint8_t dev_addr, uint8_t *data, size_t n_data) {
   return twi_status;
 }
 
-int i2c_read(uint8_t *buffer, size_t n_data, uint8_t dev_addr) {
+int riotee_i2c_read(uint8_t *buffer, size_t n_data, uint8_t dev_addr) {
   taskENTER_CRITICAL();
   NRF_TWIM1->ENABLE = TWIM_ENABLE_ENABLE_Enabled << TWIM_ENABLE_ENABLE_Pos;
 

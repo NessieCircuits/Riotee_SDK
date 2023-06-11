@@ -22,8 +22,8 @@ typedef enum {
 extern "C" {
 #endif
 
-int thresholds_low_set(thr_low_t thr);
-int thresholds_high_set(thr_high_t thr);
+int riotee_thresholds_low_set(thr_low_t thr);
+int riotee_thresholds_high_set(thr_high_t thr);
 #if defined __cplusplus
 }
 #endif

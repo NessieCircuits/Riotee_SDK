@@ -5,11 +5,11 @@
 
 #include <soc/nrfx_coredep.h>
 
-void delay_us(unsigned int us) {
+void riotee_delay_us(unsigned int us) {
   nrfx_coredep_delay_us(us);
 }
 
-void delay_ms(unsigned int ms) {
+void riotee_delay_ms(unsigned int ms) {
   if (ms == 0) {
     return;
   }
@@ -40,7 +40,7 @@ void RTC0_IRQHandler(void) {
   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
-void sleep_ticks(unsigned int ticks) {
+int riotee_sleep_ticks(unsigned int ticks) {
   unsigned long notification_value;
   taskENTER_CRITICAL();
   xTaskNotifyStateClearIndexed(usr_task_handle, 1);
@@ -52,11 +52,14 @@ void sleep_ticks(unsigned int ticks) {
 
   taskEXIT_CRITICAL();
   xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
+  if (notification_value != EVT_RTC)
+    return 0;
+  return -1;
 }
 
-void sleep_ms(unsigned int ms) {
+int riotee_sleep_ms(unsigned int ms) {
   /* Roughly ms*32768/1000 */
-  sleep_ticks((ms * 33554UL) >> 10);
+  return riotee_sleep_ticks((ms * 33554UL) >> 10);
 }
 
 void sys_setup_timer(unsigned int ticks) {
@@ -73,7 +76,7 @@ void sys_cancel_timer(void) {
   NRF_RTC0->EVENTS_COMPARE[1] = 0;
 }
 
-int timing_init(void) {
+int riotee_timing_init(void) {
   NRF_CLOCK->LFCLKSRC = CLOCK_LFCLKSRC_SRC_Xtal;
 
   NRF_CLOCK->TASKS_LFCLKSTART = 1;

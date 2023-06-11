@@ -14,7 +14,7 @@ void GPIOTE_IRQHandler(void) {
       GPINT_CALLBACK cb = registry[i];
       NRF_GPIO_Type *reg = nrf_gpio_pin_port_decode(&i);
       if ((cb != NULL) && (reg->LATCH & (1 << i))) {
-        gpint_unregister(i);
+        riotee_gpint_unregister(i);
         reg->LATCH |= (1 << i);
         NRF_GPIOTE->EVENTS_PORT = 0;
         cb(i);
@@ -24,7 +24,7 @@ void GPIOTE_IRQHandler(void) {
   }
 }
 
-int gpint_init(void) {
+int riotee_gpint_init(void) {
   NRF_P0->DETECTMODE = GPIO_DETECTMODE_DETECTMODE_LDETECT;
   NRF_P1->DETECTMODE = GPIO_DETECTMODE_DETECTMODE_LDETECT;
   NRF_GPIOTE->EVENTS_PORT = 0;
@@ -35,7 +35,7 @@ int gpint_init(void) {
   return 0;
 }
 
-int gpint_register(uint32_t pin, gpint_level_t level, gpint_pin_pull_t pull, GPINT_CALLBACK cb) {
+int riotee_gpint_register(uint32_t pin, gpint_level_t level, riotee_gpio_pin_pull_t pull, GPINT_CALLBACK cb) {
   NRF_GPIO_Type *reg = nrf_gpio_pin_port_decode(&pin);
 
   if (pin > 31)
@@ -57,7 +57,7 @@ int gpint_register(uint32_t pin, gpint_level_t level, gpint_pin_pull_t pull, GPI
   return GPINT_ERR_OK;
 }
 
-int gpint_unregister(uint32_t pin) {
+int riotee_gpint_unregister(uint32_t pin) {
   if (registry[pin] == NULL)
     return GPINT_ERR_GENERIC;
 
@@ -75,11 +75,11 @@ static void wait_callback(unsigned int pin_no) {
   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
-int gpint_wait(uint32_t pin, gpint_level_t level, gpint_pin_pull_t pull) {
+int riotee_gpint_wait(uint32_t pin, gpint_level_t level, riotee_gpio_pin_pull_t pull) {
   unsigned long notification_value;
   taskENTER_CRITICAL();
   xTaskNotifyStateClearIndexed(usr_task_handle, 1);
-  gpint_register(pin, level, pull, wait_callback);
+  riotee_gpint_register(pin, level, pull, wait_callback);
   taskEXIT_CRITICAL();
   xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
   if (notification_value != EVT_GPINT)

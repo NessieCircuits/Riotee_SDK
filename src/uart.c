@@ -7,14 +7,14 @@
 
 #include "riotee_uart.h"
 
-int uart_init(uint32_t pseltxd, uint32_t baudrate) {
+int riotee_uart_init(uint32_t pseltxd, uint32_t baudrate) {
   NRF_UART0->PSEL.TXD = pseltxd;
-  uart_set_baudrate(baudrate);
+  riotee_uart_set_baudrate(baudrate);
   nrf_gpio_cfg_input(pseltxd, NRF_GPIO_PIN_PULLUP);
   return 0;
 }
 
-int uart_set_baudrate(uint32_t baudrate) {
+int riotee_uart_set_baudrate(uint32_t baudrate) {
   switch (baudrate) {
     case 1200:
       NRF_UART0->BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud1200;

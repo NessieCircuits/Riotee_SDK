@@ -6,17 +6,14 @@
 extern "C" {
 #endif
 
-int timing_init(void);
+int riotee_timing_init(void);
 
 /* Sleep for number of 32768kHz ticks */
-void sleep_ticks(unsigned int ticks);
-void sleep_ms(unsigned int ms);
+void riotee_sleep_ticks(unsigned int ticks_32k);
+void riotee_sleep_ms(unsigned int ms);
 
-void delay_us(unsigned int us);
-void delay_ms(unsigned int ms);
-
-void sys_setup_timer(unsigned int ticks);
-void sys_cancel_timer(void);
+void riotee_delay_us(unsigned int us);
+void riotee_delay_ms(unsigned int ms);
 
 #ifdef __cplusplus
 }

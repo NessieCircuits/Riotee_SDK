@@ -19,9 +19,9 @@ static uint8_t hex2dec(uint8_t hex) {
 
 static int read_registers(uint8_t* dst, size_t n_data, uint8_t reg_addr) {
   int rc;
-  if ((rc = i2c_write(AM1805_I2C_ADDR, &reg_addr, 1)) != 0)
+  if ((rc = riotee_i2c_write(AM1805_I2C_ADDR, &reg_addr, 1)) != 0)
     return rc;
-  return i2c_read(dst, n_data, AM1805_I2C_ADDR);
+  return riotee_i2c_read(dst, n_data, AM1805_I2C_ADDR);
 }
 
 static int read_register(uint8_t* dst, uint8_t reg_addr) {
@@ -35,13 +35,13 @@ static int write_registers(uint8_t reg_addr, uint8_t* data, size_t n_data) {
   tx_buf[0] = reg_addr;
   memcpy(tx_buf + 1, data, n_data);
 
-  return i2c_write(AM1805_I2C_ADDR, tx_buf, n_data + 1);
+  return riotee_i2c_write(AM1805_I2C_ADDR, tx_buf, n_data + 1);
 }
 
 static int write_register(uint8_t reg_addr, uint8_t data) {
   tx_buf[0] = reg_addr;
   tx_buf[1] = data;
-  return i2c_write(AM1805_I2C_ADDR, tx_buf, 2);
+  return riotee_i2c_write(AM1805_I2C_ADDR, tx_buf, 2);
 }
 
 static int set_configuration_key(uint8_t key) {
@@ -67,7 +67,7 @@ static int wait_for_alarm_ok() {
     read_register(&check, AM1805_SECOND_ALARM_REG);
     if (check == 0x55)
       return 0;
-    sleep_ms(RETRY_DELAY_MS);
+    riotee_sleep_ms(RETRY_DELAY_MS);
   } while (retries > 0);
   return -1;
 }
@@ -81,7 +81,7 @@ int am1805_init(void) {
       if (id != 0x1805) {
         return 0;
       }
-    sleep_ms(RETRY_DELAY_MS);
+    riotee_sleep_ms(RETRY_DELAY_MS);
   } while (retries > 0);
   return -1;
 }

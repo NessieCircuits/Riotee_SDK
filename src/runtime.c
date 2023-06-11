@@ -49,6 +49,9 @@ StackType_t uxSystemTaskStack[SYS_STACK_SIZE];
 TaskHandle_t sys_task_handle;
 TaskHandle_t usr_task_handle;
 
+void sys_setup_timer(unsigned int ticks);
+void sys_cancel_timer(void);
+
 /* Dummy callback to be called when low capacitor voltage is detected. Can be overwritten by the user. */
 __attribute__((weak)) void turnoff_callback(void){};
 
@@ -194,7 +197,7 @@ static void initialize_retained(void) {
 
 /* Waits until capacitor is fully charged as indicated by PWRGD_H pin */
 int wait_until_charged(void) {
-  return gpint_wait(PIN_PWRGD_H, GPINT_LEVEL_HIGH, GPIO_PIN_CNF_PULL_Disabled);
+  return riotee_gpint_wait(PIN_PWRGD_H, GPINT_LEVEL_HIGH, GPIO_PIN_CNF_PULL_Disabled);
 }
 
 static void teardown(void) {
@@ -220,7 +223,7 @@ static void sys_task(void *pvParameter) {
   /* Make sure that the user task does not yet start */
   vTaskSuspend(usr_task_handle);
 
-  gpint_register(PIN_PWRGD_H, GPINT_LEVEL_HIGH, GPIO_PIN_CNF_PULL_Disabled, threshold_callback);
+  riotee_gpint_register(PIN_PWRGD_H, GPINT_LEVEL_HIGH, GPIO_PIN_CNF_PULL_Disabled, threshold_callback);
   xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
 
   if (check_fresh_start()) {
@@ -243,16 +246,17 @@ static void sys_task(void *pvParameter) {
     vTaskResume(usr_task_handle);
 
     /* Wait until capacitor voltage falls below the 'low' threshold */
-    gpint_register(PIN_PWRGD_L, GPINT_LEVEL_LOW, GPIO_PIN_CNF_PULL_Disabled, threshold_callback);
+    riotee_gpint_register(PIN_PWRGD_L, GPINT_LEVEL_LOW, GPIO_PIN_CNF_PULL_Disabled, threshold_callback);
     xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
 
+    teardown();
     vTaskSuspend(usr_task_handle);
 
     /* Set a high threshold - upon reaching this threshold, execution continues */
     /* If the user task was already waiting on high threshold, we have to notify it here */
-    if (gpint_unregister(PIN_PWRGD_H) == GPINT_ERR_OK)
+    if (riotee_gpint_unregister(PIN_PWRGD_H) == GPINT_ERR_OK)
       xTaskNotifyIndexed(usr_task_handle, 1, EVT_GPINT, eSetValueWithOverwrite);
-    gpint_register(PIN_PWRGD_H, GPINT_LEVEL_HIGH, GPIO_PIN_CNF_PULL_Disabled, threshold_callback);
+    riotee_gpint_register(PIN_PWRGD_H, GPINT_LEVEL_HIGH, GPIO_PIN_CNF_PULL_Disabled, threshold_callback);
 
     /* Set a 10ms timer*/
     sys_setup_timer(8333);
@@ -271,14 +275,14 @@ static void sys_task(void *pvParameter) {
       checkpoint_store(&usr_task_store);
     } else {
       /* Monitor for capacitor voltage to drop below threshold again */
-      gpint_register(PIN_PWRGD_L, GPINT_LEVEL_LOW, GPIO_PIN_CNF_PULL_Disabled, threshold_callback);
+      riotee_gpint_register(PIN_PWRGD_L, GPINT_LEVEL_LOW, GPIO_PIN_CNF_PULL_Disabled, threshold_callback);
     }
 
     /* Wait until capacitor is recharged or discharged below the crtitical threshold again */
     xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
     /* Recharged? */
     if (notification_value == EVT_PWRGD_H) {
-      gpint_unregister(PIN_PWRGD_L);
+      riotee_gpint_unregister(PIN_PWRGD_L);
       continue;
     }
     /* Dropped below the threshold again -> take a snapshot */
@@ -289,10 +293,10 @@ static void sys_task(void *pvParameter) {
 }
 
 void runtime_start(void) {
-  uart_init(PIN_D1, 1000000UL);
+  riotee_uart_init(PIN_D1, 1000000UL);
 
-  gpint_init();
-  timing_init();
+  riotee_gpint_init();
+  riotee_timing_init();
 
   nvm_init();
 

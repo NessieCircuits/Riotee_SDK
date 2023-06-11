@@ -31,7 +31,7 @@ static int gpio_set(uint32_t pin, gpio_state_t gpio_state) {
   return 0;
 }
 
-int thresholds_low_set(thr_low_t thr) {
+int riotee_thresholds_low_set(thr_low_t thr) {
   gpio_state_t gpio_states[2];
   switch (thr) {
     case 0:
@@ -58,7 +58,7 @@ int thresholds_low_set(thr_low_t thr) {
 
   return 0;
 }
-int thresholds_high_set(thr_high_t thr) {
+int riotee_thresholds_high_set(thr_high_t thr) {
   gpio_state_t gpio_states[2];
   switch (thr) {
     case 0:

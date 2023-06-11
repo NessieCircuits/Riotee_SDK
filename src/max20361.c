@@ -52,28 +52,28 @@
 #define MAX_SYSREGCFG_SYSRECHG_250MV (0x6UL)
 #define MAX_SYSREGCFG_SYSRECHG_300MV (0x7UL)
 
-int max20361_init() {
+int riotee_max20361_init() {
   int rc;
   uint8_t tx_buf[2];
 
   /* Disable the FRCWAKE thresholding */
-  tx_buf[0] = REG_DEV_CNTL;
+  tx_buf[0] = MAX20361_REG_DEV_CNTL;
   tx_buf[1] = MAX_DEVCNTL_FRCWAKE_HIGH_Msk;
-  if ((rc = i2c_write(I2C_DEVICE_ADDRESS, tx_buf, 2)) != 0)
+  if ((rc = riotee_i2c_write(I2C_DEVICE_ADDRESS, tx_buf, 2)) != 0)
     return rc;
 
   /* Increase the maximum storage voltage to 4.75V */
-  tx_buf[0] = REG_SYS_REG_CFG;
+  tx_buf[0] = MAX20361_REG_SYS_REG_CFG;
   tx_buf[1] = (MAX_SYSREGCFG_SYSREG_4750MV << MAX_SYSREGCFG_SYSREG_Pos);
-  return i2c_write(I2C_DEVICE_ADDRESS, tx_buf, 2);
+  return riotee_i2c_write(I2C_DEVICE_ADDRESS, tx_buf, 2);
 }
 
-int max20361_id(uint8_t *dev_id) {
+int riotee_max20361_id(uint8_t *dev_id) {
   int rc;
   uint8_t tx_buf;
-  tx_buf = REG_DEV_ID;
-  if ((rc = i2c_write(I2C_DEVICE_ADDRESS, &tx_buf, 1)) != 0)
+  tx_buf = MAX20361_REG_DEV_ID;
+  if ((rc = riotee_i2c_write(I2C_DEVICE_ADDRESS, &tx_buf, 1)) != 0)
     return rc;
 
-  return i2c_read(dev_id, 1, I2C_DEVICE_ADDRESS);
+  return riotee_i2c_read(dev_id, 1, I2C_DEVICE_ADDRESS);
 }

@@ -7,9 +7,11 @@
 extern "C" {
 #endif
 
-int uart_init(uint32_t pseltxd, uint32_t baudrate);
+int riotee_uart_init(uint32_t pseltxd, uint32_t baudrate);
+int riotee_uart_set_baudrate(uint32_t baudrate);
+
 void _putchar(char character);
-int uart_set_baudrate(uint32_t baudrate);
+#define riotee_putc(x) _putchar(x)
 
 #ifdef __cplusplus
 }

@@ -21,7 +21,7 @@ void SAADC_IRQHandler(void) {
   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
-int adc_init() {
+int riotee_adc_init() {
   NRF_SAADC->OVERSAMPLE = NRF_SAADC_OVERSAMPLE_DISABLED;
   NRF_SAADC->RESOLUTION = NRF_SAADC_RESOLUTION_12BIT;
 
@@ -52,7 +52,7 @@ int adc_init() {
   return 0;
 }
 
-int adc_read(int16_t *dst, unsigned int analog_input) {
+int riotee_adc_read(int16_t *dst, unsigned int analog_input) {
   unsigned long notification_value;
 
   taskENTER_CRITICAL();

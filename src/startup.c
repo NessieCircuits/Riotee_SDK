@@ -209,8 +209,8 @@ void c_startup(void) {
   nrf_gpio_cfg_input(PIN_C2C_CS, NRF_GPIO_PIN_PULLDOWN);
   nrf_gpio_cfg_input(PIN_C2C_MISO, NRF_GPIO_PIN_PULLDOWN);
 
-  thresholds_low_set(THR_LOW_2V5);
-  thresholds_high_set(THR_HIGH_4V4);
+  riotee_thresholds_low_set(THR_LOW_2V5);
+  riotee_thresholds_high_set(THR_HIGH_4V4);
 
   nrf_gpio_cfg_input(PIN_D0, NRF_GPIO_PIN_PULLDOWN);
   nrf_gpio_cfg_input(PIN_D1, NRF_GPIO_PIN_PULLDOWN);
@@ -233,8 +233,8 @@ void c_startup(void) {
   *(volatile uint32_t *)0x4007AC84ul = 0x00000002ul;
 
   /* This must happen soon to avoid max20361 cutting power */
-  i2c_init(PIN_SYS_SDA, PIN_SYS_SCL);
-  max20361_init();
+  riotee_i2c_init(PIN_SYS_SDA, PIN_SYS_SCL);
+  riotee_max20361_init();
   startup_callback();
 
   wait_for_high();
