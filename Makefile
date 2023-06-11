@@ -21,6 +21,7 @@ LIB_SRC_FILES += \
   $(SRC_DIR)/timing.c \
   $(SRC_DIR)/gpint.c \
   $(SRC_DIR)/uart.c \
+  $(SRC_DIR)/spic.c \
   $(SRC_DIR)/runtime.c \
 	$(SRC_DIR)/nvm.c \
 	$(SRC_DIR)/adc.c \
