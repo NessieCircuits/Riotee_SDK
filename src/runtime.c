@@ -249,8 +249,8 @@ static void sys_task(void *pvParameter) {
     riotee_gpint_register(PIN_PWRGD_L, GPINT_LEVEL_LOW, GPIO_PIN_CNF_PULL_Disabled, threshold_callback);
     xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
 
-    teardown();
     vTaskSuspend(usr_task_handle);
+    teardown();
 
     /* Set a high threshold - upon reaching this threshold, execution continues */
     /* If the user task was already waiting on high threshold, we have to notify it here */

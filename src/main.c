@@ -14,7 +14,7 @@
 #include "riotee_ble.h"
 #include "riotee_adc.h"
 
-ble_ll_addr_t adv_address = {.addr_bytes = {0xBE, 0xEF, 0xDE, 0xAD, 0x00, 0x01}};
+riotee_ble_ll_addr_t adv_address = {.addr_bytes = {0xBE, 0xEF, 0xDE, 0xAD, 0x00, 0x01}};
 
 static struct {
   uint32_t counter;
@@ -23,7 +23,7 @@ static struct {
 static void led_blink(unsigned int us) {
   taskENTER_CRITICAL();
   nrf_gpio_pin_set(PIN_LED_CTRL);
-  delay_us(us);
+  riotee_delay_us(us);
   nrf_gpio_pin_clear(PIN_LED_CTRL);
   taskEXIT_CRITICAL();
 }
@@ -37,18 +37,18 @@ void bootstrap_callback(void) {
 void reset_callback(void) {
   nrf_gpio_cfg_output(PIN_LED_CTRL);
 
-  ble_init();
-  ble_prepare_adv(&adv_address, "RIOTEE", 6, sizeof(ble_data));
+  riotee_ble_init();
+  riotee_ble_prepare_adv(&adv_address, "RIOTEE", 6, sizeof(ble_data));
   ble_data.counter = 0;
 }
 
 void user_task(void *pvParameter) {
   UNUSED_PARAMETER(pvParameter);
   for (;;) {
-    sleep_ms(500);
+    wait_until_charged();
     led_blink(250);
-    sleep_ms(500);
-    ble_advertise(&ble_data, ADV_CH_ALL);
+    riotee_sleep_ms(500);
+    riotee_ble_advertise(&ble_data, ADV_CH_ALL);
     ble_data.counter++;
   }
 }
