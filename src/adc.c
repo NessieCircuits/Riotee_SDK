@@ -11,6 +11,7 @@ TEARDOWN_FUN(adc_teardown_ptr);
 
 /* Number of samples that still need to be taken before buffer is filled. */
 static unsigned int samples_remaining;
+static unsigned int sample_interval_ticks32;
 
 /* Inverse gain lookup table, indexed by riotee_adc_gain_t */
 static const float gain_lut[] = {6.0f, 5.0f, 4.0f, 3.0f, 2.0f, 1.0f, 1.0f / 2, 1.0f / 4};
@@ -31,7 +32,7 @@ float riotee_adc_adc2vadc(int16_t adc, riotee_adc_cfg_t *cfg) {
 static inline void stop_sampling(void) {
   NRF_SAADC->INTENCLR = SAADC_INTENCLR_END_Msk;
 
-  NRF_RTC1->TASKS_STOP = 1;
+  NRF_RTC0->EVTENCLR = RTC_EVTEN_COMPARE2_Msk;
   NRF_SAADC->TASKS_STOP = 1;
   NRF_SAADC->EVENTS_END = 0;
 
@@ -50,6 +51,7 @@ void SAADC_IRQHandler(void) {
     portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
   } else {
     NRF_SAADC->RESULT.PTR += 2;
+    NRF_RTC0->CC[2] = (NRF_RTC0->COUNTER + sample_interval_ticks32) % (1 << 24);
   }
 }
 
@@ -61,7 +63,7 @@ static void teardown(void) {
 int riotee_adc_init(void) {
   NRF_SAADC->RESOLUTION = SAADC_RESOLUTION_VAL_12bit;
 
-  NRF_PPI->CH[3].EEP = (uint32_t)&NRF_RTC1->EVENTS_TICK;
+  NRF_PPI->CH[3].EEP = (uint32_t)&NRF_RTC0->EVENTS_COMPARE[2];
   NRF_PPI->CH[3].TEP = (uint32_t)&NRF_SAADC->TASKS_START;
   NRF_PPI->CHENSET = PPI_CHENSET_CH3_Msk;
 
@@ -72,8 +74,6 @@ int riotee_adc_init(void) {
   NRF_PPI->CH[5].EEP = (uint32_t)&NRF_SAADC->EVENTS_END;
   NRF_PPI->CH[5].TEP = (uint32_t)&NRF_SAADC->TASKS_STOP;
   NRF_PPI->CHENSET = PPI_CHENSET_CH5_Msk;
-
-  NRF_RTC1->EVTENSET = RTC_EVTENSET_TICK_Msk;
 
   NVIC_EnableIRQ(SAADC_IRQn);
 
@@ -115,10 +115,11 @@ int riotee_adc_sample(int16_t *dst, riotee_adc_cfg_t *cfg) {
   adc_teardown_ptr = teardown;
 
   if (cfg->n_samples > 1) {
-    NRF_RTC1->PRESCALER = cfg->sample_interval_ticks32 - 1;
-    NRF_RTC1->TASKS_START = 1;
-  } else
-    NRF_SAADC->TASKS_START = 1;
+    sample_interval_ticks32 = cfg->sample_interval_ticks32;
+    NRF_RTC0->CC[2] = (NRF_RTC0->COUNTER + cfg->sample_interval_ticks32) % (1 << 24);
+    NRF_RTC0->EVTENSET = RTC_EVTEN_COMPARE2_Msk;
+  }
+  NRF_SAADC->TASKS_START = 1;
 
   taskEXIT_CRITICAL();
 
