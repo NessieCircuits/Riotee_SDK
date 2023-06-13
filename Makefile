@@ -1,4 +1,4 @@
-PREFIX := $(GNU_INSTALL_ROOT)arm-none-eabi-
+PREFIX := "$(GNU_INSTALL_ROOT)"arm-none-eabi-
 PROJ_DIR := ./
 OUTPUT_DIR := _build
 SRC_DIR := src
