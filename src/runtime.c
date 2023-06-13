@@ -14,8 +14,7 @@
 #include "runtime.h"
 #include "riotee_thresholds.h"
 
-#define USR_STACK_SIZE (configMINIMAL_STACK_SIZE + 2048)
-#define SYS_STACK_SIZE (configMINIMAL_STACK_SIZE + 2048)
+#define SYS_STACK_SIZE (configMINIMAL_STACK_SIZE + 128)
 
 extern unsigned long __etext;
 extern unsigned long __bss_retained_start__;
@@ -32,13 +31,9 @@ extern unsigned long __teardown_end__;
 /* This marker is used to check if device has been reset before */
 unsigned long fresh_marker = 0x8BADF00D;
 
-typedef struct {
-  StackType_t stack[USR_STACK_SIZE];
-  StaticTask_t tcb;
-} task_store_t;
-
-/* Holds stack and task control block of the user task */
-task_store_t usr_task_store;
+StaticTask_t usr_task_tcb;
+/* Put this into size-limited RETAINED_RAM region (see linker.ld) */
+StackType_t usr_task_stack[USR_STACK_SIZE_WORDS] __attribute__((section(".usr_task_mem")));
 
 StaticTask_t xIdleTaskTCB;
 StackType_t uxIdleTaskStack[configMINIMAL_STACK_SIZE];
@@ -72,7 +67,8 @@ static void overwrite_marker() {
   /* Enable write to flash */
   NRF_NVMC->CONFIG |= NVMC_CONFIG_WEN_Msk;
   /* Wait for flash to become ready */
-  while (NRF_NVMC->READY == 0) __NOP();
+  while (NRF_NVMC->READY == 0)
+    __NOP();
   /* Overwrite marker with all zeroes (we can only write 0) */
   *marker_nvm_addr = 0x0;
   __DMB();
@@ -86,17 +82,17 @@ typedef struct {
   uint32_t stack_size;
   uint32_t data_size;
   uint32_t bss_size;
-} snapshot_header_t;
+} checkpoint_header;
 
 enum { NVM_SIG_VALID = 0x0D15EA5E, NVM_SIG_INVALID = 0x8BADF00D };
 
 /* Stores task stack and static/global variables in non-volatile memory. */
-static int checkpoint_store(task_store_t *task_str) {
-  snapshot_header_t hdr;
+static int checkpoint_store() {
+  checkpoint_header hdr;
 
-  hdr.top_of_stack = *(uint32_t *)&task_str->tcb;
+  hdr.top_of_stack = *(uint32_t *)&usr_task_tcb;
 
-  hdr.stack_size = ((unsigned int)&task_str->stack[USR_STACK_SIZE - 1] - hdr.top_of_stack) / sizeof(StackType_t);
+  hdr.stack_size = ((unsigned int)&usr_task_stack[USR_STACK_SIZE_WORDS - 1] - hdr.top_of_stack) / sizeof(StackType_t);
 
   hdr.data_size = (unsigned int)&__data_retained_end__ - (unsigned int)&__data_retained_start__;
 
@@ -107,7 +103,7 @@ static int checkpoint_store(task_store_t *task_str) {
   hdr.signature = NVM_SIG_INVALID;
 
   nvm_start(NVM_WRITE, 0x0);
-  nvm_write((uint8_t *)&hdr, sizeof(snapshot_header_t));
+  nvm_write((uint8_t *)&hdr, sizeof(checkpoint_header));
   nvm_write((uint8_t *)hdr.top_of_stack, hdr.stack_size * sizeof(StackType_t));
   nvm_write((uint8_t *)&__data_retained_start__, hdr.data_size);
   nvm_write((uint8_t *)&__bss_retained_start__, hdr.bss_size);
@@ -129,11 +125,11 @@ static int checkpoint_store(task_store_t *task_str) {
 }
 
 /* Loads a snapshot from NVM into task stack and static/global variables. */
-static int checkpoint_load(task_store_t *task_str) {
-  snapshot_header_t hdr;
+static int checkpoint_load() {
+  checkpoint_header hdr;
 
   nvm_start(NVM_READ, 0x0);
-  nvm_read((uint8_t *)&hdr, sizeof(snapshot_header_t));
+  nvm_read((uint8_t *)&hdr, sizeof(checkpoint_header));
 
   /* Check the signature to avoid loading garbage */
   if (hdr.signature != NVM_SIG_VALID) {
@@ -149,7 +145,7 @@ static int checkpoint_load(task_store_t *task_str) {
   nvm_stop();
 
   /* Copy top of stack into freertos TCB structure */
-  memcpy(&task_str->tcb, &hdr.top_of_stack, sizeof(uint32_t));
+  memcpy(&usr_task_tcb, &hdr.top_of_stack, sizeof(uint32_t));
   return 0;
 }
 
@@ -172,6 +168,12 @@ void vApplicationGetIdleTaskMemory(StaticTask_t **ppxIdleTaskTCBBuffer, StackTyp
   *pulIdleTaskStackSize = configMINIMAL_STACK_SIZE;
 }
 
+void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName) {
+  printf("\r\nPANIC: Stack has overflowed!\r\n");
+  while (1) {
+    enter_low_power();
+  }
+}
 static void threshold_callback(unsigned int pin_no) {
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
@@ -189,10 +191,12 @@ static void initialize_retained(void) {
   volatile unsigned long *src, *dst;
   src = &__etext + (&__data_retained_start__ - &__data_start__);
   dst = &__data_retained_start__;
-  while (dst < &__data_retained_end__) *(dst++) = *(src++);
+  while (dst < &__data_retained_end__)
+    *(dst++) = *(src++);
 
   src = &__bss_retained_start__;
-  while (src < &__bss_retained_end__) *(src++) = 0;
+  while (src < &__bss_retained_end__)
+    *(src++) = 0;
 }
 
 /* Waits until capacitor is fully charged as indicated by PWRGD_H pin */
@@ -230,7 +234,7 @@ static void sys_task(void *pvParameter) {
     initialize_retained();
     bootstrap_callback();
   } else {
-    if (checkpoint_load(&usr_task_store) == 0)
+    if (checkpoint_load() == 0)
       /* Unblock the user task */
       xTaskNotifyIndexed(usr_task_handle, 1, EVT_RESET, eSetValueWithOverwrite);
     else {
@@ -272,7 +276,8 @@ static void sys_task(void *pvParameter) {
     /* Timer has expired. Is capacitor voltage still below threshold? */
     if ((NRF_P0->IN & (1 << PIN_PWRGD_L)) == 0) {
       /* Take the snapshot */
-      checkpoint_store(&usr_task_store);
+      checkpoint_store();
+
     } else {
       /* Monitor for capacitor voltage to drop below threshold again */
       riotee_gpint_register(PIN_PWRGD_L, GPINT_LEVEL_LOW, GPIO_PIN_CNF_PULL_Disabled, threshold_callback);
@@ -286,7 +291,7 @@ static void sys_task(void *pvParameter) {
       continue;
     }
     /* Dropped below the threshold again -> take a snapshot */
-    checkpoint_store(&usr_task_store);
+    checkpoint_store();
     /* Wait until capacitor is recharged */
     xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
   }
@@ -300,8 +305,8 @@ void runtime_start(void) {
 
   nvm_init();
 
-  usr_task_handle = xTaskCreateStatic(user_task, "USR", USR_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2,
-                                      usr_task_store.stack, &usr_task_store.tcb);
+  usr_task_handle = xTaskCreateStatic(user_task, "USR", USR_STACK_SIZE_WORDS, NULL, tskIDLE_PRIORITY + 2,
+                                      usr_task_stack, &usr_task_tcb);
 
   sys_task_handle = xTaskCreateStatic(sys_task, "SYS", SYS_STACK_SIZE, NULL, (configMAX_PRIORITIES - 1),
                                       uxSystemTaskStack, &xSystemTaskTCB);

@@ -7,7 +7,8 @@ EXTERN(vectors)
 
 MEMORY {
   FLASH (rx) : ORIGIN = 0x0, LENGTH = 512k
-  RAM (rwx) :  ORIGIN = 0x20000000, LENGTH = 128k
+  RAM_RETAINED (rwx) :  ORIGIN = 0x20000000, LENGTH = 8k
+  RAM (rwx) :  ORIGIN = 0x20002000, LENGTH = 120k
 }
 
 
@@ -55,7 +56,7 @@ SECTIONS {
         . = ALIGN(4);
         __etext = .;
 
-        .data : AT ( __etext ) {         /* AT specifies the LMA (load memory address) */
+        .data : {
                 /* Exclude all system variables from retained data */
                 . = ALIGN(4);
                 __data_start__ = .;
@@ -103,12 +104,16 @@ SECTIONS {
                 KEEP(*(.jcr*))
                 /* All data end */
                 __data_end__ = .;
+
+        } >RAM AT>FLASH
+
+        .data_retained : {
                 . = ALIGN(4);
                 __data_retained_start__ = .;
                 *(.data)
                 *(.data.*)
                 __data_retained_end__ = .;
-        } >RAM
+        } >RAM_RETAINED AT>FLASH
 
         .bss (NOLOAD) : {
                 /* Exclude all system variables from retained data */
@@ -137,14 +142,18 @@ SECTIONS {
                 *(.teardown)
                 __teardown_end__ = .;
                 __bss_end__ = .;
+        } >RAM
+
+        .bss_retained (NOLOAD) : {
                 . = ALIGN(4);
                 __bss_retained_start__ = .;
                 *(COMMON)
                 *(.bss)
                 *(.bss.*)
                 __bss_retained_end__ = .;
-
-        } >RAM
+                . = ALIGN(4);
+                *(.usr_task_mem)
+        } >RAM_RETAINED
 
     
 }

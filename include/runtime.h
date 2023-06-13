@@ -7,6 +7,8 @@
 #define UNUSED_VARIABLE(X) ((void)(X))
 #define UNUSED_PARAMETER(X) UNUSED_VARIABLE(X)
 
+#define USR_STACK_SIZE_WORDS (1024)
+
 int runtime_init(void);
 void runtime_start(void);
 

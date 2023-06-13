@@ -209,8 +209,8 @@ void c_startup(void) {
   nrf_gpio_cfg_input(PIN_C2C_CS, NRF_GPIO_PIN_PULLDOWN);
   nrf_gpio_cfg_input(PIN_C2C_MISO, NRF_GPIO_PIN_PULLDOWN);
 
-  riotee_thresholds_low_set(THR_LOW_2V5);
-  riotee_thresholds_high_set(THR_HIGH_4V4);
+  riotee_thresholds_low_set(THR_LOW_3V1);
+  riotee_thresholds_high_set(THR_HIGH_4V6);
 
   nrf_gpio_cfg_input(PIN_D0, NRF_GPIO_PIN_PULLDOWN);
   nrf_gpio_cfg_input(PIN_D1, NRF_GPIO_PIN_PULLDOWN);
@@ -242,11 +242,13 @@ void c_startup(void) {
   /* Copy static/global system variables from flash to RAM */
   src = &__etext;
   dst = &__data_start__;
-  while (dst < &__data_end__) *(dst++) = *(src++);
+  while (dst < &__data_end__)
+    *(dst++) = *(src++);
 
   /* Zero initialize static/global system variables */
   src = &__bss_start__;
-  while (src < &__bss_end__) *(src++) = 0;
+  while (src < &__bss_end__)
+    *(src++) = 0;
 
     /* Activate FPU if compiler says that it's used */
 #if (__FPU_USED == 1)
