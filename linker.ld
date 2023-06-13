@@ -149,6 +149,7 @@ SECTIONS {
                 __bss_retained_start__ = .;
                 *(COMMON)
                 *(.bss)
+                *(.retained_bss)
                 *(.bss.*)
                 __bss_retained_end__ = .;
                 . = ALIGN(4);

@@ -33,8 +33,15 @@ enum {
   EVT_PWRGD_H = 0xA001,
 };
 
+typedef struct {
+  unsigned int n_reset;
+  unsigned int n_turnoff;
+} runtime_stats_t;
+
 extern TaskHandle_t usr_task_handle;
 extern TaskHandle_t sys_task_handle;
+
+extern runtime_stats_t runtime_stats;
 
 #define TEARDOWN_FUN(x) void (*x)() __attribute__((section(".teardown")))
 

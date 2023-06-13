@@ -44,6 +44,9 @@ StackType_t uxSystemTaskStack[SYS_STACK_SIZE];
 TaskHandle_t sys_task_handle;
 TaskHandle_t usr_task_handle;
 
+/* Runtime stats go into retained bss so they are automatically checkpointed. */
+runtime_stats_t runtime_stats __attribute__((section(".retained_bss")));
+
 void sys_setup_timer(unsigned int ticks);
 void sys_cancel_timer(void);
 
@@ -233,11 +236,13 @@ static void sys_task(void *pvParameter) {
   if (check_fresh_start()) {
     initialize_retained();
     bootstrap_callback();
+
   } else {
-    if (checkpoint_load() == 0)
+    if (checkpoint_load() == 0) {
       /* Unblock the user task */
       xTaskNotifyIndexed(usr_task_handle, 1, EVT_RESET, eSetValueWithOverwrite);
-    else {
+      runtime_stats.n_reset++;
+    } else {
       initialize_retained();
       /* Call user bootstrap code */
       bootstrap_callback();
@@ -255,6 +260,7 @@ static void sys_task(void *pvParameter) {
 
     vTaskSuspend(usr_task_handle);
     teardown();
+    runtime_stats.n_turnoff++;
 
     /* Set a high threshold - upon reaching this threshold, execution continues */
     /* If the user task was already waiting on high threshold, we have to notify it here */
