@@ -8,6 +8,8 @@
 extern "C" {
 #endif
 
+#define SPIC_PIN_UNUSED (1UL << 31)
+
 typedef enum {
   SPIC_FREQUENCY_K125 = 0x02000000UL, /*!< 125 kbps */
   SPIC_FREQUENCY_K250 = 0x04000000UL, /*!< 250 kbps */
