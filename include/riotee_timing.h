@@ -9,8 +9,8 @@ extern "C" {
 int riotee_timing_init(void);
 
 /* Sleep for number of 32768kHz ticks */
-void riotee_sleep_ticks(unsigned int ticks_32k);
-void riotee_sleep_ms(unsigned int ms);
+int riotee_sleep_ticks(unsigned int ticks_32k);
+int riotee_sleep_ms(unsigned int ms);
 
 void riotee_delay_us(unsigned int us);
 void riotee_delay_ms(unsigned int ms);

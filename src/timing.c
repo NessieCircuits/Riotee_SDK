@@ -53,8 +53,8 @@ int riotee_sleep_ticks(unsigned int ticks) {
   taskEXIT_CRITICAL();
   xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
   if (notification_value != EVT_RTC)
-    return 0;
-  return -1;
+    return -1;
+  return 0;
 }
 
 int riotee_sleep_ms(unsigned int ms) {
