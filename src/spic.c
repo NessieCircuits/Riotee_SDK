@@ -9,10 +9,10 @@
 TEARDOWN_FUN(spic_teardown_ptr);
 
 int spic_init(riotee_spic_cfg_t* cfg) {
-  NRF_SPIM3->PSEL.CSN = PIN_D7;
-  NRF_SPIM3->PSEL.MOSI = PIN_D8;
-  NRF_SPIM3->PSEL.MISO = PIN_D9;
-  NRF_SPIM3->PSEL.SCK = PIN_D10;
+  NRF_SPIM3->PSEL.CSN = cfg->pin_cs;
+  NRF_SPIM3->PSEL.MOSI = cfg->pin_copi;
+  NRF_SPIM3->PSEL.MISO = cfg->pin_cipo;
+  NRF_SPIM3->PSEL.SCK = cfg->pin_sck;
 
   NRF_SPIM3->FREQUENCY = cfg->frequency;
   switch (cfg->mode) {
