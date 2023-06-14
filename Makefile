@@ -2,6 +2,7 @@ PREFIX := "$(GNU_INSTALL_ROOT)"arm-none-eabi-
 PROJ_DIR := ./
 OUTPUT_DIR := _build
 SRC_DIR := src
+DRIVER_DIR := drivers
 RTOS_DIR := freertos
 NRFX_DIR := nrfx
 CMSIS_DIR := CMSIS_5
@@ -26,6 +27,7 @@ LIB_SRC_FILES += \
 	$(SRC_DIR)/nvm.c \
 	$(SRC_DIR)/adc.c \
 	$(SRC_DIR)/stella.c \
+	$(DRIVER_DIR)/shtc3.c \
   $(RTOS_DIR)/queue.c \
   $(RTOS_DIR)/list.c \
   $(RTOS_DIR)/tasks.c \
@@ -41,6 +43,7 @@ LIB_OBJS = $(addprefix $(OUTPUT_DIR)/, $(addsuffix .o, $(LIB_SRC_FILES)))
 # Include folders common to all targets
 INC_FOLDERS += \
   $(PROJ_DIR)/include \
+  $(DRIVER_DIR) \
   $(RTOS_DIR)/include \
   $(RTOS_DIR)/portable/GCC/ARM_CM4F \
   $(NRFX_DIR) \
