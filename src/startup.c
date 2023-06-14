@@ -214,8 +214,7 @@ void c_startup(void) {
 
   nrf_gpio_cfg_input(PIN_D0, NRF_GPIO_PIN_PULLDOWN);
   nrf_gpio_cfg_input(PIN_D1, NRF_GPIO_PIN_PULLDOWN);
-  nrf_gpio_cfg_input(PIN_D2, NRF_GPIO_PIN_PULLDOWN);
-  nrf_gpio_cfg_input(PIN_D3, NRF_GPIO_PIN_PULLDOWN);
+
   nrf_gpio_cfg_input(PIN_D4, NRF_GPIO_PIN_PULLDOWN);
   nrf_gpio_cfg_input(PIN_D5, NRF_GPIO_PIN_PULLDOWN);
   nrf_gpio_cfg_input(PIN_D6, NRF_GPIO_PIN_PULLDOWN);
