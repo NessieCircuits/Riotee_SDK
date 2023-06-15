@@ -1,32 +1,32 @@
 PREFIX := "$(GNU_INSTALL_ROOT)"arm-none-eabi-
 PROJ_DIR := ./
 OUTPUT_DIR := _build
-SRC_DIR := src
-DRIVER_DIR := drivers
-RTOS_DIR := freertos
-NRFX_DIR := nrfx
-CMSIS_DIR := CMSIS_5
-LINKER_SCRIPT:= linker.ld
-NRF_DEV_NUM ?= 52833
+CORE_DIR := $(SDK_ROOT)/core
+DRIVER_DIR := $(SDK_ROOT)/drivers
+RTOS_DIR := $(SDK_ROOT)/external/freertos
+NRFX_DIR := $(SDK_ROOT)/external/nrfx
+CMSIS_DIR := $(SDK_ROOT)/external/CMSIS_5
+LINKER_SCRIPT:= $(SDK_ROOT)/linker.ld
+NRF_DEV_NUM := 52833
 
 
-LIB_SRC_FILES += \
-  $(SRC_DIR)/startup.c \
-  $(SRC_DIR)/thresholds.c \
-  $(SRC_DIR)/printf.c \
-  $(SRC_DIR)/radio.c \
-  $(SRC_DIR)/ble.c \
-  $(SRC_DIR)/i2c.c \
-  $(SRC_DIR)/max20361.c \
-  $(SRC_DIR)/am1805.c \
-  $(SRC_DIR)/timing.c \
-  $(SRC_DIR)/gpint.c \
-  $(SRC_DIR)/uart.c \
-  $(SRC_DIR)/spic.c \
-  $(SRC_DIR)/runtime.c \
-	$(SRC_DIR)/nvm.c \
-	$(SRC_DIR)/adc.c \
-	$(SRC_DIR)/stella.c \
+SDK_SRC_FILES += \
+  $(CORE_DIR)/startup.c \
+  $(CORE_DIR)/thresholds.c \
+  $(CORE_DIR)/printf.c \
+  $(CORE_DIR)/radio.c \
+  $(CORE_DIR)/ble.c \
+  $(CORE_DIR)/i2c.c \
+  $(CORE_DIR)/max20361.c \
+  $(CORE_DIR)/am1805.c \
+  $(CORE_DIR)/timing.c \
+  $(CORE_DIR)/gpint.c \
+  $(CORE_DIR)/uart.c \
+  $(CORE_DIR)/spic.c \
+  $(CORE_DIR)/runtime.c \
+	$(CORE_DIR)/nvm.c \
+	$(CORE_DIR)/adc.c \
+	$(CORE_DIR)/stella.c \
 	$(DRIVER_DIR)/shtc3.c \
 	$(DRIVER_DIR)/vm1010.c \
   $(RTOS_DIR)/queue.c \
@@ -35,16 +35,15 @@ LIB_SRC_FILES += \
   $(RTOS_DIR)/event_groups.c \
   $(RTOS_DIR)/portable/GCC/ARM_CM4F/port.c
 
-APP_SRC_FILES += \
-  $(SRC_DIR)/main.c
 
-APP_OBJS = $(addprefix $(OUTPUT_DIR)/, $(addsuffix .o, $(APP_SRC_FILES)))
-LIB_OBJS = $(addprefix $(OUTPUT_DIR)/, $(addsuffix .o, $(LIB_SRC_FILES)))
+OBJS = $(addprefix $(OUTPUT_DIR), $(addsuffix .o, $(SRC_FILES))) 
+OBJS += $(subst $(SDK_ROOT),$(OUTPUT_DIR), $(addsuffix .o, $(SDK_SRC_FILES)))
+
 
 # Include folders common to all targets
 INC_FOLDERS += \
-  $(PROJ_DIR)/include \
-  $(DRIVER_DIR) \
+  $(CORE_DIR)/include \
+  $(DRIVER_DIR)/include \
   $(RTOS_DIR)/include \
   $(RTOS_DIR)/portable/GCC/ARM_CM4F \
   $(NRFX_DIR) \
@@ -93,19 +92,23 @@ LDFLAGS += -Wl,--gc-sections,-Map=${OUTPUT_DIR}/build.map
 # use newlib in nano version and system call stubs
 LDFLAGS += --specs=nano.specs
 
-LIB_FILES += -lm -lriotee
+LIB_FILES += -lm
 
 ARFLAGS = -rcs
 
-.PHONY: clean flash erase lib app
+.PHONY: clean flash erase app
 
-all: lib app
+all: app
 
-lib: ${OUTPUT_DIR}/libriotee.a
 app: ${OUTPUT_DIR}/build.hex
 
 
-${OUTPUT_DIR}/%.c.o: %.c
+${OUTPUT_DIR}/%.c.o: ${SDK_ROOT}/%.c
+	@mkdir -p $(@D)
+	@${PREFIX}gcc ${CFLAGS} -c $< -o $@
+	@echo "CC $<"
+
+${OUTPUT_DIR}/%.c.o: ${PRJ_ROOT}/%.c
 	@mkdir -p $(@D)
 	@${PREFIX}gcc ${CFLAGS} -c $< -o $@
 	@echo "CC $<"
@@ -115,13 +118,10 @@ ${OUTPUT_DIR}/%.c.o: %.cpp
 	@${PREFIX}c++ ${CPPFLAGS} -c $< -o $@
 	@echo "CC $<"
 
-${OUTPUT_DIR}/build.elf: $(APP_OBJS) ${OUTPUT_DIR}/libriotee.a
+${OUTPUT_DIR}/build.elf: $(OBJS) 
 	@${PREFIX}c++ ${LDFLAGS} $^ -o $@ ${LIB_FILES}
 	@${PREFIX}size $@
 
-${OUTPUT_DIR}/libriotee.a: $(LIB_OBJS)
-	@echo "Preparing $@"
-	@${PREFIX}ar ${ARFLAGS} $@ $^
 
 ${OUTPUT_DIR}/build.hex: ${OUTPUT_DIR}/build.elf
 	@echo "Preparing $@"
