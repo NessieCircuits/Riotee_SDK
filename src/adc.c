@@ -4,7 +4,6 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "runtime.h"
-
 #include "nrf_gpio.h"
 
 TEARDOWN_FUN(adc_teardown_ptr);

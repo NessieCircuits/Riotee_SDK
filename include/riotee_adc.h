@@ -1,7 +1,8 @@
-#ifndef __ADC_H_
-#define __ADC_H_
+#ifndef __ROPTEE_ADC_H_
+#define __RIOTEE_ADC_H_
 
 #include <stdint.h>
+#include "riotee.h"
 
 typedef enum {
   RIOTEE_ADC_INPUT_NC = 0,
@@ -97,4 +98,17 @@ static inline float riotee_adc_vadc2vcap(float v_adc) {
   return v_adc / 1.727f * 4.8f;
 }
 
-#endif
+static inline int riotee_adc_pin2input(riotee_adc_input_t *input, unsigned int pin) {
+  switch (pin) {
+    case PIN_D2:
+      *input = RIOTEE_ADC_INPUT_A0;
+      return 0;
+    case PIN_D3:
+      *input = RIOTEE_ADC_INPUT_A1;
+      return 0;
+    default:
+      return -1;
+  }
+}
+
+#endif /* __RIOTEE_ADC_H_ */
