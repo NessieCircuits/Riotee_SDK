@@ -2,6 +2,7 @@
 #define __STELLA_H_
 
 #include <stdint.h>
+#include <stddef.h>
 
 typedef struct __attribute__((packed)) {
   /* ID of the sender of this packet */
