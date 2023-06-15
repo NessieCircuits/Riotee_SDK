@@ -52,6 +52,8 @@ void sys_cancel_timer(void);
 
 /* Dummy callback to be called when low capacitor voltage is detected. Can be overwritten by the user. */
 __attribute__((weak)) void turnoff_callback(void){};
+/* Dummy callback during first boot-up of the device */
+__attribute__((weak)) void bootstrap_callback(void){};
 
 /* Checks if a certain value is found in flash memory to determine if this is the first boot after programming. */
 static bool check_fresh_start() {
