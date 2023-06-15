@@ -6,7 +6,6 @@
 #include "riotee_stella.h"
 #include "radio.h"
 #include "runtime.h"
-#include "printf.h"
 
 static riotee_stella_pkt_t rx_buf;
 static riotee_stella_pkt_t tx_buf;
@@ -94,7 +93,7 @@ int riotee_stella_init() {
   NRF_RADIO->TXPOWER = (RADIO_TXPOWER_TXPOWER_0dBm << RADIO_TXPOWER_TXPOWER_Pos);
   /* 2476 MHz frequency */
   NRF_RADIO->FREQUENCY = 76UL;
-  /* BLE 2MBit */
+  /* BLE 1MBit */
   NRF_RADIO->MODE = (RADIO_MODE_MODE_Ble_1Mbit << RADIO_MODE_MODE_Pos);
   /* Fast radio rampup */
   NRF_RADIO->MODECNF0 = (RADIO_MODECNF0_RU_Fast << RADIO_MODECNF0_RU_Pos);
@@ -185,6 +184,10 @@ int riotee_stella_transceive(riotee_stella_pkt_t *rx_pkt, riotee_stella_pkt_t *t
 
   /* Wait until acknowledgement is received/expired */
   xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
+
+  /* Make sure HFXO has stopped so the next packet can be sent right after returning. */
+  while ((NRF_CLOCK->HFCLKSTAT & CLOCK_HFCLKSTAT_SRC_Msk) == CLOCK_HFCLKSTAT_SRC_Xtal) {
+  }
 
   if (notification_value == EVT_RESET)
     return STELLA_ERR_RESET;
