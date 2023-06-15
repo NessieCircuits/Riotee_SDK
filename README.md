@@ -1,8 +1,8 @@
-[![Build](https://github.com/NessieCircuits/Riotee_Runtime/actions/workflows/make.yml/badge.svg)](https://github.com/NessieCircuits/Riotee_Runtime/actions/workflows/make.yml)
+[![Build](https://github.com/NessieCircuits/Riotee_Runtime/actions/workflows/build.yml/badge.svg)](https://github.com/NessieCircuits/Riotee_Runtime/actions/workflows/build.yml)
 
-# A battery-free runtime for the Riotee platform
+# Software Development Kit for Riotee: A battery-free IoT platform.
 
-The code in this repository allows executing user-code on the battery-free Riotee module.
+The code in this repository allows building applications that run on the battery-free Riotee module.
 For a detailed description refer to the [documentation](https://www.riotee.nessie-circuits.de/docs/software/riotee-runtime).
 
 ## Features
@@ -18,15 +18,14 @@ For a detailed description refer to the [documentation](https://www.riotee.nessi
  - UART driver
  - Driver for MAX20361 boost converter
  - ADC driver
- - Stella wireless protocol for bidirectional communication with a basestation
+ - *Stella* wireless protocol for bidirectional communication with a basestation
 
 ## Usage
 
-There are three ways how you can use this runtime. 
+There are two ways how you can use this SDK. 
 
-- Use our Arduino package to conveniently program your Riotee hardware. The Arduino IDE will automatically include the runtime and you develop your application as a sketch.
-- Write your own application code and link it against the runtime as a static library.
-- Copy your code into the codebase of the runtime and build everything together.
+- Use our Arduino package to conveniently program your Riotee hardware. You develop your application as a sketch and the Arduino IDE will automatically include the SDK
+- Write your own application and refer to this SDK in your Makefile
 
 ## Building
 

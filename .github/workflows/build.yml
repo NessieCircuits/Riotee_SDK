@@ -1,7 +1,8 @@
-name: Make build
+name: Build examples
 
 on:
   push:
+  workflow_call:
 
 jobs:
   build:
@@ -16,4 +17,4 @@ jobs:
       run: sudo apt update && sudo apt install -y gcc-arm-none-eabi
 
     - name: Build code
-      run: make clean all
+      run: cd examples && make
