@@ -56,17 +56,12 @@ void bootstrap_callback(void);
 void reset_callback(void);
 /* This gets called right before user code is suspended */
 void turnoff_callback(void);
-/* This is the FreeRTOS task running user code*/
-void user_task(void *pvParameter);
 
 /* Waits until capacitor is fully charged as indicated by PWRGD_H pin */
 int wait_until_charged(void);
 
 #define __VOLATILE_INITIALIZED __attribute__((section(".volatile.data")))
 #define __VOLATILE_UNINITIALIZED __attribute__((section(".volatile.bss")))
-
-#define UNUSED_VARIABLE(X) ((void)(X))
-#define UNUSED_PARAMETER(X) UNUSED_VARIABLE(X)
 
 #if defined __cplusplus
 }

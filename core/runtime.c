@@ -14,6 +14,8 @@
 #include "runtime.h"
 #include "riotee_thresholds.h"
 
+#define UNUSED(X) ((void)(X))
+
 #define SYS_STACK_SIZE (configMINIMAL_STACK_SIZE + 128)
 
 extern unsigned long __etext;
@@ -225,7 +227,7 @@ static void teardown(void) {
 
 /* High priority system task initializes runtime, and handles intermittent execution and checkpointing. */
 static void sys_task(void *pvParameter) {
-  UNUSED_PARAMETER(pvParameter);
+  UNUSED(pvParameter);
 
   unsigned long notification_value;
 
@@ -303,6 +305,13 @@ static void sys_task(void *pvParameter) {
     /* Wait until capacitor is recharged */
     xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
   }
+}
+
+int main(void);
+
+void user_task(void *pvParameter) {
+  UNUSED(pvParameter);
+  main();
 }
 
 void runtime_start(void) {

@@ -13,9 +13,7 @@ void turnoff_callback(void) {
   riotee_gpio_clear(PIN_LED_CTRL);
 }
 
-void user_task(void *pvParameter) {
-  UNUSED_PARAMETER(pvParameter);
-
+int main(void) {
   for (;;) {
     wait_until_charged();
     riotee_gpio_set(PIN_LED_CTRL);
