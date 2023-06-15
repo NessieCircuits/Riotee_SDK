@@ -209,7 +209,7 @@ int riotee_stella_transceive(riotee_stella_pkt_t *rx_pkt, riotee_stella_pkt_t *t
   return STELLA_ERR_OK;
 }
 
-int riotee_stella_send(uint8_t *data, size_t n) {
+int riotee_stella_send(void *data, size_t n) {
   memcpy(tx_buf.data, data, n);
 
   tx_buf.len = sizeof(riotee_stella_pkt_header_t) + n;

@@ -27,7 +27,7 @@ int riotee_stella_init(void);
 int riotee_stella_transceive(riotee_stella_pkt_t *rx_pkt, riotee_stella_pkt_t *tx_pkt);
 
 /* Wrapper function for simple uplink data. Returns STELLA_ERR_OK if acknowledgement is received. */
-int riotee_stella_send(uint8_t *data, size_t n);
+int riotee_stella_send(void *data, size_t n);
 
 /* Set the ID that our device uses to identify to the nework */
 void riotee_stella_set_id(uint32_t dev_id);
