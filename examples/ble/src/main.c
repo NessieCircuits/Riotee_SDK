@@ -1,0 +1,23 @@
+
+#include "riotee.h"
+#include "riotee_ble.h"
+
+riotee_ble_ll_addr_t adv_address = {.addr_bytes = {0xBE, 0xEF, 0xDE, 0xAD, 0x00, 0x01}};
+
+static struct {
+  unsigned int counter;
+} ble_data;
+
+void reset_callback(void) {
+  riotee_ble_init();
+  riotee_ble_prepare_adv(&adv_address, "RIOTEE", 6, sizeof(ble_data));
+  ble_data.counter = 0;
+}
+
+int main() {
+  for (;;) {
+    wait_until_charged();
+    riotee_ble_advertise(&ble_data, ADV_CH_ALL);
+    ble_data.counter++;
+  }
+}
