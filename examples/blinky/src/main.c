@@ -1,0 +1,23 @@
+
+#include "riotee.h"
+#include "riotee_gpio.h"
+#include "riotee_timing.h"
+
+/* This gets called after every reset */
+void reset_callback(void) {
+  riotee_gpio_cfg_output(PIN_LED_CTRL);
+}
+
+/* This gets called when capacitor voltage gets low */
+void turnoff_callback(void) {
+  riotee_gpio_clear(PIN_LED_CTRL);
+}
+
+void user_task(void *pvParameter) {
+  UNUSED_PARAMETER(pvParameter);
+
+  for (;;) {
+    wait_until_charged();
+    riotee_gpio_set(PIN_LED_CTRL);
+  }
+}

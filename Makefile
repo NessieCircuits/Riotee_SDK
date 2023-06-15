@@ -1,6 +1,3 @@
-PREFIX := "$(GNU_INSTALL_ROOT)"arm-none-eabi-
-PROJ_DIR := ./
-OUTPUT_DIR := _build
 CORE_DIR := $(SDK_ROOT)/core
 DRIVER_DIR := $(SDK_ROOT)/drivers
 RTOS_DIR := $(SDK_ROOT)/external/freertos
@@ -36,8 +33,8 @@ SDK_SRC_FILES += \
   $(RTOS_DIR)/portable/GCC/ARM_CM4F/port.c
 
 
-OBJS = $(addprefix $(OUTPUT_DIR), $(addsuffix .o, $(SRC_FILES))) 
-OBJS += $(subst $(SDK_ROOT),$(OUTPUT_DIR), $(addsuffix .o, $(SDK_SRC_FILES)))
+OBJS = $(addprefix $(OUTPUT_DIR)/, $(addsuffix .o, $(SRC_FILES))) 
+OBJS += $(subst $(SDK_ROOT)/,$(OUTPUT_DIR)/, $(addsuffix .o, $(SDK_SRC_FILES)))
 
 
 # Include folders common to all targets
