@@ -16,7 +16,7 @@ void reset_callback(void) {
 
 int main() {
   for (;;) {
-    wait_until_charged();
+    riotee_wait_cap_charged();
     riotee_ble_advertise(&ble_data, ADV_CH_ALL);
     ble_data.counter++;
   }

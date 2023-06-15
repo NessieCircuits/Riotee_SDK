@@ -15,7 +15,7 @@ void turnoff_callback(void) {
 
 int main(void) {
   for (;;) {
-    wait_until_charged();
+    riotee_wait_cap_charged();
     riotee_gpio_set(PIN_LED_CTRL);
   }
 }

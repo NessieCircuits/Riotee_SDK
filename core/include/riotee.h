@@ -58,7 +58,7 @@ void reset_callback(void);
 void turnoff_callback(void);
 
 /* Waits until capacitor is fully charged as indicated by PWRGD_H pin */
-int wait_until_charged(void);
+int riotee_wait_cap_charged(void);
 
 #define __VOLATILE_INITIALIZED __attribute__((section(".volatile.data")))
 #define __VOLATILE_UNINITIALIZED __attribute__((section(".volatile.bss")))

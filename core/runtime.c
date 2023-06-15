@@ -207,7 +207,7 @@ static void initialize_retained(void) {
 }
 
 /* Waits until capacitor is fully charged as indicated by PWRGD_H pin */
-int wait_until_charged(void) {
+int riotee_wait_cap_charged(void) {
   return riotee_gpint_wait(PIN_PWRGD_H, GPINT_LEVEL_HIGH, GPIO_PIN_CNF_PULL_Disabled);
 }
 
