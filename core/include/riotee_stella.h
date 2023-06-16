@@ -4,6 +4,10 @@
 #include <stdint.h>
 #include <stddef.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct __attribute__((packed)) {
   /* ID of the sender of this packet */
   uint32_t dev_id;
@@ -33,5 +37,9 @@ int riotee_stella_send(void *data, size_t n);
 void riotee_stella_set_id(uint32_t dev_id);
 
 enum { STELLA_ERR_OK = 0, STELLA_ERR_GENERIC = -1, STELLA_ERR_RESET = -2, STELLA_ERR_NOACK = 1 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __STELLA_H_ */
