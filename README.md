@@ -23,7 +23,7 @@ Download the [latest release zip](https://github.com/NessieCircuits/Riotee_Runti
 
 ## Usage
 
-Take a look at the [examples](./examples) for how you can use this SDK. We also provide a [template project]() to get you started with your first Riotee project using the SDK.
+Take a look at the [examples](./examples) for how you can use this SDK. We also provide a [template project](https://github.com/NessieCircuits/Riotee_AppTemplate) to get you started with your first Riotee project using the SDK.
 
 Your application must provide a `main` function. This function is executed while the device has energy and suspended when energy becomes critically low. If the power supply is interrupted, the stack and all static and global variables are saved and restored as soon as the supply comes back.
 
