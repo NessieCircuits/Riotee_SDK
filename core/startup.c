@@ -256,7 +256,8 @@ void c_startup(void) {
   __ISB();
 #endif
 
-  /* Call static constructors via newlibc */
+  /* First call to static constructors via newlibc. There will be a second when nonretained memory gets set up.
+   */
   __libc_init_array();
   runtime_start();
 }

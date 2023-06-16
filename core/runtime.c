@@ -56,6 +56,10 @@ void sys_cancel_timer(void);
 __attribute__((weak)) void turnoff_callback(void){};
 /* Dummy callback during first boot-up of the device */
 __attribute__((weak)) void bootstrap_callback(void){};
+/* Dummy callback after every reset */
+__attribute__((weak)) void reset_callback(void){};
+
+void __libc_init_array(void);
 
 /* Checks if a certain value is found in flash memory to determine if this is the first boot after programming. */
 static bool check_fresh_start() {
@@ -204,6 +208,9 @@ static void initialize_retained(void) {
   src = &__bss_retained_start__;
   while (src < &__bss_retained_end__)
     *(src++) = 0;
+
+  /* Call static constructors via newlibc to re-setup the memory that just got cleared. */
+  __libc_init_array();
 }
 
 /* Waits until capacitor is fully charged as indicated by PWRGD_H pin */

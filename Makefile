@@ -69,7 +69,7 @@ CFLAGS += -fsingle-precision-constant
 CFLAGS += -ffunction-sections
 CFLAGS += -fdata-sections
 
-CPPFLAGS = ${CFLAGS}
+CPPFLAGS = ${CFLAGS} -fno-exceptions
 
 ASMFLAGS += -g3
 ASMFLAGS += -mcpu=cortex-m4
@@ -110,7 +110,7 @@ ${OUTPUT_DIR}/%.c.o: ${PRJ_ROOT}/%.c
 	@${PREFIX}gcc ${CFLAGS} -c $< -o $@
 	@echo "CC $<"
 
-${OUTPUT_DIR}/%.c.o: %.cpp
+${OUTPUT_DIR}/%.cpp.o: ${PRJ_ROOT}/%.cpp
 	@mkdir -p $(@D)
 	@${PREFIX}c++ ${CPPFLAGS} -c $< -o $@
 	@echo "CC $<"
