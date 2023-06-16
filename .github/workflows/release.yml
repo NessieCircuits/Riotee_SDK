@@ -5,6 +5,9 @@ on:
       tags:
       - 'v*.*.*'
 
+permissions:
+  contents: write
+
 jobs:
   call-build:
     uses: ./.github/workflows/build.yml
