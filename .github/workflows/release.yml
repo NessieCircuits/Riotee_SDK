@@ -10,15 +10,25 @@ jobs:
     uses: ./.github/workflows/build.yml
   release:
     runs-on: ubuntu-latest
-    needs: call-build
 
     steps:
     - uses: actions/checkout@v3
       with:
         submodules: true
+        path: riotee_sdk_${{github.ref_name}}
 
-    - name: Upload artifacts to github
-      uses: actions/upload-artifact@v3
+    - name: Remove CMSIS clutter
+      run: |
+        shopt -s extglob
+        cd riotee_sdk_${{github.ref_name}}/external/CMSIS_5/CMSIS
+        rm -rf !(Core)
+        cd ..
+        rm -rf !(CMSIS)
+      shell: bash
+
+    - run: zip -qq -r riotee_sdk_${{github.ref_name}}.zip riotee_sdk_${{github.ref_name}} -x "*.git*"
+
+    - name: Release
+      uses: softprops/action-gh-release@v1
       with:
-        name: sdk
-  
+        files: riotee_sdk_${{github.ref_name}}.zip
