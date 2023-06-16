@@ -39,6 +39,7 @@ OBJS += $(subst $(SDK_ROOT)/,$(OUTPUT_DIR)/, $(addsuffix .o, $(SDK_SRC_FILES)))
 
 # Include folders common to all targets
 INC_FOLDERS += \
+  $(CORE_DIR) \
   $(CORE_DIR)/include \
   $(DRIVER_DIR)/include \
   $(RTOS_DIR)/include \
