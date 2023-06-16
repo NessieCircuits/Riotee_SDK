@@ -4,7 +4,6 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "runtime.h"
-#include "nrf_gpio.h"
 
 TEARDOWN_FUN(adc_teardown_ptr);
 
@@ -79,6 +78,34 @@ int riotee_adc_init(void) {
   return 0;
 }
 
+int16_t riotee_adc_read(riotee_adc_input_t in) {
+  int16_t result;
+  taskENTER_CRITICAL();
+
+  NRF_SAADC->CH[0].CONFIG = (SAADC_CH_CONFIG_RESP_Bypass << SAADC_CH_CONFIG_RESP_Pos) |
+                            (SAADC_CH_CONFIG_RESN_Bypass << SAADC_CH_CONFIG_RESN_Pos) |
+                            (SAADC_CH_CONFIG_GAIN_Gain1_4 << SAADC_CH_CONFIG_GAIN_Pos) |
+                            (SAADC_CH_CONFIG_REFSEL_VDD1_4 << SAADC_CH_CONFIG_REFSEL_Pos) |
+                            (SAADC_CH_CONFIG_TACQ_5us << SAADC_CH_CONFIG_TACQ_Pos);
+
+  NRF_SAADC->CH[0].PSELP = in;
+  NRF_SAADC->CH[0].PSELN = RIOTEE_ADC_INPUT_NC;
+  NRF_SAADC->RESULT.PTR = (uint32_t)&result;
+  NRF_SAADC->RESULT.MAXCNT = 1;
+  NRF_SAADC->OVERSAMPLE = RIOTEE_ADC_OVERSAMPLE_DISABLED;
+
+  NRF_SAADC->ENABLE = (SAADC_ENABLE_ENABLE_Enabled << SAADC_ENABLE_ENABLE_Pos);
+
+  NRF_SAADC->EVENTS_END = 0;
+  NRF_SAADC->TASKS_START = 1;
+  while (NRF_SAADC->EVENTS_END == 0) {
+  };
+  NRF_SAADC->EVENTS_END = 0;
+  NRF_SAADC->ENABLE = (SAADC_ENABLE_ENABLE_Disabled << SAADC_ENABLE_ENABLE_Pos);
+
+  taskEXIT_CRITICAL();
+  return result;
+}
 int riotee_adc_sample(int16_t *dst, riotee_adc_cfg_t *cfg) {
   unsigned long notification_value;
 

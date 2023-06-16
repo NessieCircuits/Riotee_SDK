@@ -4,6 +4,10 @@
 #include <stdint.h>
 #include "riotee.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef enum {
   RIOTEE_ADC_INPUT_NC = 0,
   RIOTEE_ADC_INPUT_VCAP = 6,
@@ -72,22 +76,7 @@ int riotee_adc_init(void);
 int riotee_adc_sample(int16_t *dst, riotee_adc_cfg_t *cfg);
 
 /* Reads a single ADC sample. */
-static inline int riotee_adc_read(float *dst, riotee_adc_input_t input) {
-  int16_t adc_res;
-  int rc;
-  riotee_adc_cfg_t cfg = {.gain = RIOTEE_ADC_GAIN1_4,
-                          .reference = RIOTEE_ADC_REFERENCE_VDD4,
-                          .acq_time = RIOTEE_ADC_ACQTIME_5US,
-                          .input_pos = input,
-                          .input_neg = RIOTEE_ADC_INPUT_NC,
-                          .oversampling = RIOTEE_ADC_OVERSAMPLE_DISABLED,
-                          .n_samples = 1};
-
-  if ((rc = riotee_adc_sample(&adc_res, &cfg)) != 0)
-    return rc;
-  *dst = ((float)adc_res) / 4096.0f * 2.0f;
-  return 0;
-}
+int16_t riotee_adc_read(riotee_adc_input_t in);
 
 /* Converts binary ADC result to voltage. */
 float riotee_adc_adc2vadc(int16_t adc, riotee_adc_cfg_t *cfg);
@@ -110,5 +99,9 @@ static inline int riotee_adc_pin2input(riotee_adc_input_t *input, unsigned int p
       return -1;
   }
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __RIOTEE_ADC_H_ */
