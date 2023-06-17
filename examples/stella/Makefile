@@ -10,4 +10,7 @@ endif
 SRC_FILES = \
   $(PRJ_ROOT)/src/main.c
 
+INC_FOLDERS = \
+  $(PRJ_ROOT)/include
+
 include $(SDK_ROOT)/Makefile
