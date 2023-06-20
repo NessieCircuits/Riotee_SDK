@@ -13,8 +13,8 @@ Download the [latest zip release](https://github.com/NessieCircuits/Riotee_Runti
 
 ### Linux
 
- - Install `make` from your distribution's repository (`apt-get install build-essential` on Ubuntu)
- - Install the `GNU Arm Embedded Toolchain` from your distribution's repository (`apt-get install arm-none-eabi-gcc` on Ubuntu) or from [the official website](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads)
+ - Install `make` from your distribution's repository (`apt install build-essential` on Ubuntu)
+ - Install the `GNU Arm Embedded Toolchain` from your distribution's repository (`apt install gcc-arm-none-eabi` on Ubuntu) or from [the official website](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads)
  - For uploading firmware to your Riotee device install [pyOCD](https://pyocd.io/) with
 
 ```bash
