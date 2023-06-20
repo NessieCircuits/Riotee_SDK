@@ -11,6 +11,12 @@ For a quickstart with Riotee you can use our Arduino package which internally ma
 
 Download the [latest zip release](https://github.com/NessieCircuits/Riotee_Runtime/releases/latest) and unpack it to a path on your machine.
 
+Alternatively, clone this repository to get the latest development version of the SDK:
+
+```bash
+git clone --recursive git@github.com:NessieCircuits/Riotee_Runtime.git
+```
+
 ### Linux
 
  - Install `make` from your distribution's repository (`apt install build-essential` on Ubuntu)
