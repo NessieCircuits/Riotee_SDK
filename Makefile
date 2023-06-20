@@ -1,9 +1,9 @@
-CORE_DIR := $(SDK_ROOT)/core
-DRIVER_DIR := $(SDK_ROOT)/drivers
-RTOS_DIR := $(SDK_ROOT)/external/freertos
-NRFX_DIR := $(SDK_ROOT)/external/nrfx
-CMSIS_DIR := $(SDK_ROOT)/external/CMSIS_5
-LINKER_SCRIPT:= $(SDK_ROOT)/linker.ld
+CORE_DIR := $(RIOTEE_SDK_ROOT)/core
+DRIVER_DIR := $(RIOTEE_SDK_ROOT)/drivers
+RTOS_DIR := $(RIOTEE_SDK_ROOT)/external/freertos
+NRFX_DIR := $(RIOTEE_SDK_ROOT)/external/nrfx
+CMSIS_DIR := $(RIOTEE_SDK_ROOT)/external/CMSIS_5
+LINKER_SCRIPT:= $(RIOTEE_SDK_ROOT)/linker.ld
 NRF_DEV_NUM := 52833
 
 
@@ -34,7 +34,7 @@ SDK_SRC_FILES += \
 
 
 OBJS = $(addprefix $(OUTPUT_DIR)/, $(addsuffix .o, $(SRC_FILES))) 
-OBJS += $(subst $(SDK_ROOT)/,$(OUTPUT_DIR)/, $(addsuffix .o, $(SDK_SRC_FILES)))
+OBJS += $(subst $(RIOTEE_SDK_ROOT)/,$(OUTPUT_DIR)/, $(addsuffix .o, $(SDK_SRC_FILES)))
 
 
 # Include folders common to all targets
@@ -101,7 +101,7 @@ all: app
 app: ${OUTPUT_DIR}/build.hex
 
 
-${OUTPUT_DIR}/%.c.o: ${SDK_ROOT}/%.c
+${OUTPUT_DIR}/%.c.o: ${RIOTEE_SDK_ROOT}/%.c
 	@mkdir -p $(@D)
 	@${PREFIX}gcc ${CFLAGS} -c $< -o $@
 	@echo "CC $<"
