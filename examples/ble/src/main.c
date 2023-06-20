@@ -3,7 +3,7 @@
 #include "riotee_ble.h"
 #include "riotee_timing.h"
 
-riotee_ble_ll_addr_t adv_address = {.addr_bytes = {0xBE, 0xEF, 0xDE, 0xAD, 0x00, 0x01}};
+riotee_ble_ll_addr_t adv_address = {.addr_bytes = {0x01, 0xEE, 0xC0, 0xFF, 0x03, 0x02}};
 
 static struct {
   unsigned int counter;
