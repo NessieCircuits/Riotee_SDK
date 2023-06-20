@@ -78,7 +78,7 @@ int am1805_init(void) {
   do {
     retries--;
     if (get_id(&id) == 0)
-      if (id != 0x1805) {
+      if (id == 0x0518) {
         return 0;
       }
     riotee_sleep_ms(RETRY_DELAY_MS);
