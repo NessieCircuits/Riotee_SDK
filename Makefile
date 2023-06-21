@@ -39,7 +39,7 @@ OBJS += $(subst $(RIOTEE_SDK_ROOT)/,$(OUTPUT_DIR)/, $(addsuffix .o, $(SDK_SRC_FI
 
 
 # Include folders common to all targets
-INC_FOLDERS += \
+INC_DIRS += \
   $(CORE_DIR) \
   $(CORE_DIR)/include \
   $(DRIVER_DIR)/include \
@@ -51,7 +51,7 @@ INC_FOLDERS += \
   $(NRFX_DIR)/templates \
   $(CMSIS_DIR)/CMSIS/Core/Include
 
-INCLUDES = $(INC_FOLDERS:%=-I%)
+INCLUDES = $(INC_DIRS:%=-I%)
 
 OPT = -O3 -g3
 
@@ -85,7 +85,7 @@ LDFLAGS += -T$(LINKER_SCRIPT)
 LDFLAGS += -mthumb -mabi=aapcs
 LDFLAGS += -mcpu=cortex-m4
 LDFLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16
-LDFLAGS += -L$(OUTPUT_DIR)
+LDFLAGS += -L$(LIB_DIRS)
 # let linker dump unused sections
 LDFLAGS += -Wl,--gc-sections,-Map=${OUTPUT_DIR}/build.map
 # use newlib in nano version and system call stubs

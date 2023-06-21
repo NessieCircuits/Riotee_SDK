@@ -44,9 +44,11 @@ In a nutshell: Your application must provide a Makefile that includes the [SDK's
 
  - `RIOTEE_SDK_ROOT`: Path to the Riotee SDK
  - `SRC_FILES`: Your C/C++ source files
- - `INC_FOLDERS`: Paths to your header files
+ - `INC_DIRS`: Paths to your header files
  - `OUTPUT_DIR`: Path where project is built
  - `GNU_INSTALL_ROOT`: Optional. Path to your gcc toolchain if not on your *Path*.
+ - `LIB_DIRS`: Optional. Paths to static libraries.
+ - `LIB_FILES`: Optional. Static libraries to link against. 
 
  Your code defines a `main()` function. This function is executed while the device has energy and suspended when energy becomes critically low. If the power supply is interrupted, the stack and all static and global variables are stored in non-volatile memory and restored as soon as the supply comes back.
 

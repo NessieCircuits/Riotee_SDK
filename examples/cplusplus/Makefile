@@ -12,7 +12,7 @@ SRC_FILES = \
   $(PRJ_ROOT)/src/led.cpp \
   $(PRJ_ROOT)/src/main.cpp
 
-INC_FOLDERS = \
+INC_DIRS = \
   $(PRJ_ROOT)/include
 
 include $(RIOTEE_SDK_ROOT)/Makefile

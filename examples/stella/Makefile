@@ -11,7 +11,7 @@ endif
 SRC_FILES = \
   $(PRJ_ROOT)/src/main.c
 
-INC_FOLDERS = \
+INC_DIRS = \
   $(PRJ_ROOT)/include
 
 include $(RIOTEE_SDK_ROOT)/Makefile
