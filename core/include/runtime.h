@@ -5,8 +5,6 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
-#define USR_STACK_SIZE_WORDS (1024)
-
 int runtime_init(void);
 void runtime_start(void);
 

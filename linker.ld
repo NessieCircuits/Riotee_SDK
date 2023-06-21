@@ -1,14 +1,29 @@
-/* details on syntax can be found in GCC linker manual */
+/* This linker script must first run through gcc preprocessor */
+
+#if __has_include("riotee_config.h")
+#include "riotee_config.h"
+#endif
+
+#ifndef RIOTEE_RAM_RETAINED_SIZE
+#define RIOTEE_RAM_RETAINED_SIZE 8192
+#endif
 
 SEARCH_DIR(.)
 
 ENTRY(c_startup)
 EXTERN(vectors)
 
+/* 128k total RAM */
+RAM_SIZE = 131072;
+RAM_ORIGIN = 0x20000000;
+
+RAM_VOLATILE_SIZE = RAM_SIZE - RIOTEE_RAM_RETAINED_SIZE;
+RAM_VOLATILE_ORIGIN = RAM_ORIGIN + RIOTEE_RAM_RETAINED_SIZE;
+
 MEMORY {
   FLASH (rx) : ORIGIN = 0x0, LENGTH = 512k
-  RAM_RETAINED (rwx) :  ORIGIN = 0x20000000, LENGTH = 8k
-  RAM (rwx) :  ORIGIN = 0x20002000, LENGTH = 120k
+  RAM_RETAINED (rwx) :  ORIGIN = 0x20000000, LENGTH = RIOTEE_RAM_RETAINED_SIZE
+  RAM (rwx) :  ORIGIN = RAM_VOLATILE_ORIGIN, LENGTH = RAM_VOLATILE_SIZE
 }
 
 

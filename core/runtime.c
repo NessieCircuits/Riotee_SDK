@@ -14,9 +14,18 @@
 #include "runtime.h"
 #include "riotee_thresholds.h"
 
-#define UNUSED(X) ((void)(X))
+#if __has_include("riotee_config.h")
+#include "riotee_config.h"
+#endif
 
+#ifndef RIOTEE_STACK_SIZE
+#define RIOTEE_STACK_SIZE 4096UL
+#endif
+
+#define USR_STACK_SIZE_WORDS (RIOTEE_STACK_SIZE / sizeof(uint32_t))
 #define SYS_STACK_SIZE (configMINIMAL_STACK_SIZE + 128)
+
+#define UNUSED(X) ((void)(X))
 
 extern unsigned long __etext;
 extern unsigned long __bss_retained_start__;
