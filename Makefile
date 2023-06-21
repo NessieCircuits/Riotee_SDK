@@ -1,3 +1,4 @@
+PREFIX := "$(GNU_INSTALL_ROOT)"arm-none-eabi-
 CORE_DIR := $(RIOTEE_SDK_ROOT)/core
 DRIVER_DIR := $(RIOTEE_SDK_ROOT)/drivers
 RTOS_DIR := $(RIOTEE_SDK_ROOT)/external/freertos

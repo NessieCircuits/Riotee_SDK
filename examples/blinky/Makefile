@@ -1,5 +1,5 @@
-PREFIX := "$(GNU_INSTALL_ROOT)"arm-none-eabi-
 RIOTEE_SDK_ROOT ?= ../..
+GNU_INSTALL_ROOT ?=
 PRJ_ROOT := .
 OUTPUT_DIR := _build
 
