@@ -7,13 +7,13 @@
 #include "radio.h"
 #include "runtime.h"
 
-static riotee_stella_pkt_t rx_buf;
-static riotee_stella_pkt_t tx_buf;
+static riotee_stella_pkt_t rx_buf __attribute__((section(".retained_bss")));
 
+static riotee_stella_pkt_t tx_buf;
 static riotee_stella_pkt_t *rx_buf_ptr;
 
 /* Counts number of transmitted packets */
-static uint16_t pkt_counter = 0;
+static uint16_t pkt_counter __attribute__((section(".retained_bss")));
 
 enum {
   /* Uplink logical address index */
@@ -29,7 +29,7 @@ enum {
   LA_DOWNLINK = 0xF7,
 };
 
-static uint32_t _dev_id;
+static uint32_t _dev_id __attribute__((section(".retained_bss")));
 
 TEARDOWN_FUN(stella_teardown_ptr);
 
@@ -88,7 +88,7 @@ static int timer_init(void) {
   return 0;
 }
 
-int riotee_stella_init() {
+void riotee_stella_init() {
   /* 0dBm TX power */
   NRF_RADIO->TXPOWER = (RADIO_TXPOWER_TXPOWER_0dBm << RADIO_TXPOWER_TXPOWER_Pos);
   /* 2476 MHz frequency */
@@ -137,8 +137,6 @@ int riotee_stella_init() {
   radio_cb_register(RADIO_EVT_TXREADY, radio_txready);
 
   NRF_PPI->CHENSET = PPI_CHENSET_CH18_Msk;
-
-  return 0;
 }
 
 /* Timeout for reception of the acknowledgement */
@@ -164,23 +162,8 @@ static void teardown(void) {
   stella_teardown_ptr = NULL;
 }
 
-int riotee_stella_transceive(riotee_stella_pkt_t *rx_pkt, riotee_stella_pkt_t *tx_pkt) {
+static inline int wait_for_completion(riotee_stella_pkt_t *rx_pkt, riotee_stella_pkt_t *tx_pkt) {
   unsigned long notification_value;
-
-  taskENTER_CRITICAL();
-  /* Packet transmission will start automatically when HFXO is running */
-  NRF_CLOCK->TASKS_HFCLKSTART = 1;
-
-  /* Set correct device ID */
-  tx_pkt->hdr.dev_id = _dev_id;
-
-  rx_buf_ptr = rx_pkt;
-  NRF_RADIO->SHORTS |= RADIO_SHORTS_DISABLED_RXEN_Msk;
-  NRF_RADIO->PACKETPTR = (uint32_t)tx_pkt;
-
-  xTaskNotifyStateClearIndexed(usr_task_handle, 1);
-  stella_teardown_ptr = teardown;
-  taskEXIT_CRITICAL();
 
   /* Wait until acknowledgement is received/expired */
   xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
@@ -209,12 +192,46 @@ int riotee_stella_transceive(riotee_stella_pkt_t *rx_pkt, riotee_stella_pkt_t *t
   return STELLA_ERR_OK;
 }
 
+int riotee_stella_transceive(riotee_stella_pkt_t *rx_pkt, riotee_stella_pkt_t *tx_pkt) {
+  taskENTER_CRITICAL();
+  /* Packet transmission will start automatically when HFXO is running */
+  NRF_CLOCK->TASKS_HFCLKSTART = 1;
+
+  rx_buf_ptr = rx_pkt;
+  NRF_RADIO->SHORTS |= RADIO_SHORTS_DISABLED_RXEN_Msk;
+  NRF_RADIO->PACKETPTR = (uint32_t)tx_pkt;
+
+  xTaskNotifyStateClearIndexed(usr_task_handle, 1);
+  stella_teardown_ptr = teardown;
+  taskEXIT_CRITICAL();
+
+  return wait_for_completion(rx_pkt, tx_pkt);
+}
+
 int riotee_stella_send(void *data, size_t n) {
+  if (n > RIOTEE_STELLA_MAX_DATA)
+    return STELLA_ERR_GENERIC;
+
+  taskENTER_CRITICAL();
+  /* Packet transmission will start automatically when HFXO is running */
+  NRF_CLOCK->TASKS_HFCLKSTART = 1;
+
   memcpy(tx_buf.data, data, n);
 
   tx_buf.len = sizeof(riotee_stella_pkt_header_t) + n;
   tx_buf.hdr.pkt_id = pkt_counter++;
-  return riotee_stella_transceive(&rx_buf, &tx_buf);
+
+  /* Set correct device ID */
+  tx_buf.hdr.dev_id = _dev_id;
+
+  rx_buf_ptr = &rx_buf;
+  NRF_RADIO->SHORTS |= RADIO_SHORTS_DISABLED_RXEN_Msk;
+  NRF_RADIO->PACKETPTR = (uint32_t)&tx_buf;
+
+  xTaskNotifyStateClearIndexed(usr_task_handle, 1);
+  stella_teardown_ptr = teardown;
+  taskEXIT_CRITICAL();
+  return wait_for_completion(&rx_buf, &tx_buf);
 }
 
 void riotee_stella_set_id(uint32_t dev_id) {
