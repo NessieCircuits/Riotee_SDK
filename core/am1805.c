@@ -50,9 +50,7 @@ static int set_configuration_key(uint8_t key) {
 
 static int get_id(uint16_t* id) {
   int rc;
-  if ((rc = read_register((uint8_t*)id, AM1805_ID0_REG)) != 0)
-    return rc;
-  if ((rc = read_register(((uint8_t*)id) + 1, AM1805_ID1_REG)) != 0)
+  if ((rc = read_registers((uint8_t*)id, 2, AM1805_ID0_REG)) != 0)
     return rc;
   return 0;
 }
