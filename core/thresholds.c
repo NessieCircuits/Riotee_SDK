@@ -31,7 +31,7 @@ static int gpio_set(uint32_t pin, gpio_state_t gpio_state) {
   return 0;
 }
 
-int riotee_thresholds_low_set(thr_low_t thr) {
+void riotee_thresholds_low_set(thr_low_t thr) {
   gpio_state_t gpio_states[2];
   switch (thr) {
     case 0:
@@ -51,14 +51,12 @@ int riotee_thresholds_low_set(thr_low_t thr) {
       gpio_states[1] = HIGH;
       break;
     default:
-      return -1;
+      return;
   }
   gpio_set(PIN_THRCTL_L0, gpio_states[0]);
   gpio_set(PIN_THRCTL_L1, gpio_states[1]);
-
-  return 0;
 }
-int riotee_thresholds_high_set(thr_high_t thr) {
+void riotee_thresholds_high_set(thr_high_t thr) {
   gpio_state_t gpio_states[2];
   switch (thr) {
     case 0:
@@ -98,13 +96,11 @@ int riotee_thresholds_high_set(thr_high_t thr) {
       gpio_states[1] = HIGH;
       break;
     default:
-      return -1;
+      return;
   }
   gpio_set(PIN_THRCTL_H0, gpio_states[0]);
   /* Synchronize other NFC pin, see PS v1.5 6.13.3 */
   gpio_set(PIN_NFC2, gpio_states[0]);
 
   gpio_set(PIN_THRCTL_H1, gpio_states[1]);
-
-  return 0;
 }

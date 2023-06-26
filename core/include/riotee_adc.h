@@ -1,3 +1,9 @@
+/**
+ * @file riotee_adc.h
+ * @brief ADC driver
+ *
+ */
+
 #ifndef __ROPTEE_ADC_H_
 #define __RIOTEE_ADC_H_
 
@@ -9,9 +15,13 @@ extern "C" {
 #endif
 
 typedef enum {
+  /* Input not connected. */
   RIOTEE_ADC_INPUT_NC = 0,
+  /* Capacitor voltage. */
   RIOTEE_ADC_INPUT_VCAP = 6,
+  /* Analog input A0 */
   RIOTEE_ADC_INPUT_A0 = 3,
+  /* Analog input A1 */
   RIOTEE_ADC_INPUT_A1 = 4,
 } riotee_adc_input_t;
 
@@ -60,33 +70,68 @@ typedef enum {
 } riotee_adc_acqtime_t;
 
 typedef struct {
-  riotee_adc_gain_t gain;            ///< Gain control value.
-  riotee_adc_reference_t reference;  ///< Reference control value.
-  riotee_adc_acqtime_t acq_time;     ///< Acquisition time.
-  riotee_adc_input_t input_pos;
-  riotee_adc_input_t input_neg;
-  riotee_adc_oversample_t oversampling;
-  unsigned int n_samples;
-  unsigned int sample_interval_ticks32;
+  riotee_adc_gain_t gain;                ///< Gain of ADC pre-amplifier.
+  riotee_adc_reference_t reference;      ///< ADC reference.
+  riotee_adc_acqtime_t acq_time;         ///< Acquisition time.
+  riotee_adc_input_t input_pos;          ///< ADC positive input.
+  riotee_adc_input_t input_neg;          ///< ADC negative input.
+  riotee_adc_oversample_t oversampling;  ///< Oversampling factor.
+  unsigned int n_samples;                ///< Number of samples to be taken.
+  unsigned int sample_interval_ticks32;  ///< Sample interval in ticks on a 32kHz clock
 } riotee_adc_cfg_t;
 
 int riotee_adc_init(void);
 
-/* Samples ADC into provided buffer. */
+/**
+ * @brief Reads multiple samples from the ADC.
+ *
+ * Periodically samples the ADC with a specified sampling interval storing the samples in the provided buffer. Blocks
+ * until all samples are taken or until the operation is aborted due to low energy.
+ *
+ * @param dst Buffer where samples are stored.
+ * @param cfg ADC and sampling configuration.
+ * @return int 0 on success, <0 otherwise
+ */
 int riotee_adc_sample(int16_t *dst, riotee_adc_cfg_t *cfg);
 
-/* Reads a single ADC sample. */
+/**
+ * @brief Reads a sample from the ADC.
+ *
+ * Reads one sample from the ADC with a preconfigured configuration. Blocks until sample is taken. Gain and reference
+ * settings are chosen such that the full 12-bit input range equals the supply voltage.
+ *
+ * @param in Analog input.
+ * @return int16_t ADC sample as 12-bit value w.r.t. the supply voltage.
+ */
 int16_t riotee_adc_read(riotee_adc_input_t in);
 
-/* Converts binary ADC result to voltage. */
+/**
+ * @brief Converts a raw binary value sampled from the ADC to a voltage value.
+ *
+ * @param adc 12-bit ADC sample.
+ * @param cfg ADC configuration that was used for taking the sample.
+ * @return float Voltage value.
+ */
 float riotee_adc_adc2vadc(int16_t adc, riotee_adc_cfg_t *cfg);
 
-/* Converts ADC voltage to capacitor voltage based on amplifier gain. */
+/**
+ * @brief Converts ADC input voltage to capacitor voltage based on amplifier gain.
+ *
+ * @param v_adc ADC input voltage.
+ * @return float Capacitor voltage.
+ */
 static inline float riotee_adc_vadc2vcap(float v_adc) {
   /* A capacitor voltage of 4.8V produces 1.727V on the ADC input */
   return v_adc / 1.727f * 4.8f;
 }
 
+/**
+ * @brief Translates digital pin to analog input channel.
+ *
+ * @param input
+ * @param pin
+ * @return int
+ */
 static inline int riotee_adc_pin2input(riotee_adc_input_t *input, unsigned int pin) {
   switch (pin) {
     case PIN_D2:

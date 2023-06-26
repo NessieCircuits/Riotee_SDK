@@ -76,7 +76,7 @@ void sys_cancel_timer(void) {
   NRF_RTC0->EVENTS_COMPARE[1] = 0;
 }
 
-int riotee_timing_init(void) {
+void riotee_timing_init(void) {
   NRF_CLOCK->LFCLKSRC = CLOCK_LFCLKSRC_SRC_Xtal;
 
   NRF_CLOCK->TASKS_LFCLKSTART = 1;
@@ -86,5 +86,4 @@ int riotee_timing_init(void) {
   NRF_RTC0->PRESCALER = 0;
   NRF_RTC0->TASKS_CLEAR = 1;
   NRF_RTC0->TASKS_START = 1;
-  return 0;
 }

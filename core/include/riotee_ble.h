@@ -7,13 +7,25 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @brief Type of advertisement
+ *
+ */
 typedef enum {
+  /* Undirected, connectable advertisement. */
   ADV_IND = 0,
+  /* Directed, connectable advertisement. */
   ADV_DIRECT_IND = 1,
+  /* Undirected, unconnectable advertisement. */
   ADV_NONCONN_IND = 2,
+  /* Scan request. */
   SCAN_REQ = 3,
+  /* Scan response. */
   SCAN_RSP = 4,
+  /* Connection request. */
   CONNECT_REQ = 5,
+  /* Scannable undirected advertisement. */
   ADV_SCAN_IND = 6,
 } riotee_adv_pdu_type_t;
 
@@ -39,13 +51,32 @@ typedef struct {
   uint8_t payload[31];
 } __attribute__((__packed__)) riotee_adv_pck_t;
 
-/* Setup the internal packet buffer for advertisting with given name, address and payload size */
+/**
+ * @brief Sets up the internal packet buffer for advertisting with given name, address and payload size.
+ *
+ * @param adv_addr Pointer to adress buffer.
+ * @param adv_name Advertising name of the device.
+ * @param name_len Length of the advertising name.
+ * @param data_len Size of the payload.
+ * @return int
+ */
 int riotee_ble_prepare_adv(riotee_ble_ll_addr_t *adv_addr, const char adv_name[], size_t name_len, size_t data_len);
 
-/* Advertise the given payload on the selected channel(s) */
+/**
+ * @brief Advertises the given payload on the selected channel(s)
+ *
+ * @param data Pointer to payload.
+ * @param ch Channel(s) on which advertisement should be sent.
+ * @return int
+ */
 int riotee_ble_advertise(void *data, riotee_adv_ch_t ch);
 
-int riotee_ble_init();
+/**
+ * @brief Initializes BLE driver.
+ *
+ * @return int
+ */
+void riotee_ble_init(void);
 
 #ifdef __cplusplus
 }

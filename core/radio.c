@@ -10,12 +10,11 @@ RADIO_CALLBACK cb_crcok = NULL;
 RADIO_CALLBACK cb_crcerr = NULL;
 RADIO_CALLBACK cb_address = NULL;
 
-int radio_init() {
+void radio_init() {
   NRF_PPI->CH[18].EEP = (uint32_t)&NRF_CLOCK->EVENTS_HFCLKSTARTED;
   NRF_PPI->CH[18].TEP = (uint32_t)&NRF_RADIO->TASKS_TXEN;
 
   NVIC_EnableIRQ(RADIO_IRQn);
-  return 0;
 }
 
 void radio_start() {

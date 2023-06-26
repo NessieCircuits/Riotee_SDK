@@ -22,8 +22,25 @@ typedef enum {
 extern "C" {
 #endif
 
-int riotee_thresholds_low_set(thr_low_t thr);
-int riotee_thresholds_high_set(thr_high_t thr);
+/**
+ * @brief Sets the 'low' threshold that triggers suspension of the user task and checkpoining.
+ *
+ * Changing of the threshold takes multiple milliseconds to take effect.
+ *
+ * @param thr Selected threshold.
+ *
+ */
+void riotee_thresholds_low_set(thr_low_t thr);
+
+/**
+ * @brief Sets the 'high' threshold upon which user task execution is resumed.
+ *
+ * Changing of the threshold takes multiple milliseconds to take effect.
+ *
+ * @param thr Selected threshold.
+ *
+ */
+void riotee_thresholds_high_set(thr_high_t thr);
 #if defined __cplusplus
 }
 #endif

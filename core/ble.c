@@ -142,7 +142,7 @@ void radio_disabled_callback() {
   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
-int riotee_ble_init() {
+void riotee_ble_init(void) {
   NRF_RADIO->TXPOWER = (RADIO_TXPOWER_TXPOWER_Pos4dBm << RADIO_TXPOWER_TXPOWER_Pos);
 
   NRF_RADIO->MODE = (RADIO_MODE_MODE_Ble_1Mbit << RADIO_MODE_MODE_Pos);
@@ -187,6 +187,4 @@ int riotee_ble_init() {
 
   /* This channel starts radio transmissions as soon as HFCLK is running*/
   NRF_PPI->CHENSET = PPI_CHEN_CH18_Msk;
-
-  return 0;
 }
