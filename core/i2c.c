@@ -27,8 +27,8 @@ int riotee_i2c_init(unsigned int pin_sda, unsigned int pin_scl) {
   NRF_TWIM1->PSEL.SDA = pin_sda;
 
   /* These should stay high when I2C is disabled */
-  nrf_gpio_cfg_input(PIN_SYS_SCL, NRF_GPIO_PIN_PULLUP);
-  nrf_gpio_cfg_input(PIN_SYS_SDA, NRF_GPIO_PIN_PULLUP);
+  nrf_gpio_cfg_input(pin_scl, NRF_GPIO_PIN_PULLUP);
+  nrf_gpio_cfg_input(pin_sda, NRF_GPIO_PIN_PULLUP);
 
   NRF_TWIM1->FREQUENCY = TWIM_FREQUENCY_FREQUENCY_K250 << TWIM_FREQUENCY_FREQUENCY_Pos;
   NRF_TWIM1->SHORTS = 0;
