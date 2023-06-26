@@ -14,6 +14,6 @@ int main(void) {
   int counter = 0;
   for (;;) {
     printf("Loop: %d\r\n", counter++);
-    riotee_delay_ms(100);
+    riotee_sleep_ms(100);
   }
 }
