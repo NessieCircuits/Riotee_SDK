@@ -108,6 +108,7 @@ enum { NVM_SIG_VALID = 0x0D15EA5E, NVM_SIG_INVALID = 0x8BADF00D };
 
 /* Stores task stack and static/global variables in non-volatile memory. */
 static int checkpoint_store() {
+  int rc;
   checkpoint_header hdr;
 
   hdr.top_of_stack = *(uint32_t *)&usr_task_tcb;
@@ -122,18 +123,25 @@ static int checkpoint_store() {
    * loaded. */
   hdr.signature = NVM_SIG_INVALID;
 
-  nvm_start(NVM_WRITE, 0x0);
-  nvm_write((uint8_t *)&hdr, sizeof(checkpoint_header));
-  nvm_write((uint8_t *)hdr.top_of_stack, hdr.stack_size * sizeof(StackType_t));
-  nvm_write((uint8_t *)&__data_retained_start__, hdr.data_size);
-  nvm_write((uint8_t *)&__bss_retained_start__, hdr.bss_size);
+  if ((rc = nvm_start(NVM_WRITE, 0x0)) != 0)
+    return rc;
+  if ((rc = nvm_write((uint8_t *)&hdr, sizeof(checkpoint_header))) != 0)
+    return rc;
+  if ((rc = nvm_write((uint8_t *)hdr.top_of_stack, hdr.stack_size * sizeof(StackType_t))) != 0)
+    return rc;
+  if ((rc = nvm_write((uint8_t *)&__data_retained_start__, hdr.data_size)) != 0)
+    return rc;
+  if ((rc = nvm_write((uint8_t *)&__bss_retained_start__, hdr.bss_size)) != 0)
+    return rc;
 
   nvm_stop();
 
   /* Now that the snapshot was written successfully, we can update the signature */
-  nvm_start(NVM_WRITE, 0x0);
+  if ((rc = nvm_start(NVM_WRITE, 0x0)) != 0)
+    return rc;
   uint32_t signature = NVM_SIG_VALID;
-  nvm_write((uint8_t *)&signature, sizeof(signature));
+  if ((rc = nvm_write((uint8_t *)&signature, sizeof(signature))) != 0)
+    return rc;
   nvm_stop();
 
   /* If this was a first boot, overwrite the marker now */
@@ -146,10 +154,13 @@ static int checkpoint_store() {
 
 /* Loads a snapshot from NVM into task stack and static/global variables. */
 static int checkpoint_load() {
+  int rc;
   checkpoint_header hdr;
 
-  nvm_start(NVM_READ, 0x0);
-  nvm_read((uint8_t *)&hdr, sizeof(checkpoint_header));
+  if ((rc = nvm_start(NVM_READ, 0x0)) != 0)
+    return rc;
+  if ((rc = nvm_read((uint8_t *)&hdr, sizeof(checkpoint_header))) != 0)
+    return rc;
 
   /* Check the signature to avoid loading garbage */
   if (hdr.signature != NVM_SIG_VALID) {
@@ -158,10 +169,13 @@ static int checkpoint_load() {
   }
 
   /* Restore stack */
-  nvm_read((uint8_t *)hdr.top_of_stack, hdr.stack_size * sizeof(StackType_t));
+  if ((rc = nvm_read((uint8_t *)hdr.top_of_stack, hdr.stack_size * sizeof(StackType_t))) != 0)
+    return rc;
   /* Restore static/global variables */
-  nvm_read((uint8_t *)&__data_retained_start__, hdr.data_size);
-  nvm_read((uint8_t *)&__bss_retained_start__, hdr.bss_size);
+  if ((rc = nvm_read((uint8_t *)&__data_retained_start__, hdr.data_size)) != 0)
+    return rc;
+  if ((rc = nvm_read((uint8_t *)&__bss_retained_start__, hdr.bss_size)) != 0)
+    return rc;
   nvm_stop();
 
   /* Copy top of stack into freertos TCB structure */
@@ -302,7 +316,8 @@ static void sys_task(void *pvParameter) {
     /* Timer has expired. Is capacitor voltage still below threshold? */
     if ((NRF_P0->IN & (1 << PIN_PWRGD_L)) == 0) {
       /* Take the snapshot */
-      checkpoint_store();
+      if (checkpoint_store() != 0)
+        printf("Checkpointing failed!");
 
     } else {
       /* Monitor for capacitor voltage to drop below threshold again */
