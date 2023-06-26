@@ -1,0 +1,1 @@
+--8<-- "examples/blinky/README.md"
