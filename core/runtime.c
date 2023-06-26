@@ -44,7 +44,7 @@ unsigned long fresh_marker = 0x8BADF00D;
 
 StaticTask_t usr_task_tcb;
 /* Put this into size-limited RETAINED_RAM region (see linker.ld) */
-StackType_t usr_task_stack[USR_STACK_SIZE_WORDS] __attribute__((section(".retained_bss")));
+StackType_t usr_task_stack[USR_STACK_SIZE_WORDS] __attribute__((section(".usr_task_mem")));
 
 StaticTask_t xIdleTaskTCB;
 StackType_t uxIdleTaskStack[configMINIMAL_STACK_SIZE];

@@ -167,6 +167,8 @@ SECTIONS {
                 *(.retained_bss)
                 *(.bss.*)
                 __bss_retained_end__ = .;
+                . = ALIGN(4);
+                *(.usr_task_mem)
         } >RAM_RETAINED
 
     
