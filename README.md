@@ -3,7 +3,7 @@
 # Riotee Software Development Kit
 
 The code in this repository allows building applications that run on battery-free Riotee devices.
-For a detailed description refer to the [documentation](https://www.riotee.nessie-circuits.de/docs/software/riotee-runtime).
+For a detailed description refer to the [documentation](https://www.riotee.nessie-circuits.de/docs/latest/software/runtime/).
 
 For a quickstart with Riotee you can use our Arduino package which internally makes use of the SDK. For more involved projects, continue reading here.
 
