@@ -14,3 +14,13 @@ Upon reception of a packet from a device, the basestation responds with an ackno
 We provide a reference implementation for a basestation using a Nordic Semiconductor nRF52840-Dongle [here](https://github.com/NessieCircuits/Riotee_Gateway).
 The Gateway forwards messages received from devices to a host application running on a user's computer via an HTTP API.
 It also allows sending messages to devices.
+
+# Reference
+::: doxy.riotee.Function
+  name: void riotee_stella_init(void)
+
+::: doxy.riotee.Function
+  name: int riotee_stella_send(void *data, size_t n)
+
+::: doxy.riotee.Function
+  name: int riotee_stella_transceive(riotee_stella_pkt_t *rx_pkt, riotee_stella_pkt_t *tx_pkt)

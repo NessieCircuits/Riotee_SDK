@@ -80,7 +80,11 @@ typedef struct {
   unsigned int sample_interval_ticks32;  ///< Sample interval in ticks on a 32kHz clock
 } riotee_adc_cfg_t;
 
-int riotee_adc_init(void);
+/**
+ * @brief Initializes ADC. Must be called once after reset before ADC can be used.
+ *
+ */
+void riotee_adc_init(void);
 
 /**
  * @brief Reads multiple samples from the ADC.

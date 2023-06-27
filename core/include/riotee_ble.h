@@ -67,14 +67,13 @@ int riotee_ble_prepare_adv(riotee_ble_ll_addr_t *adv_addr, const char adv_name[]
  *
  * @param data Pointer to payload.
  * @param ch Channel(s) on which advertisement should be sent.
- * @return int
+ * @return int 0 on success
  */
 int riotee_ble_advertise(void *data, riotee_adv_ch_t ch);
 
 /**
  * @brief Initializes BLE driver.
  *
- * @return int
  */
 void riotee_ble_init(void);
 

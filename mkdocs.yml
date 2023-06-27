@@ -28,7 +28,9 @@ nav:
   - 'Software':
     - 'Runtime': 'software/runtime.md'
     - 'Drivers':
+      - 'GPIO': 'software/drivers/gpio.md'
       - 'ADC': 'software/drivers/adc.md'
+      - 'UART': 'software/drivers/uart.md'
     - 'Examples':
       - 'ADC': 'software/examples/adc.md'
       - 'Blinky': 'software/examples/blinky.md'
@@ -53,9 +55,9 @@ plugins:
   - mkdoxy:
       projects:
         riotee:
-          src-dirs: core/include examples/ble examples/blinky
+          src-dirs: core/include examples
           full-doc: True
           doxy-cfg:
-            FILE_PATTERNS: "*.c *.h*"
-            EXAMPLE_PATH: ""
+            FILE_PATTERNS: "riotee_*.h* main.c"
             RECURSIVE: True
+            EXAMPLE_PATH: ""

@@ -58,7 +58,7 @@ static void teardown(void) {
   xTaskNotifyIndexed(usr_task_handle, 1, EVT_TEARDOWN, eSetValueWithOverwrite);
 }
 
-int riotee_adc_init(void) {
+void riotee_adc_init(void) {
   NRF_SAADC->RESOLUTION = SAADC_RESOLUTION_VAL_12bit;
 
   NRF_PPI->CH[3].EEP = (uint32_t)&NRF_RTC0->EVENTS_COMPARE[2];
@@ -74,8 +74,6 @@ int riotee_adc_init(void) {
   NRF_PPI->CHENSET = PPI_CHENSET_CH5_Msk;
 
   NVIC_EnableIRQ(SAADC_IRQn);
-
-  return 0;
 }
 
 int16_t riotee_adc_read(riotee_adc_input_t in) {

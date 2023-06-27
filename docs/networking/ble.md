@@ -11,10 +11,3 @@ The implementation is not standard-conformant. You may only use it for evaluatio
 
 ::: doxy.riotee.Function
   name: int riotee_ble_advertise(void *data, riotee_adv_ch_t ch)
-
-# Example
-
-::: doxy.riotee.Code
-  file: main.c
-  start: 0
-  end: 35

@@ -14,7 +14,6 @@ jobs:
       - run: sudo apt update && sudo apt install -y doxygen
       - run: pip install mkdocs mkdocs-material mkdoxy pymdown-extensions 
       - run: mkdocs build
-      - run: ls -lha site
 
       - name: Upload artifacts to github
         uses: actions/upload-artifact@v3
