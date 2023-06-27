@@ -2,6 +2,8 @@
 # Riotee Runtime
 
 The Riotee runtime allows executing user-code on battery-free devices built around the Riotee Module.
+Your code defines a `main()` function. This function is executed while the device has energy and suspended when energy becomes critically low.
+If the power supply is interrupted, the stack and all static and global variables are stored in non-volatile memory and restored as soon as the supply comes back.
 
 ## Key concepts
 
@@ -21,6 +23,12 @@ There are two possible scenarios for what happens next: 1. The capacitor dischar
 
 ## Callbacks
 
+There are a number of callbacks that your application can implement:
+
+ - `bootstrap_callback()`: Called once after programming the device.
+ - `startup_callback()`: Called right after every reset. Perform early stage initizialization required for low-power operation here
+ - `reset_callback()`: Called later after every reset. Initialize peripherals here.
+ - `turnoff_callback()`: Called right before the application gets suspended. Abort any energy-intensive operation immediately.
 
 ## Retained memory
 
@@ -51,6 +59,8 @@ The SDK will reserve a memory area of the specifed size for your variables and t
 The drawback is that, depending on the specified size, the checkpointing may take significantly longer and consume significantly more energy.
 You must chose the capacitance of your device such that the checkpoint can still safely complete before the power supply gets interrupted.
 
+The runtime only checkpoints the part of the retained memory area that is actually occupied by the variables and the stack so don't worry about reducing RIOTEE_RAM_RETAINED_SIZE beyond the default values of 8192B.
+However you may find that you can fit more static/global variables into the retained memory when you reduce the (generous) `RIOTEE_STACK_SIZE` in `riotee_config.h`.
 
 ## Early startup
 

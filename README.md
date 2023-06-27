@@ -57,7 +57,7 @@ There are a number of callbacks that your application can implement:
  - `reset_callback()`: Called later after every reset. Initialize peripherals here.
  - `turnoff_callback()`: Called right before the application gets suspended. Abort any energy-intensive operation immediately.
 
-Your application may change the default size of the memory that is retained across power failures as well as the stack size by definining `RAM_RETAINED_SIZE` and `STACK_SIZE` in a `riotee_config.h` header.
+Your application may change the default size of the memory that is retained across power failures as well as the stack size by definining `RIOTEE_RAM_RETAINED_SIZE` and `RIOTEE_STACK_SIZE` in a `riotee_config.h` header.
 
 ## Features
 
