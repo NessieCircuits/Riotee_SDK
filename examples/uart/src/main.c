@@ -6,7 +6,7 @@
 
 /* This gets called after every reset */
 void reset_callback(void) {
-  riotee_uart_init(PIN_D1, 1000000);
+  riotee_uart_init(PIN_D1, RIOTEE_UART_BAUDRATE_1000000);
   printf("Hello Riotee!\r\n");
 }
 
