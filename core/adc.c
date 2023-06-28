@@ -77,7 +77,7 @@ void riotee_adc_init(void) {
 }
 
 int16_t riotee_adc_read(riotee_adc_input_t in) {
-  int16_t result;
+  int16_t result = 0;
   taskENTER_CRITICAL();
 
   NRF_SAADC->CH[0].CONFIG = (SAADC_CH_CONFIG_RESP_Bypass << SAADC_CH_CONFIG_RESP_Pos) |
