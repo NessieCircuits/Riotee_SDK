@@ -7,3 +7,6 @@
 [submodule "nrfx"]
 	path = external/nrfx
 	url = https://github.com/NordicSemiconductor/nrfx
+[submodule "external/ArduinoCore-API"]
+	path = external/ArduinoCore-API
+	url = https://github.com/arduino/ArduinoCore-API

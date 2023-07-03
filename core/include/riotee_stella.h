@@ -1,3 +1,8 @@
+/**
+ * @defgroup stella Stella protocol
+ *  @{
+ *
+ */
 #ifndef __STELLA_H_
 #define __STELLA_H_
 
@@ -47,7 +52,7 @@ int riotee_stella_transceive(riotee_stella_pkt_t *rx_pkt, riotee_stella_pkt_t *t
 /**
  * @brief Sends data in a Stella packet.
  *
- * @param rx_pkt Pointer to data.
+ * @param data Pointer to data.
  * @param n Size of data.
  *
  * @return STELLA_ERR_OK if acknowledgement is received.
@@ -68,3 +73,5 @@ enum { STELLA_ERR_OK = 0, STELLA_ERR_GENERIC = -1, STELLA_ERR_RESET = -2, STELLA
 #endif
 
 #endif /* __STELLA_H_ */
+
+/** @} */

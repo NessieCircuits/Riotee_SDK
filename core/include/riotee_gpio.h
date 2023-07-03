@@ -1,3 +1,9 @@
+/**
+ * @defgroup gpio GPIO driver
+ *  @{
+ *
+ */
+
 #ifndef __RIOTEE_GPIO_H_
 #define __RIOTEE_GPIO_H_
 
@@ -57,6 +63,7 @@ static inline void riotee_gpio_cfg_output(unsigned int pin) {
  * @brief Configures pin as output.
  *
  * @param pin Pin number.
+ * @param pull Type of pull resistor.
  */
 static inline void riotee_gpio_cfg_input(unsigned int pin, riotee_gpio_in_pull_t pull) {
   nrf_gpio_port_t* reg = riotee_gpio_get_port(&pin);
@@ -120,3 +127,5 @@ static inline uint32_t riotee_gpio_is_set(unsigned int pin) {
 }
 
 #endif /* __RIOTEE_GPIO_H_ */
+
+/** @} */

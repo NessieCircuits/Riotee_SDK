@@ -1,6 +1,8 @@
 /**
  * @file riotee_adc.h
  * @brief ADC driver
+ * @defgroup adc ADC driver
+ *  @{
  *
  */
 
@@ -154,3 +156,5 @@ static inline int riotee_adc_pin2input(riotee_adc_input_t *input, unsigned int p
 #endif
 
 #endif /* __RIOTEE_ADC_H_ */
+
+/** @} */

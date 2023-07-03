@@ -22,7 +22,7 @@ void SPIM1_SPIS1_TWIM1_TWIS1_SPI1_TWI1_IRQHandler(void) {
   }
 }
 
-int riotee_i2c_init(unsigned int pin_sda, unsigned int pin_scl) {
+void riotee_i2c_init(unsigned int pin_sda, unsigned int pin_scl) {
   NRF_TWIM1->PSEL.SCL = pin_scl;
   NRF_TWIM1->PSEL.SDA = pin_sda;
 
@@ -35,7 +35,6 @@ int riotee_i2c_init(unsigned int pin_sda, unsigned int pin_scl) {
 
   NRF_TWIM1->INTENSET = TWIM_INTENSET_ERROR_Msk | TWIM_INTENSET_STOPPED_Msk;
   NVIC_EnableIRQ(SPIM1_SPIS1_TWIM1_TWIS1_SPI1_TWI1_IRQn);
-  return 0;
 }
 
 int riotee_i2c_write(uint8_t dev_addr, uint8_t *data, size_t n_data) {
@@ -87,4 +86,8 @@ int riotee_i2c_read(uint8_t *buffer, size_t n_data, uint8_t dev_addr) {
   taskEXIT_CRITICAL();
 
   return twi_status;
+}
+
+void riotee_i2c_set_freq(riotee_i2c_freq_t freq) {
+  NRF_TWIM1->FREQUENCY = freq;
 }

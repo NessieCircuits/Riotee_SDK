@@ -50,7 +50,7 @@ void riotee_delay_us(unsigned int us);
  *
  * Keeps the CPU busy for the specified time. Consumes significant energy while waiting.
  *
- * @param us Number of milliseconds to wait.
+ * @param ms Number of milliseconds to wait.
  */
 void riotee_delay_ms(unsigned int ms);
 
