@@ -85,3 +85,8 @@ Your application may change the default size of the memory that is retained acro
  - `/drivers`: Drivers for external devices
  - `/examples`: Examples using the SDK
  - `/external`: External dependencies
+ - `/arduino`: Arduino core
+
+## License
+
+Most of the code in this repository is published under an MIT License. The Arduino core in `/arduino` is licensed under the LGPL 2.1.

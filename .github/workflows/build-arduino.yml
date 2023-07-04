@@ -1,0 +1,47 @@
+name: Arduino build
+
+on:
+  workflow_call:
+
+jobs:
+  build-arduino:
+    runs-on: ubuntu-latest
+    name: Build Arduino package
+    defaults:
+      run:
+        working-directory: ./arduino
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Populate core from external sources
+        run: ./build_tree.sh
+
+      - name: Create directory for server and core
+        run: mkdir core
+
+      - name: Copy files into release dir
+        run: cp -r cores/ variants/ libraries/ boards.txt platform.txt programmers.txt core
+
+
+      - name: Zip the core
+        run: zip -qq -r Riotee_ArduinoCore.zip core
+
+      - name: Upload zipped core as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: core_zip
+          path: arduino/Riotee_ArduinoCore.zip
+
+      - name: Compute checksum of release zip
+        run: echo "MD5SUM=$(md5sum Riotee_ArduinoCore.zip | head -n1 | awk '{print $1;}')" >> zip_props.env
+
+      - name: Compute filesize of release zip
+        run: echo "FILESIZE=$(wc -c Riotee_ArduinoCore.zip | head -n1 | awk '{print $1;}')" >> zip_props.env
+
+      - name: Upload properties as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: zip_props
+          path: arduino/zip_props.env

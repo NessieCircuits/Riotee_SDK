@@ -1,0 +1,6 @@
+cmsisdap.name=CMSIS-DAP
+cmsisdap.communication=USB
+cmsisdap.protocol=cmsis-dap
+cmsisdap.program.protocol=cmsis-dap
+cmsisdap.program.tool=openocd
+cmsisdap.program.setup_command=;

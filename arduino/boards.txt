@@ -1,0 +1,50 @@
+# Copyright (c) 2014-2015 Arduino LLC.  All right reserved.
+# Copyright (c) 2016 Sandeep Mistry All right reserved.
+# Copyright (c) 2023 Nessie Circuits. All right reserved.
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the GNU Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+menu.chip=Chip
+menu.softdevice=Softdevice
+menu.version=Version
+menu.lfclk=Low Frequency Clock
+menu.board_variant=Board Variant
+
+# nRF52833 variants
+###################
+
+RioteeBoard.name=Riotee Board
+
+RioteeBoard.upload.tool=openocd
+RioteeBoard.upload.protocol=cmsis-dap
+RioteeBoard.upload.target=nrf52
+RioteeBoard.upload.maximum_size=524288
+RioteeBoard.upload.setup_command=transport select swd;
+RioteeBoard.upload.use_1200bps_touch=false
+RioteeBoard.upload.wait_for_upload_port=false
+RioteeBoard.upload.native_usb=false
+
+RioteeBoard.bootloader.tool=openocd
+
+RioteeBoard.build.mcu=cortex-m4
+RioteeBoard.build.f_cpu=64000000
+RioteeBoard.build.board=GENERIC
+RioteeBoard.build.core=Riotee
+RioteeBoard.build.variant=RioteeBoard
+RioteeBoard.build.variant_system_lib=
+RioteeBoard.build.extra_flags=-DNRF52833_XXAA
+RioteeBoard.build.float_flags=-mabi=aapcs -mfloat-abi=hard -mfpu=fpv4-sp-d16
+RioteeBoard.build.ldscript={build.core.path}/linker.ld
+RioteeBoard.build.openocdscript=openocd_scripts/riotee_board.cfg

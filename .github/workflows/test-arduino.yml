@@ -1,0 +1,69 @@
+name: Test Arduino package
+
+on:
+  push:
+    branches: '*'
+  pull_request:
+    branches: '*'
+  workflow_call:
+
+jobs:
+  call-build:
+    uses: ./.github/workflows/build-arduino.yml
+  test-arduino:
+    runs-on: ubuntu-latest
+    name: Test sketch compilation
+    needs: call-build
+    steps:
+      - name: Install dependencies of envsubst
+        run: sudo apt update && sudo apt install gettext-base
+
+      - uses: actions/checkout@v3
+
+      - name: Install Arduino CLI
+        run: sudo sh -c 'curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | BINDIR=/usr/bin sh'
+
+      - run: mkdir server
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: core_zip
+          path: server/
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: zip_props
+
+      - name: Load zip properties into environment variables
+        run: cat zip_props.env >> $GITHUB_ENV
+
+      - name: Render template of package_index json for CI/CD
+        run: envsubst < arduino/package_index_test.tmpl > ${{ github.workspace }}/package_index_test.json
+  
+      - name: Serve files on http server
+        uses: Eun/http-server-action@v1
+        with:
+          directory: ${{ github.workspace }}/server
+          port: 8000
+
+      - name: Install core
+        run: arduino-cli core install riotee:riotee --additional-urls file:///${{ github.workspace }}/package_index_test.json --log-level debug --verbose
+
+      - name: Create blinky sketch to compile
+        run: |
+          mkdir blinky
+          cat > blinky/blinky.ino << EOF
+            void setup() {
+              pinMode(LED_BUILTIN, OUTPUT);
+            }
+
+            void loop() {
+              digitalWrite(LED_BUILTIN, HIGH);
+              delay(1000);
+              digitalWrite(LED_BUILTIN, LOW);
+              delay(1000);
+            }
+          EOF
+
+      - name: Compile blinky sketch
+        run: arduino-cli compile -b riotee:riotee:RioteeBoard blinky --log-level debug --verbose
