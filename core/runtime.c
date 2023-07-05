@@ -123,7 +123,7 @@ static int checkpoint_store() {
    * loaded. */
   hdr.signature = NVM_SIG_INVALID;
 
-  if ((rc = nvm_start(NVM_WRITE, 0x0)) != 0)
+  if ((rc = nvm_begin_write(0x0)) != 0)
     return rc;
   if ((rc = nvm_write((uint8_t *)&hdr, sizeof(checkpoint_header))) != 0)
     return rc;
@@ -134,15 +134,15 @@ static int checkpoint_store() {
   if ((rc = nvm_write((uint8_t *)&__bss_retained_start__, hdr.bss_size)) != 0)
     return rc;
 
-  nvm_stop();
+  nvm_end();
 
   /* Now that the snapshot was written successfully, we can update the signature */
-  if ((rc = nvm_start(NVM_WRITE, 0x0)) != 0)
+  if ((rc = nvm_begin_write(0x0)) != 0)
     return rc;
   uint32_t signature = NVM_SIG_VALID;
   if ((rc = nvm_write((uint8_t *)&signature, sizeof(signature))) != 0)
     return rc;
-  nvm_stop();
+  nvm_end();
 
   /* If this was a first boot, overwrite the marker now */
   if (check_fresh_start()) {
@@ -157,14 +157,14 @@ static int checkpoint_load() {
   int rc;
   checkpoint_header hdr;
 
-  if ((rc = nvm_start(NVM_READ, 0x0)) != 0)
+  if ((rc = nvm_begin_read(0x0)) != 0)
     return rc;
   if ((rc = nvm_read((uint8_t *)&hdr, sizeof(checkpoint_header))) != 0)
     return rc;
 
   /* Check the signature to avoid loading garbage */
   if (hdr.signature != NVM_SIG_VALID) {
-    nvm_stop();
+    nvm_end();
     return -1;
   }
 
@@ -176,7 +176,7 @@ static int checkpoint_load() {
     return rc;
   if ((rc = nvm_read((uint8_t *)&__bss_retained_start__, hdr.bss_size)) != 0)
     return rc;
-  nvm_stop();
+  nvm_end();
 
   /* Copy top of stack into freertos TCB structure */
   memcpy(&usr_task_tcb, &hdr.top_of_stack, sizeof(uint32_t));

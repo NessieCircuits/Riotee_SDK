@@ -1,14 +1,18 @@
+#include <stdbool.h>
+
 #include "nrf.h"
-#include "nrf_gpio.h"
 
 #include "printf.h"
 
 #include "riotee_nvm.h"
+#include "riotee_gpio.h"
 #include "riotee.h"
 #include "runtime.h"
 
 /* Minimum time between operations on the NVM */
 #define NVM_TEARDOWN_US 10
+
+typedef enum { NVM_WRITE = 0x800000, NVM_READ = 0x000000 } nvm_transfer_type_t;
 
 static volatile bool nvm_event = false;
 static unsigned int _pin_cs;
@@ -22,11 +26,11 @@ int nvm_init(void) {
 
   _pin_cs = PIN_C2C_CS;
 
-  nrf_gpio_cfg_output(_pin_cs);
-  nrf_gpio_pin_set(_pin_cs);
+  riotee_gpio_cfg_output(_pin_cs);
+  riotee_gpio_set(_pin_cs);
 
   /* This is used by the NVM to signal when its ready for a transfer */
-  nrf_gpio_cfg_input(PIN_C2C_GPIO, NRF_GPIO_PIN_NOPULL);
+  riotee_gpio_cfg_input(PIN_C2C_GPIO, RIOTEE_GPIO_IN_NOPULL);
 
   NRF_SPIM0->CONFIG = (SPI_CONFIG_CPHA_Leading << SPI_CONFIG_CPHA_Pos) |
                       (SPI_CONFIG_CPOL_ActiveHigh << SPI_CONFIG_CPOL_Pos) |
@@ -94,7 +98,7 @@ static int prep_xfer(uint8_t* tx_buf, uint8_t* rx_buf, size_t n_tx, size_t n_rx)
   return 0;
 }
 
-int nvm_start(nvm_transfer_type_t transfer_type, uint32_t address) {
+static int begin(nvm_transfer_type_t transfer_type, uint32_t address) {
   int rc;
 
   /* If less than 10us have passed since the last transaction, wait for the remaining time */
@@ -106,7 +110,7 @@ int nvm_start(nvm_transfer_type_t transfer_type, uint32_t address) {
   if ((rc = is_ready()) != 0)
     return rc;
 
-  nrf_gpio_pin_clear(_pin_cs);
+  riotee_gpio_clear(_pin_cs);
 
   uint32_t cmd = (address & 0xFFFFF) | transfer_type;
   prep_xfer((uint8_t*)&cmd, NULL, 3, 0);
@@ -142,8 +146,16 @@ int nvm_start(nvm_transfer_type_t transfer_type, uint32_t address) {
   return 0;
 }
 
-int nvm_stop(void) {
-  nrf_gpio_pin_set(_pin_cs);
+int nvm_begin_read(uint32_t address) {
+  return begin(NVM_READ, address);
+}
+
+int nvm_begin_write(uint32_t address) {
+  return begin(NVM_WRITE, address);
+}
+
+int nvm_end(void) {
+  riotee_gpio_set(_pin_cs);
 
   /* Start a timer that allows us to check if the required time has passed before starting again. */
   NRF_TIMER4->TASKS_CLEAR = 1;
