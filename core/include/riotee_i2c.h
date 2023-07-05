@@ -1,12 +1,21 @@
+/**
+ * @defgroup i2c I2C controller driver
+ * @{
+ */
+
 #ifndef __RIOTEE_I2C_H_
 #define __RIOTEE_I2C_H_
 
 #include <stddef.h>
 #include <stdint.h>
 
+/** I2C SCL frequency. */
 typedef enum {
+  /** 100kHz SCL frequency. */
   RIOTEE_I2C_FREQ_100K = 0x01980000UL,
+  /** 250kHz SCL frequency. */
   RIOTEE_I2C_FREQ_250K = 0x04000000UL,
+  /** 400kHz SCL frequency. */
   RIOTEE_I2C_FREQ_400K = 0x06400000UL,
 
 } riotee_i2c_freq_t;
@@ -54,4 +63,4 @@ void riotee_i2c_set_freq(riotee_i2c_freq_t freq);
 }
 #endif
 
-#endif /* __RIOTEE_I2C_H_ */
+#endif /* @} __RIOTEE_I2C_H_ */

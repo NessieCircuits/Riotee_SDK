@@ -1,5 +1,5 @@
-#ifndef __THRESHOLDS_H_
-#define __THRESHOLDS_H_
+#ifndef __RIOTEE_THRESHOLDS_H_
+#define __RIOTEE_THRESHOLDS_H_
 
 typedef enum { THR_LOW_2V5 = 0, THR_LOW_3V1 = 6, THR_LOW_3V5 = 2, THR_LOW_4V1 = 8 } thr_low_t;
 
@@ -45,4 +45,4 @@ void riotee_thresholds_high_set(thr_high_t thr);
 }
 #endif
 
-#endif /* __THRESHOLDS_H_ */
+#endif /* __RIOTEE_THRESHOLDS_H_ */

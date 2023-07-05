@@ -1,5 +1,5 @@
-#ifndef __AM1805_H_
-#define __AM1805_H_
+#ifndef __RIOTEE_AM1805_H_
+#define __RIOTEE_AM1805_H_
 
 #include <stdint.h>
 #include <time.h>
@@ -215,4 +215,4 @@ int am1805_disable_power(void);
 /* Enables trickle charging of VBAT from VCC */
 int am1805_enable_trickle(void);
 
-#endif /* AM1805_H_ */
+#endif /* __RIOTEE_AM1805_H_ */

@@ -6,7 +6,7 @@
 #include "task.h"
 
 #include "riotee_timing.h"
-#include "riotee_gpint.h"
+#include "gpint.h"
 #include "printf.h"
 #include "riotee.h"
 #include "riotee_uart.h"

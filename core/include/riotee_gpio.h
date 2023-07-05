@@ -1,7 +1,6 @@
 /**
  * @defgroup gpio GPIO driver
  *  @{
- *
  */
 
 #ifndef __RIOTEE_GPIO_H_
@@ -126,6 +125,4 @@ static inline uint32_t riotee_gpio_is_set(unsigned int pin) {
   return (reg->OUT >> pin) & 1UL;
 }
 
-#endif /* __RIOTEE_GPIO_H_ */
-
-/** @} */
+#endif /** @} __RIOTEE_GPIO_H_ */

@@ -1,9 +1,6 @@
 /**
- * @file riotee_adc.h
- * @brief ADC driver
  * @defgroup adc ADC driver
- *  @{
- *
+ * @{
  */
 
 #ifndef __ROPTEE_ADC_H_
@@ -17,69 +14,106 @@ extern "C" {
 #endif
 
 typedef enum {
-  /* Input not connected. */
+  /** Input not connected. */
   RIOTEE_ADC_INPUT_NC = 0,
-  /* Capacitor voltage. */
+  /** Capacitor voltage. */
   RIOTEE_ADC_INPUT_VCAP = 6,
-  /* Analog input A0 */
+  /** Analog input A0 */
   RIOTEE_ADC_INPUT_A0 = 3,
-  /* Analog input A1 */
+  /** Analog input A1 */
   RIOTEE_ADC_INPUT_A1 = 4,
 } riotee_adc_input_t;
 
 typedef enum {
-  RIOTEE_ADC_RESOLUTION_8BIT = 0UL,   ///< 8 bit resolution.
-  RIOTEE_ADC_RESOLUTION_10BIT = 1UL,  ///< 10 bit resolution.
-  RIOTEE_ADC_RESOLUTION_12BIT = 2UL,  ///< 12 bit resolution.
-  RIOTEE_ADC_RESOLUTION_14BIT = 3UL   ///< 14 bit resolution.
+  /** 8 bit resolution */
+  RIOTEE_ADC_RESOLUTION_8BIT = 0UL,
+  /** 10 bit resolution */
+  RIOTEE_ADC_RESOLUTION_10BIT = 1UL,
+  /** 12 bit resolution */
+  RIOTEE_ADC_RESOLUTION_12BIT = 2UL,
+  /** 14 bit resolution */
+  RIOTEE_ADC_RESOLUTION_14BIT = 3UL
 } riotee_adc_resolution_t;
 
 typedef enum {
-  RIOTEE_ADC_OVERSAMPLE_DISABLED = 0UL,  ///< No oversampling.
-  RIOTEE_ADC_OVERSAMPLE_2X = 1UL,        ///< Oversample 2x.
-  RIOTEE_ADC_OVERSAMPLE_4X = 2UL,        ///< Oversample 4x.
-  RIOTEE_ADC_OVERSAMPLE_8X = 3UL,        ///< Oversample 8x.
-  RIOTEE_ADC_OVERSAMPLE_16X = 4UL,       ///< Oversample 16x.
-  RIOTEE_ADC_OVERSAMPLE_32X = 5UL,       ///< Oversample 32x.
-  RIOTEE_ADC_OVERSAMPLE_64X = 6UL,       ///< Oversample 64x.
-  RIOTEE_ADC_OVERSAMPLE_128X = 7UL,      ///< Oversample 128x.
-  RIOTEE_ADC_OVERSAMPLE_256X = 8UL       ///< Oversample 256x.
+  /** No oversampling. */
+  RIOTEE_ADC_OVERSAMPLE_DISABLED = 0UL,
+  /** Oversample 2x. */
+  RIOTEE_ADC_OVERSAMPLE_2X = 1UL,
+  /** Oversample 4x. */
+  RIOTEE_ADC_OVERSAMPLE_4X = 2UL,
+  /** Oversample 8x. */
+  RIOTEE_ADC_OVERSAMPLE_8X = 3UL,
+  /** Oversample 16x. */
+  RIOTEE_ADC_OVERSAMPLE_16X = 4UL,
+  /** Oversample 32x. */
+  RIOTEE_ADC_OVERSAMPLE_32X = 5UL,
+  /** Oversample 64x. */
+  RIOTEE_ADC_OVERSAMPLE_64X = 6UL,
+  /** Oversample 128x. */
+  RIOTEE_ADC_OVERSAMPLE_128X = 7UL,
+  /** Oversample 256x. */
+  RIOTEE_ADC_OVERSAMPLE_256X = 8UL
 } riotee_adc_oversample_t;
 
 typedef enum {
-  RIOTEE_ADC_GAIN1_6 = 0UL,  ///< Gain factor 1/6.
-  RIOTEE_ADC_GAIN1_5 = 1UL,  ///< Gain factor 1/5.
-  RIOTEE_ADC_GAIN1_4 = 2UL,  ///< Gain factor 1/4.
-  RIOTEE_ADC_GAIN1_3 = 3UL,  ///< Gain factor 1/3.
-  RIOTEE_ADC_GAIN1_2 = 4UL,  ///< Gain factor 1/2.
-  RIOTEE_ADC_GAIN1 = 5UL,    ///< Gain factor 1.
-  RIOTEE_ADC_GAIN2 = 6UL,    ///< Gain factor 2.
-  RIOTEE_ADC_GAIN4 = 7UL,    ///< Gain factor 4.
+  /** Gain factor 1/6. */
+  RIOTEE_ADC_GAIN1_6 = 0UL,
+  /** Gain factor 1/5. */
+  RIOTEE_ADC_GAIN1_5 = 1UL,
+  /** Gain factor 1/4. */
+  RIOTEE_ADC_GAIN1_4 = 2UL,
+  /** Gain factor 1/3. */
+  RIOTEE_ADC_GAIN1_3 = 3UL,
+  /** Gain factor 1/2. */
+  RIOTEE_ADC_GAIN1_2 = 4UL,
+  /** Gain factor 1. */
+  RIOTEE_ADC_GAIN1 = 5UL,
+  /** Gain factor 2. */
+  RIOTEE_ADC_GAIN2 = 6UL,
+  /** Gain factor 4. */
+  RIOTEE_ADC_GAIN4 = 7UL,
 } riotee_adc_gain_t;
 
 typedef enum {
-  RIOTEE_ADC_REFERENCE_INTERNAL = 0UL,  ///< Internal reference (0.6 V).
-  RIOTEE_ADC_REFERENCE_VDD4 = 1UL       ///< VDD/4 as reference.
+  /** Internal reference (0.6 V). */
+  RIOTEE_ADC_REFERENCE_INTERNAL = 0UL,
+  /** VDD/4 reference. */
+  RIOTEE_ADC_REFERENCE_VDD4 = 1UL
 } riotee_adc_reference_t;
 
 typedef enum {
+  /** 3us acquisition time. */
   RIOTEE_ADC_ACQTIME_3US = 0UL,
+  /** 5us acquisition time. */
   RIOTEE_ADC_ACQTIME_5US = 1UL,
+  /** 10us acquisition time. */
   RIOTEE_ADC_ACQTIME_10US = 2UL,
+  /** 15us acquisition time. */
   RIOTEE_ADC_ACQTIME_15US = 3UL,
+  /** 20us acquisition time. */
   RIOTEE_ADC_ACQTIME_20US = 4UL,
+  /** 40us acquisition time. */
   RIOTEE_ADC_ACQTIME_40US = 5UL
 } riotee_adc_acqtime_t;
 
 typedef struct {
-  riotee_adc_gain_t gain;                ///< Gain of ADC pre-amplifier.
-  riotee_adc_reference_t reference;      ///< ADC reference.
-  riotee_adc_acqtime_t acq_time;         ///< Acquisition time.
-  riotee_adc_input_t input_pos;          ///< ADC positive input.
-  riotee_adc_input_t input_neg;          ///< ADC negative input.
-  riotee_adc_oversample_t oversampling;  ///< Oversampling factor.
-  unsigned int n_samples;                ///< Number of samples to be taken.
-  unsigned int sample_interval_ticks32;  ///< Sample interval in ticks on a 32kHz clock
+  /** Gain of ADC pre-amplifier. */
+  riotee_adc_gain_t gain;
+  /** ADC reference. */
+  riotee_adc_reference_t reference;
+  /** Acquisition time. */
+  riotee_adc_acqtime_t acq_time;
+  /** ADC positive input. */
+  riotee_adc_input_t input_pos;
+  /** ADC negative input. */
+  riotee_adc_input_t input_neg;
+  /** Oversampling factor. */
+  riotee_adc_oversample_t oversampling;
+  /** Number of samples to be taken. */
+  unsigned int n_samples;
+  /**  Sample interval in ticks on a 32kHz clock. */
+  unsigned int sample_interval_ticks32;
 } riotee_adc_cfg_t;
 
 /**
@@ -134,9 +168,9 @@ static inline float riotee_adc_vadc2vcap(float v_adc) {
 /**
  * @brief Translates digital pin to analog input channel.
  *
- * @param input
- * @param pin
- * @return int
+ * @param input Pointer where ADC input gets stored.
+ * @param pin Pin number.
+ * @return int 0 if pin is ADC input, -1 else
  */
 static inline int riotee_adc_pin2input(riotee_adc_input_t *input, unsigned int pin) {
   switch (pin) {
@@ -155,6 +189,4 @@ static inline int riotee_adc_pin2input(riotee_adc_input_t *input, unsigned int p
 }
 #endif
 
-#endif /* __RIOTEE_ADC_H_ */
-
-/** @} */
+#endif /** @} __RIOTEE_ADC_H_ */

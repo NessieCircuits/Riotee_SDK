@@ -1,5 +1,5 @@
-#ifndef __MAX20361_H_
-#define __MAX20361_H_
+#ifndef __RIOTEE_MAX20361_H_
+#define __RIOTEE_MAX20361_H_
 
 #include <stdint.h>
 
@@ -48,4 +48,4 @@ int riotee_max20361_id(uint8_t *dev_id);
 }
 #endif
 
-#endif /* __MAX20361_H_ */
+#endif /* __RIOTEE_MAX20361_H_ */

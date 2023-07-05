@@ -1,10 +1,9 @@
 /**
  * @defgroup stella Stella protocol
  *  @{
- *
  */
-#ifndef __STELLA_H_
-#define __STELLA_H_
+#ifndef __RIOTEE_STELLA_H_
+#define __RIOTEE_STELLA_H_
 
 #include <stdint.h>
 #include <stddef.h>
@@ -16,20 +15,20 @@ extern "C" {
 #define RIOTEE_STELLA_MAX_DATA (255 - sizeof(riotee_stella_pkt_header_t))
 
 typedef struct __attribute__((packed)) {
-  /* ID of the sender of this packet. */
+  /** ID of the device sending/receiving this packet. */
   uint32_t dev_id;
-  /* ID of the packet. */
+  /** ID of the packet. */
   uint16_t pkt_id;
-  /* ID of a previous packet that is acknowledged with this packet. */
+  /** ID of a previous packet that is acknowledged with this packet. */
   uint16_t ack_id;
 } riotee_stella_pkt_header_t;
 
 typedef struct __attribute__((packed)) {
-  /* Lenght of the packet, excluding this one byte length field. */
+  /** Lenght of the packet, excluding this one byte length field. */
   uint8_t len;
-  /* Packet header. */
+  /** Packet header. */
   riotee_stella_pkt_header_t hdr;
-  /* Payload data. */
+  /** Payload data. */
   uint8_t data[RIOTEE_STELLA_MAX_DATA];
 } riotee_stella_pkt_t;
 
@@ -66,12 +65,19 @@ int riotee_stella_send(void *data, size_t n);
  */
 void riotee_stella_set_id(uint32_t dev_id);
 
-enum { STELLA_ERR_OK = 0, STELLA_ERR_GENERIC = -1, STELLA_ERR_RESET = -2, STELLA_ERR_NOACK = 1 };
+enum {
+  /** Acknowledgement received. */
+  STELLA_ERR_OK = 0,
+  /** Generic error occured. */
+  STELLA_ERR_GENERIC = -1,
+  /** Reset occured while transmitting/receiving. */
+  STELLA_ERR_RESET = -2,
+  /** No acknowledgement received. */
+  STELLA_ERR_NOACK = 1
+};
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __STELLA_H_ */
-
-/** @} */
+#endif /** @} __RIOTEE_STELLA_H_ */

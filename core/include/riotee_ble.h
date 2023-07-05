@@ -1,5 +1,5 @@
-#ifndef __BLE_H__
-#define __BLE_H__
+#ifndef __RIOTEE_BLE_H__
+#define __RIOTEE_BLE_H__
 
 #include <stdint.h>
 #include <stdio.h>
@@ -13,19 +13,19 @@ extern "C" {
  *
  */
 typedef enum {
-  /* Undirected, connectable advertisement. */
+  /** Undirected, connectable advertisement. */
   ADV_IND = 0,
-  /* Directed, connectable advertisement. */
+  /** Directed, connectable advertisement. */
   ADV_DIRECT_IND = 1,
-  /* Undirected, unconnectable advertisement. */
+  /** Undirected, unconnectable advertisement. */
   ADV_NONCONN_IND = 2,
-  /* Scan request. */
+  /** Scan request. */
   SCAN_REQ = 3,
-  /* Scan response. */
+  /** Scan response. */
   SCAN_RSP = 4,
-  /* Connection request. */
+  /** Connection request. */
   CONNECT_REQ = 5,
-  /* Scannable undirected advertisement. */
+  /** Scannable undirected advertisement. */
   ADV_SCAN_IND = 6,
 } riotee_adv_pdu_type_t;
 
@@ -44,7 +44,7 @@ typedef struct {
   uint8_t len;
 } __attribute__((__packed__)) riotee_ble_ll_header_t;
 
-// This format is common to a number of ADV PDU types
+/** Common packet format for some ADV PDU types */
 typedef struct {
   riotee_ble_ll_header_t header;
   riotee_ble_ll_addr_t adv_addr;

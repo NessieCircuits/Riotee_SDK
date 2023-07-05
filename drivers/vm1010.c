@@ -7,7 +7,7 @@
 
 #include "vm1010.h"
 #include "riotee_adc.h"
-#include "riotee_gpint.h"
+#include "gpint.h"
 #include "riotee_gpio.h"
 #include "riotee_timing.h"
 

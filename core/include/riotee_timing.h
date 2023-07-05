@@ -1,5 +1,5 @@
-#ifndef __TIMING_H_
-#define __TIMING_H_
+#ifndef __RIOTEE_TIMING_H_
+#define __RIOTEE_TIMING_H_
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -58,4 +58,4 @@ void riotee_delay_ms(unsigned int ms);
 }
 #endif
 
-#endif /* __TIMING_H_ */
+#endif /* __RIOTEE_TIMING_H_ */

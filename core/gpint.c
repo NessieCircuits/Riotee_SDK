@@ -4,7 +4,7 @@
 
 #include "FreeRTOS.h"
 #include "runtime.h"
-#include "riotee_gpint.h"
+#include "gpint.h"
 
 static GPINT_CALLBACK registry[32] = {0};
 
