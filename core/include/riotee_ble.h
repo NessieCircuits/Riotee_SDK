@@ -58,7 +58,7 @@ typedef struct {
  * @param adv_name Advertising name of the device.
  * @param name_len Length of the advertising name.
  * @param data_len Size of the payload.
- * @return int
+ * @return int Size of remaining unused payload (>=0)
  */
 int riotee_ble_prepare_adv(riotee_ble_ll_addr_t *adv_addr, const char adv_name[], size_t name_len, size_t data_len);
 
