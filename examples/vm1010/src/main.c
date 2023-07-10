@@ -10,7 +10,7 @@
 #include "vm1010.h"
 
 /* Pin D10 enables/disables microphone on the Riotee Sensor Shield */
-#define PIN_MICROPHONE_ENABLE PIN_D10
+#define PIN_MICROPHONE_ENABLE PIN_D5
 
 void startup_callback(void) {
   /* Call this early to put SHTC3 into low power mode */
@@ -28,7 +28,7 @@ void reset_callback(void) {
   /* Required for VM1010 */
   riotee_adc_init();
 
-  vm1010_cfg_t cfg = {.pin_vout = PIN_D2, .pin_vbias = PIN_D3, .pin_mode = PIN_D8, .pin_dout = PIN_D9};
+  vm1010_cfg_t cfg = {.pin_vout = PIN_D2, .pin_vbias = PIN_D3, .pin_mode = PIN_D10, .pin_dout = PIN_D4};
   vm1010_init(&cfg);
 }
 
