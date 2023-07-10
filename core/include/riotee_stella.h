@@ -72,8 +72,11 @@ enum {
   STELLA_ERR_GENERIC = -1,
   /** Reset occured while transmitting/receiving. */
   STELLA_ERR_RESET = -2,
+  /** Data would overflow sendbuffer */
+  STELLA_ERR_OFLOW = -3,
   /** No acknowledgement received. */
   STELLA_ERR_NOACK = 1
+
 };
 
 #ifdef __cplusplus

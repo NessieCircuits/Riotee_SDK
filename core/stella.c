@@ -210,7 +210,7 @@ int riotee_stella_transceive(riotee_stella_pkt_t *rx_pkt, riotee_stella_pkt_t *t
 
 int riotee_stella_send(void *data, size_t n) {
   if (n > RIOTEE_STELLA_MAX_DATA)
-    return STELLA_ERR_GENERIC;
+    return STELLA_ERR_OFLOW;
 
   taskENTER_CRITICAL();
   /* Packet transmission will start automatically when HFXO is running */
