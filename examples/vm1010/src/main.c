@@ -54,14 +54,14 @@ int main(void) {
     riotee_sleep_ticks(5);
     printf("Sampling..");
     rc = vm1010_sample(samples, 120, 4);
-    printf("Done: %d", rc);
+    printf("done: %d, ", rc);
     /* Disable the microphone */
     riotee_gpio_set(PIN_MICROPHONE_DISABLE);
     /* Re-charge */
     riotee_wait_cap_charged();
 
     printf("Sending..");
-    rc = riotee_stella_send((uint8_t *)samples, sizeof(samples) * sizeof(int16_t));
-    printf("Done: %d", rc);
+    rc = riotee_stella_send((uint8_t *)samples, sizeof(samples));
+    printf("done: %d\r\n", rc);
   }
 }
