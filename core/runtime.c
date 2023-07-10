@@ -346,7 +346,7 @@ void user_task(void *pvParameter) {
 }
 
 void runtime_start(void) {
-  riotee_uart_init(PIN_D1, 1000000UL);
+  riotee_uart_init(PIN_D1, RIOTEE_UART_BAUDRATE_1000000);
 
   riotee_gpint_init();
   riotee_timing_init();
