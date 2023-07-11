@@ -324,7 +324,7 @@ static void sys_task(void *pvParameter) {
       riotee_gpint_register(PIN_PWRGD_L, GPINT_LEVEL_LOW, GPIO_PIN_CNF_PULL_Disabled, threshold_callback);
     }
 
-    /* Wait until capacitor is recharged or discharged below the crtitical threshold again */
+    /* Wait until capacitor is recharged or discharged below the critical threshold again */
     xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
     /* Recharged? */
     if (notification_value == EVT_PWRGD_H) {
