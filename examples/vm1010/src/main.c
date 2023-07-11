@@ -40,7 +40,7 @@ int16_t samples[120];
 int main(void) {
   int rc;
 
-  printf("Startup!");
+  printf("Startup!\r\n");
   for (;;) {
     riotee_wait_cap_charged();
 
@@ -49,19 +49,22 @@ int main(void) {
     /* Wait for 2ms for V_BIAS to come up */
     riotee_sleep_ticks(70);
     /* Wait for wake-on-sound signal from microphone */
-    vm1010_wait4sound();
-    /* Wait until microphone can be sampled (see VM1010 datasheet)*/
-    riotee_sleep_ticks(5);
-    printf("Sampling..");
-    rc = vm1010_sample(samples, 120, 4);
-    printf("done: %d, ", rc);
-    /* Disable the microphone */
-    riotee_gpio_set(PIN_MICROPHONE_DISABLE);
-    /* Re-charge */
-    riotee_wait_cap_charged();
+    rc = vm1010_wait4sound();
+    if (rc == 0) {
+      /* Wait until microphone can be sampled (see VM1010 datasheet)*/
+      riotee_sleep_ticks(5);
+      riotee_wait_cap_charged();
+      printf("Sampling..");
+      rc = vm1010_sample(samples, 120, 4);
+      printf("done: %d, ", rc);
+      /* Disable the microphone */
+      riotee_gpio_set(PIN_MICROPHONE_DISABLE);
+      /* Re-charge */
+      riotee_wait_cap_charged();
 
-    printf("Sending..");
-    rc = riotee_stella_send((uint8_t *)samples, sizeof(samples));
-    printf("done: %d\r\n", rc);
+      printf("Sending..");
+      rc = riotee_stella_send((uint8_t *)samples, sizeof(samples));
+      printf("done: %d\r\n", rc);
+    }
   }
 }
