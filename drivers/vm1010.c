@@ -36,6 +36,11 @@ int vm1010_init(vm1010_cfg_t *cfg) {
   return rc;
 }
 
+void vm1010_exit(void) {
+  /* pin alone can power the microphone */
+  riotee_gpio_clear(pin_mode);
+}
+
 int vm1010_sample(int16_t *result, unsigned int n_samples, unsigned int sample_interval_ticks32) {
   adc_cfg.n_samples = n_samples;
   adc_cfg.sample_interval_ticks32 = sample_interval_ticks32;
@@ -87,7 +92,7 @@ int vm1010_wait4sound(void) {
   else  {
     taskEXIT_CRITICAL();
     while (!riotee_gpio_read(pin_dout)) {
-      if ((rc = riotee_sleep_ms(1)) != 0) {
+      if ((rc = riotee_sleep_ms(5)) != 0) {
         /* interrupt polling on errors */
         riotee_gpio_clear(pin_mode);
         return rc;

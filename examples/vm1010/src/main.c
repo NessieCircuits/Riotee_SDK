@@ -33,6 +33,7 @@ void reset_callback(void) {
 void turnoff_callback(void) {
   /* Disable the microphone */
   riotee_gpio_set(PIN_MICROPHONE_DISABLE);
+  vm1010_exit();
 }
 
 int16_t samples[120];
