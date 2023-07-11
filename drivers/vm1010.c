@@ -31,6 +31,7 @@ int vm1010_init(vm1010_cfg_t *cfg) {
     return rc;
 
   riotee_gpio_cfg_output(pin_mode);
+  riotee_gpio_clear(pin_mode);
   riotee_gpio_cfg_input(pin_dout, RIOTEE_GPIO_PIN_NOPULL);
   return rc;
 }
@@ -59,8 +60,11 @@ int vm1010_wait4sound(void) {
   riotee_gpio_set(pin_mode);
 
   /* Wait 5ms according to datasheet */
-  if ((rc = riotee_sleep_ms(5)) != 0)
+  if ((rc = riotee_sleep_ms(5)) != 0) {
+    riotee_gpio_clear(pin_mode);
     return rc;
+  }
+
 
   taskENTER_CRITICAL();
   /* Check if there was a reset since we entered WoS mode */
