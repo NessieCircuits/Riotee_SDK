@@ -65,7 +65,6 @@ int vm1010_wait4sound(void) {
     return rc;
   }
 
-
   taskENTER_CRITICAL();
   /* Check if there was a reset since we entered WoS mode */
   if (reset_counter != runtime_stats.n_reset) {
@@ -87,7 +86,13 @@ int vm1010_wait4sound(void) {
   }
   else  {
     taskEXIT_CRITICAL();
-    while (!riotee_gpio_read(pin_dout)) riotee_sleep_ms(1);
+    while (!riotee_gpio_read(pin_dout)) {
+      if ((rc = riotee_sleep_ms(1)) != 0) {
+        /* interrupt polling on errors */
+        riotee_gpio_clear(pin_mode);
+        return rc;
+      }
+    }
     notification_value = EVT_GPINT;
   }
 
