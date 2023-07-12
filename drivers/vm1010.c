@@ -32,7 +32,7 @@ int vm1010_init(vm1010_cfg_t *cfg) {
 
   riotee_gpio_cfg_output(pin_mode);
   riotee_gpio_clear(pin_mode);
-  riotee_gpio_cfg_input(pin_dout, RIOTEE_GPIO_PIN_NOPULL);
+  riotee_gpio_cfg_input(pin_dout, RIOTEE_GPIO_IN_NOPULL);
   return rc;
 }
 
@@ -85,7 +85,7 @@ int vm1010_wait4sound(void) {
      * it just drains the cap when int arrives (without returning xTaskNotifyWaitIndexed())
      */
     xTaskNotifyStateClearIndexed(usr_task_handle, 1);
-    riotee_gpint_register(pin_dout, GPINT_LEVEL_HIGH, RIOTEE_GPIO_PIN_NOPULL, wos_callback);
+    gpint_register(pin_dout, RIOTEE_GPIO_LEVEL_HIGH, RIOTEE_GPIO_IN_NOPULL, wos_callback);
     taskEXIT_CRITICAL();
     xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
   }

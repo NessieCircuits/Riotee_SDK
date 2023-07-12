@@ -15,12 +15,18 @@ We provide a reference implementation for a basestation using a Nordic Semicondu
 The Gateway forwards messages received from devices to a host application running on a user's computer via an HTTP API.
 It also allows sending messages to devices.
 
-# Reference
-::: doxy.riotee.Function
-  name: void riotee_stella_init(void)
+## Example usage
 
-::: doxy.riotee.Function
-  name: int riotee_stella_send(void *data, size_t n)
+```{eval-rst}
+.. literalinclude:: ../../examples/stella/src/main.c
+   :language: c
+   :linenos:
+```
 
-::: doxy.riotee.Function
-  name: int riotee_stella_transceive(riotee_stella_pkt_t *rx_pkt, riotee_stella_pkt_t *tx_pkt)
+## API reference
+
+```{eval-rst}
+.. doxygengroup:: stella
+   :project: riotee
+   :content-only:
+```

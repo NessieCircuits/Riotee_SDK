@@ -1,4 +1,4 @@
-# Riotee
+# Riotee documentation
 
 Every year millions of new portable IoT devices are sold, and they are all powered by batteries.
 Regularly replacing millions of batteries is inconvenient, expensive, and bad for the environment.
@@ -20,3 +20,18 @@ Riotee products are available for purchase on [CrowdSupply](https://www.crowdsup
 
  - For a quickstart with Riotee, use the Arduino package.
  - For more involved development, use the [SDK](https://github.com/NessieCircuits/Riotee_Runtime) and the [template project](https://github.com/NessieCircuits/Riotee_AppTemplate).
+
+
+```{eval-rst}
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+   quickstart
+   basics
+   hardware/index
+   software/index
+   networking/index
+   miscellaneous
+   legal_notice
+```

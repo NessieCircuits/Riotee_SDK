@@ -1,1 +1,1 @@
---8<-- "examples/blinky/README.md"
+../../../examples/blinky/README.md

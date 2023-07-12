@@ -18,7 +18,7 @@ SDK_SRC_FILES += \
   $(CORE_DIR)/max20361.c \
   $(CORE_DIR)/am1805.c \
   $(CORE_DIR)/timing.c \
-  $(CORE_DIR)/gpint.c \
+  $(CORE_DIR)/gpio.c \
   $(CORE_DIR)/uart.c \
   $(CORE_DIR)/spic.c \
   $(CORE_DIR)/runtime.c \
@@ -138,4 +138,4 @@ clean:
 # Flash the program
 flash: ${OUTPUT_DIR}/build.hex
 	@echo Flashing: $<
-	pyocd load -t nrf52 $<
+	riotee-probe program -d nrf52 -f $<

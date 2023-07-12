@@ -2,7 +2,7 @@
 
 Our Sensor Shield adds an accelerometer, a temperature-and-humidity sensor, and a microphone to your Riotee device.
 
-#### Features & Specifications
+## Features & Specifications
 
 - Bosch BMA400 digital accelerometer
 - Sensirion SHTC3 digital temperature and humidity sensor

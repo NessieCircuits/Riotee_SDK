@@ -4,10 +4,18 @@ Riotee has limited support for BLE. You can use the API to send advertisement pa
 
 The implementation is not standard-conformant. You may only use it for evaluation purposes in dedicated facilities where it cannot interfere with other spectrum users.
 
+## Example usage
 
-# Reference
-::: doxy.riotee.Function
-  name: void riotee_ble_init(void)
+```{eval-rst}
+.. literalinclude:: ../../examples/ble/src/main.c
+   :language: c
+   :linenos:
+```
 
-::: doxy.riotee.Function
-  name: int riotee_ble_advertise(void *data, riotee_adv_ch_t ch)
+## API reference
+
+```{eval-rst}
+.. doxygengroup:: ble
+   :project: riotee
+   :content-only:
+```
