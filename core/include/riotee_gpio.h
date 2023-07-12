@@ -176,4 +176,8 @@ static inline uint32_t riotee_gpio_is_set(unsigned int pin) {
   return (reg->OUT >> pin) & 1UL;
 }
 
+#ifdef __cplusplus
+}
+#endif
+
 #endif /** __RIOTEE_GPIO_H_ */
