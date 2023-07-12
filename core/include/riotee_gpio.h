@@ -42,6 +42,44 @@ typedef enum {
   RIOTEE_GPIO_IN_NOPULL = 0,
 } riotee_gpio_in_pull_t;
 
+/**
+ * @brief GPIO levels.
+ * \ingroup gpio
+ */
+typedef enum {
+  /** GPIO level high. */
+  RIOTEE_GPIO_LEVEL_LOW = 0,
+  /** GPIO level low. */
+  RIOTEE_GPIO_LEVEL_HIGH = 1
+} riotee_gpio_level_t;
+
+enum { RIOTEE_GPIO_ERR_OK = 0, RIOTEE_GPIO_ERR_GENERIC = 1, RIOTEE_GPIO_ERR_BUSY = 2, RIOTEE_GPIO_ERR_UNSUPPORTED = 3 };
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/**
+ * @brief Initializes GPIO. Must be called once after reset before GPIO interrupt functionality can be used.
+ * \ingroup gpio
+ *
+ */
+void riotee_gpio_init(void);
+
+/**
+ * @brief Waits in low power mode until level is detected on pin.
+ *
+ * CAUTION: The pin remains in the specified pull configuration after the function returns.
+ *
+ * @param pin Pin number.
+ * @param level Level to wait for.
+ * @param pull Pullup configuration.
+ * @return int 0 when level is detected, <0 on error or reset.
+ * \ingroup gpio
+ *
+ */
+int riotee_gpio_wait_level(unsigned int pin, riotee_gpio_level_t level, riotee_gpio_in_pull_t pull);
+
 static inline riotee_gpio_port_t* riotee_gpio_get_port(unsigned int* pin) {
   if (*pin > 41)
     return NULL;
