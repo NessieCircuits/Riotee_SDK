@@ -13,7 +13,7 @@ extern "C" {
 void riotee_timing_init(void);
 
 /**
- * @brief Waits in a low power mode for the specificed number of ticks on a 32kHz clock.
+ * @brief Waits in a low power mode for the specified number of ticks on a 32kHz clock.
  *
  * Starts a timer and blocks on a notification. The idle task will keep the system in a low power mode. Function may
  * return earlier than requested if the power runs out and a reset occurs.
@@ -25,7 +25,7 @@ void riotee_timing_init(void);
 int riotee_sleep_ticks(unsigned int ticks_32k);
 
 /**
- * @brief Waits in a low power mode for the specificed time.
+ * @brief Waits in a low power mode for the specified time.
  *
  * Starts a timer and blocks on a notification. The idle task will keep the system in a low power mode. Function may
  * return earlier than requested if the power runs out and a reset occurs.

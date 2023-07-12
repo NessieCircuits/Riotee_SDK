@@ -904,7 +904,7 @@ static inline int32x4_t __arm_vec_sqrt_q31_neon(int32x4_t vec)
   uint32_t x,
   uint32_t y)
   {
-/*  q31_t r,     s;  without initialisation 'arm_offset_q15 test' fails  but 'intrinsic' tests pass! for armCC */
+/*  q31_t r,     s;  without initialization 'arm_offset_q15 test' fails  but 'intrinsic' tests pass! for armCC */
     q31_t r = 0, s = 0;
 
     r = __SSAT(((((q31_t)x << 16) >> 16) + (((q31_t)y << 16) >> 16)), 16) & (int32_t)0x0000FFFF;

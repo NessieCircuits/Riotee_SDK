@@ -61,7 +61,7 @@ typedef struct {
 /**
  * @brief Sets up the internal packet buffer for advertisting with given name, address and payload size.
  *
- * @param adv_addr Pointer to adress buffer.
+ * @param adv_addr Pointer to address buffer.
  * @param adv_name Advertising name of the device.
  * @param name_len Length of the advertising name.
  * @param data_len Size of the payload.
