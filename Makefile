@@ -138,4 +138,4 @@ clean:
 # Flash the program
 flash: ${OUTPUT_DIR}/build.hex
 	@echo Flashing: $<
-	pyocd load -t nrf52 $<
+	riotee-probe program -d nrf52 -f $<
