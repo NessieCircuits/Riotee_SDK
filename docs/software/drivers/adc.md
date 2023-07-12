@@ -1,13 +1,23 @@
 # ADC
 
-The nRF52 on the Riotee Module has a 12-bit successive approximation ADC.
 
-# Reference
-::: doxy.riotee.Function
-  name: void riotee_adc_init(void)
+The Riotee Module has two analog pins that can be sampled with the 12-bit successive approximation ADC on-board the nRF52.
+Additionally, the ADC can be used to sample the supply voltage and the capacitor voltage.
 
-::: doxy.riotee.Function
-  name: int16_t riotee_adc_read(riotee_adc_input_t in)
+The API supports simple reading of single samples with a default configuration and more sophisticated periodic sampling with custom configuration.
 
-::: doxy.riotee.Function
-  name: int riotee_adc_sample(int16_t *dst, riotee_adc_cfg_t *cfg)
+## Example usage
+
+```{eval-rst}
+.. literalinclude:: ../../../examples/adc/src/main.c
+   :language: c
+   :linenos:
+```
+
+## API reference
+
+```{eval-rst}
+.. doxygengroup:: adc
+   :project: riotee
+   :content-only:
+```

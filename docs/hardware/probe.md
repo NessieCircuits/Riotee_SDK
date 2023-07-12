@@ -6,7 +6,7 @@ With the Riotee Probe the process becomes much easier: When programming/debuggin
 
 The Riotee probe supports programming both, the MSP430 and the nRF52 on the Riotee Module after you've soldered it onto your PCB or plugged it into a breadboard. It has a standard, 10-pin, 0.1-inch connector and is compatible with Tag-Connect cables that support in-circuit debugging.
 
-#### Features & Specifications
+## Features & Specifications
 
 - Custom debug probe for in-circuit programming and debugging of Riotee Modules
 - USB Type-C connector for communicating with a computer

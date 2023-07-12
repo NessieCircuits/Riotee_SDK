@@ -3,7 +3,7 @@
 
 Our Riotee Board combines a Riotee Module with a USB Type-C connector and circuitry that facilitates programming and debugging. Two 0.1-inch pin sockets expose all signals from the Riotee module, including 11 GPIOs that support I²C, SPI, and analog sensor applications. You can also use these headers to connect multiple Riotee Shields if you want to extend the capabilities of your device without designing a custom PCB. The Riotee Board has a push button, an LED, and a connector for a solar panel. Once your firmware has been flashed to the board, it will automatically switch over to untethered, battery-free operation.
 
-#### Features & Specifications
+## Features & Specifications
 
 - 56 x 23 mm board with two 0.1-inch expansion headers for shields
 - USB Type-C connector for communicating with a computer

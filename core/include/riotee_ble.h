@@ -1,3 +1,7 @@
+/**
+ * @defgroup ble Bluetooth Low Energy
+ *  @{
+ */
 #ifndef __RIOTEE_BLE_H__
 #define __RIOTEE_BLE_H__
 
@@ -44,7 +48,10 @@ typedef struct {
   uint8_t len;
 } __attribute__((__packed__)) riotee_ble_ll_header_t;
 
-/** Common packet format for some ADV PDU types */
+/**
+ * @brief Common packet format for some ADV PDU types
+ *
+ */
 typedef struct {
   riotee_ble_ll_header_t header;
   riotee_ble_ll_addr_t adv_addr;
@@ -81,4 +88,4 @@ void riotee_ble_init(void);
 }
 #endif
 
-#endif /* __BLE_H__ */
+#endif /** @} __BLE_H__ */
