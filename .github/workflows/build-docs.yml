@@ -13,6 +13,7 @@ jobs:
 
       - run: sudo apt update && sudo apt install -y doxygen
       - run: pip install myst-parser breathe sphinx-rtd-theme renku-sphinx-theme 
+
       - run: doxygen doxygen.cfg
       - run: cd docs && TZ=UTC make html
 
