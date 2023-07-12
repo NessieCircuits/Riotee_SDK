@@ -21,20 +21,20 @@ git clone --recursive git@github.com:NessieCircuits/Riotee_Runtime.git
 
  - Install `make` from your distribution's repository (`apt install build-essential` on Ubuntu).
  - Install the `GNU Arm Embedded Toolchain` from your distribution's repository (`apt install gcc-arm-none-eabi` on Ubuntu) or from [the official website](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads).
- - For uploading firmware to your Riotee device install [pyOCD](https://pyocd.io/) with
+ - For uploading firmware to your Riotee device install the [riotee-probe](https://github.com/NessieCircuits/Riotee_ProbeSoftware) Python package with
 
 ```bash
-pip install pyocd
+pip install riotee-probe
 ```
 
 ### Windows
- - Install `make` via Chocolatey or Cygwin following the instructions [here](https://earthly.dev/blog/makefiles-on-windows/).
- - Add `C:/cygwin64/bin` to your `Path` variable ([Instructions](https://www.architectryan.com/2018/03/17/add-to-the-path-on-windows-10/)).
+ - Install `make` via Cygwin or Chocolatey following the instructions [here](https://earthly.dev/blog/makefiles-on-windows/).
+ - Add the path to `make`  (e.g. `C:/cygwin64/bin` for Cygwin) to your `Path` variable ([Instructions](https://www.architectryan.com/2018/03/17/add-to-the-path-on-windows-10/)).
  - Install the `GNU Arm Embedded Toolchain` from the [official website](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads).
- - For uploading firmware to your Riotee device install [pyOCD](https://pyocd.io/) with
+ - For uploading firmware to your Riotee device install the [riotee-probe](https://github.com/NessieCircuits/Riotee_ProbeSoftware) Python package with
 
 ```bash
-pip install pyocd
+pip install riotee-probe
 ```
 ## Usage
 
