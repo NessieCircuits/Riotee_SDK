@@ -55,10 +55,10 @@ jobs:
           server: www.riotee.nessie-circuits.de
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: output
+          local-dir: output/
           server-dir: /htdocs/riotee/arduino/
           protocol: ftps
-          exclude: tools
+          exclude: tools/
 
       - uses: actions/download-artifact@v3
         with:
