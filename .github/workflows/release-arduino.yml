@@ -28,9 +28,8 @@ jobs:
       - name: Load zip properties into environment variables
         run: cat zip_props.env >> $GITHUB_ENV
           
-      - name: Store release tag in environment variable
-        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
-          
+      - name: Store release tag (without leading v) in environment variable
+        run: echo "RELEASE_VERSION=${GITHUB_REF_NAME:1}" >> $GITHUB_ENV
         
       - name: Render template of package_index snippet for release
         run: envsubst < arduino/package_index_snippet.tmpl > package_index_snippet.json
