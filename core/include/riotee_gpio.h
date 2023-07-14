@@ -80,14 +80,22 @@ void riotee_gpio_init(void);
  */
 int riotee_gpio_wait_level(unsigned int pin, riotee_gpio_level_t level, riotee_gpio_in_pull_t pull);
 
-static inline riotee_gpio_port_t* riotee_gpio_get_port(unsigned int* pin) {
-  if (*pin > 41)
+static inline riotee_gpio_port_t* riotee_gpio_get_port(unsigned int pin) {
+  if (pin > 41)
     return NULL;
-  if (*pin > 31) {
-    *pin -= 32;
+  if (pin > 31) {
     return NRF_PORT1;
   }
   return NRF_PORT0;
+}
+
+static inline int riotee_gpio_get_pin_idx(unsigned int pin) {
+  if (pin > 41)
+    return -1;
+  if (pin > 31) {
+    return pin - 32;
+  }
+  return pin;
 }
 
 /**
@@ -97,10 +105,11 @@ static inline riotee_gpio_port_t* riotee_gpio_get_port(unsigned int* pin) {
  * \ingroup gpio
  */
 static inline void riotee_gpio_cfg_output(unsigned int pin) {
-  riotee_gpio_port_t* reg = riotee_gpio_get_port(&pin);
+  riotee_gpio_port_t* reg = riotee_gpio_get_port(pin);
+  int pin_idx = riotee_gpio_get_pin_idx(pin);
 
   /* Output, input buffer disconnected */
-  reg->PIN_CNF[pin] = (1UL << 0) | (1UL << 1);
+  reg->PIN_CNF[pin_idx] = (1UL << 0) | (1UL << 1);
 }
 
 /**
@@ -111,10 +120,11 @@ static inline void riotee_gpio_cfg_output(unsigned int pin) {
  * \ingroup gpio
  */
 static inline void riotee_gpio_cfg_input(unsigned int pin, riotee_gpio_in_pull_t pull) {
-  riotee_gpio_port_t* reg = riotee_gpio_get_port(&pin);
+  riotee_gpio_port_t* reg = riotee_gpio_get_port(pin);
+  int pin_idx = riotee_gpio_get_pin_idx(pin);
 
   /* Input buffer connected */
-  reg->PIN_CNF[pin] = (pull << 2);
+  reg->PIN_CNF[pin_idx] = (pull << 2);
 }
 
 /**
@@ -124,8 +134,10 @@ static inline void riotee_gpio_cfg_input(unsigned int pin, riotee_gpio_in_pull_t
  * \ingroup gpio
  */
 static inline void riotee_gpio_set(unsigned int pin) {
-  riotee_gpio_port_t* reg = riotee_gpio_get_port(&pin);
-  reg->OUTSET = (1UL << pin);
+  riotee_gpio_port_t* reg = riotee_gpio_get_port(pin);
+  int pin_idx = riotee_gpio_get_pin_idx(pin);
+
+  reg->OUTSET = (1UL << pin_idx);
 }
 
 /**
@@ -135,9 +147,10 @@ static inline void riotee_gpio_set(unsigned int pin) {
  * \ingroup gpio
  */
 static inline void riotee_gpio_clear(unsigned int pin) {
-  riotee_gpio_port_t* reg = riotee_gpio_get_port(&pin);
+  riotee_gpio_port_t* reg = riotee_gpio_get_port(pin);
+  int pin_idx = riotee_gpio_get_pin_idx(pin);
 
-  reg->OUTCLR = (1UL << pin);
+  reg->OUTCLR = (1UL << pin_idx);
 }
 
 /**
@@ -147,9 +160,10 @@ static inline void riotee_gpio_clear(unsigned int pin) {
  * \ingroup gpio
  */
 static inline void riotee_gpio_toggle(unsigned int pin) {
-  riotee_gpio_port_t* reg = riotee_gpio_get_port(&pin);
+  riotee_gpio_port_t* reg = riotee_gpio_get_port(pin);
+  int pin_idx = riotee_gpio_get_pin_idx(pin);
 
-  reg->OUT ^= (1UL << pin);
+  reg->OUT ^= (1UL << pin_idx);
 }
 
 /**
@@ -160,8 +174,10 @@ static inline void riotee_gpio_toggle(unsigned int pin) {
  * \ingroup gpio
  */
 static inline uint32_t riotee_gpio_read(unsigned int pin) {
-  riotee_gpio_port_t* reg = riotee_gpio_get_port(&pin);
-  return (reg->IN >> pin) & 1UL;
+  riotee_gpio_port_t* reg = riotee_gpio_get_port(pin);
+  int pin_idx = riotee_gpio_get_pin_idx(pin);
+
+  return (reg->IN >> pin_idx) & 1UL;
 }
 
 /**
@@ -172,8 +188,9 @@ static inline uint32_t riotee_gpio_read(unsigned int pin) {
  * \ingroup gpio
  */
 static inline uint32_t riotee_gpio_is_set(unsigned int pin) {
-  riotee_gpio_port_t* reg = riotee_gpio_get_port(&pin);
-  return (reg->OUT >> pin) & 1UL;
+  riotee_gpio_port_t* reg = riotee_gpio_get_port(pin);
+  int pin_idx = riotee_gpio_get_pin_idx(pin);
+  return (reg->OUT >> pin_idx) & 1UL;
 }
 
 #ifdef __cplusplus

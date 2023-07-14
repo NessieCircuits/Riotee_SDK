@@ -16,38 +16,56 @@ jobs:
     name: Release core package to webserver
     needs: call-test-arduino
     steps:
-      - name: Install dependencies of envsubst
-        run: sudo apt update && sudo apt install gettext-base
+      - name: Install dependencies
+        run: sudo apt update && sudo apt install -y gettext-base
 
       - uses: actions/checkout@v3
-
-      - run: mkdir output
-
-      - uses: actions/download-artifact@v3
-        with:
-          name: core_zip
-          path: output/Riotee_ArduinoCore_${{github.ref_name}}.zip
 
       - uses: actions/download-artifact@v3
         with:
           name: zip_props
-
+          
       - name: Load zip properties into environment variables
         run: cat zip_props.env >> $GITHUB_ENV
-
-      - name: Store release tag in environment variable
-        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
-  
+          
+      - name: Store release tag (without leading v) in environment variable
+        run: echo "RELEASE_VERSION=${GITHUB_REF_NAME:1}" >> $GITHUB_ENV
+        
       - name: Render template of package_index snippet for release
-        run: envsubst < arduino/package_index_snippet.tmpl > output/package_index_snippet.json
+        run: envsubst < arduino/package_index_snippet.tmpl > package_index_snippet.json
+        
+      - run: mkdir output
+      
+      - name: Download current package_index.json
+        run: wget -P output https://riotee.nessie-circuits.de/arduino/package_index.json
 
+      - name: Insert snippet into package_index.json
+        run: sed -i '/"platforms":/r package_index_snippet.json' output/package_index.json
+    
       - name: Upload package index snippet as artifact
         uses: actions/upload-artifact@v3
         with:
-          name: package_index_snippet
-          path: output/package_index_snippet.json
+          name: package_index
+          path: output/package_index.json
 
-      - run: ls -lha output
+      - name: Upload package index to FTP server
+        uses: SamKirkland/FTP-Deploy-Action@4.3.3
+        with:
+          server: www.riotee.nessie-circuits.de
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: output/
+          server-dir: /htdocs/riotee/arduino/
+          protocol: ftps
+          exclude: tools/
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: core_zip
+          path: output/
+
+      - run: mv output/Riotee_ArduinoCore.zip output/Riotee_ArduinoCore_${{github.ref_name}}.zip
+  
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
