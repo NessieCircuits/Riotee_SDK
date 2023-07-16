@@ -34,7 +34,7 @@ compiler.path={runtime.tools.gcc-arm-none-eabi-12.2.0.path}/bin/
 compiler.c.cmd=arm-none-eabi-gcc
 compiler.c.flags=-mthumb -mcpu={build.mcu} -c {compiler.opt_flags} {compiler.warning_flags} {build.float_flags} -fno-math-errno -ffunction-sections -fdata-sections
 compiler.c.elf.cmd=arm-none-eabi-g++
-compiler.c.elf.flags={compiler.opt_flags} -T{build.ldscript} -mcpu={build.mcu} -mthumb {build.float_flags} -Wl,--gc-sections,-Map,{build.path}/{build.project_name}.map --specs=nano.specs
+compiler.c.elf.flags={compiler.opt_flags} -T{build.ldscript} -mcpu={build.mcu} -mthumb {build.float_flags} -Wl,--gc-sections,-Map,{build.path}/{build.project_name}.map --specs=nano.specs -Wl,--defsym=RIOTEE_RAM_RETAINED_SIZE={build.retainedsize}
 
 compiler.S.cmd=arm-none-eabi-gcc
 compiler.S.flags=-c -g -x assembler-with-cpp
@@ -70,10 +70,10 @@ compiler.elf2hex.extra_flags=
 # ----------------
 
 ## Compile c files
-recipe.c.o.pattern="{compiler.path}{compiler.c.cmd}" {compiler.c.flags} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.c.extra_flags} {build.extra_flags} {compiler.riotee.includes} {includes} "{source_file}" -o "{object_file}"
+recipe.c.o.pattern="{compiler.path}{compiler.c.cmd}" {compiler.c.flags} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} -DRIOTEE_STACK_SIZE={build.stacksize} {compiler.c.extra_flags} {build.extra_flags} {compiler.riotee.includes} {includes} "{source_file}" -o "{object_file}"
 
 ## Compile c++ files
-recipe.cpp.o.pattern="{compiler.path}{compiler.cpp.cmd}" {compiler.cpp.flags} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.cpp.extra_flags} {build.extra_flags} {compiler.riotee.includes} {includes} "{source_file}" -o "{object_file}"
+recipe.cpp.o.pattern="{compiler.path}{compiler.cpp.cmd}" {compiler.cpp.flags} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} -DRIOTEE_STACK_SIZE={build.stacksize} {compiler.cpp.extra_flags} {build.extra_flags} {compiler.riotee.includes} {includes} "{source_file}" -o "{object_file}"
 
 ## Compile S files
 recipe.S.o.pattern="{compiler.path}{compiler.S.cmd}" {compiler.S.flags} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.S.extra_flags} {build.extra_flags} {includes} "{source_file}" -o "{object_file}"
