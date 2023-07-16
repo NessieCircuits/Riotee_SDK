@@ -54,13 +54,14 @@ You are responsible for keeping data and application flow consistent in this cas
 
 2. Increase the retained memory area.
 
-You may increase the memory area where retained variables are stored by defining a constant `RIOTEE_RAM_RETAINED_SIZE` in a header file `riotee_config.h` that's on one of your include paths.
+You may increase the memory area where retained variables are stored by defining `RIOTEE_RAM_RETAINED_SIZE` in your application's Makefile.
 The SDK will reserve a memory area of the specifed size for your variables and the runtime will automatically checkpoint all variables to non-volatile RAM.
 The drawback is that, depending on the specified size, the checkpointing may take significantly longer and consume significantly more energy.
 You must chose the capacitance of your device such that the checkpoint can still safely complete before the power supply gets interrupted.
 
-The runtime only checkpoints the part of the retained memory area that is actually occupied by the variables and the stack so don't worry about reducing RIOTEE_RAM_RETAINED_SIZE beyond the default values of 8192B.
-However you may find that you can fit more static/global variables into the retained memory when you reduce the (generous) `RIOTEE_STACK_SIZE` in `riotee_config.h`.
+The runtime only checkpoints the part of the retained memory area that is actually occupied by the variables and the stack so don't worry about reducing RIOTEE_RAM_RETAINED_SIZE beyond the default value of 8192B.
+However you may find that you can fit more static/global variables into the retained memory when you reduce the (generous) default `RIOTEE_STACK_SIZE` in your application's Makefile.
+For an example, take a look at the [dsp example's Makefile](https://github.com/NessieCircuits/Riotee_Runtime/blob/main/examples/dsp/Makefile).
 
 ## Early startup
 
