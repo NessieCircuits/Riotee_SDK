@@ -26,7 +26,7 @@ void GPIOTE_IRQHandler(void) {
   }
 }
 
-int gpint_register(unsigned pin, riotee_gpio_level_t level, riotee_gpio_in_pull_t pull, GPINT_CALLBACK cb) {
+int gpint_register(unsigned int pin, riotee_gpio_level_t level, riotee_gpio_in_pull_t pull, GPINT_CALLBACK cb) {
   riotee_gpio_port_t *reg = riotee_gpio_get_port(pin);
   int pin_idx = riotee_gpio_get_pin_idx(pin);
 
