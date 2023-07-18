@@ -90,8 +90,6 @@ static inline riotee_gpio_port_t* riotee_gpio_get_port(unsigned int pin) {
 }
 
 static inline int riotee_gpio_get_pin_idx(unsigned int pin) {
-  if (pin > 41)
-    return -1;
   if (pin > 31) {
     return pin - 32;
   }
