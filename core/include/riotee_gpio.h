@@ -8,6 +8,8 @@
 #include <stdint.h>
 #include <stddef.h>
 
+#include "riotee.h"
+
 #define NRF_PORT0_ADDR 0x50000000UL
 #define NRF_PORT1_ADDR 0x50000300UL
 
@@ -71,14 +73,16 @@ void riotee_gpio_init(void);
  *
  * CAUTION: The pin remains in the specified pull configuration after the function returns.
  *
+ * \ingroup gpio
+ *
  * @param pin Pin number.
  * @param level Level to wait for.
  * @param pull Pullup configuration.
- * @return int 0 when level is detected, <0 on error or reset.
- * \ingroup gpio
  *
+ * @retval RIOTEE_SUCCESS                 Specified level detected on pin.
+ * @retval RIOTEE_ERR_RESET              Reset occured while waiting for level.
  */
-int riotee_gpio_wait_level(unsigned int pin, riotee_gpio_level_t level, riotee_gpio_in_pull_t pull);
+riotee_rc_t riotee_gpio_wait_level(unsigned int pin, riotee_gpio_level_t level, riotee_gpio_in_pull_t pull);
 
 static inline riotee_gpio_port_t* riotee_gpio_get_port(unsigned int pin) {
   if (pin > 41)

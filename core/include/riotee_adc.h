@@ -130,9 +130,12 @@ void riotee_adc_init(void);
  *
  * @param dst Buffer where samples are stored.
  * @param cfg ADC and sampling configuration.
- * @return int 0 on success, <0 otherwise
+ *
+ * @retval RIOTEE_SUCCESS       Sampling completed.
+ * @retval RIOTEE_ERR_RESET    Reset occured while sampling.
+ * @retval RIOTEE_ERR_TEARDOWN Teardown occured while sampling.
  */
-int riotee_adc_sample(int16_t *dst, riotee_adc_cfg_t *cfg);
+riotee_rc_t riotee_adc_sample(int16_t *dst, riotee_adc_cfg_t *cfg);
 
 /**
  * @brief Reads a sample from the ADC.
@@ -170,18 +173,20 @@ static inline float riotee_adc_vadc2vcap(float v_adc) {
  *
  * @param input Pointer where ADC input gets stored.
  * @param pin Pin number.
- * @return int 0 if pin is ADC input, -1 else
+ *
+ * @retval RIOTEE_SUCCESS         Successfully converted.
+ * @retval RIOTEE_ERR_INVALIDARG Pin is not an ADC input.
  */
-static inline int riotee_adc_pin2input(riotee_adc_input_t *input, unsigned int pin) {
+static inline riotee_rc_t riotee_adc_pin2input(riotee_adc_input_t *input, unsigned int pin) {
   switch (pin) {
     case PIN_D2:
       *input = RIOTEE_ADC_INPUT_A0;
-      return 0;
+      return RIOTEE_SUCCESS;
     case PIN_D3:
       *input = RIOTEE_ADC_INPUT_A1;
-      return 0;
+      return RIOTEE_SUCCESS;
     default:
-      return -1;
+      return RIOTEE_ERR_INVALIDARG;
   }
 }
 

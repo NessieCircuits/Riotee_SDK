@@ -104,7 +104,7 @@ int16_t riotee_adc_read(riotee_adc_input_t in) {
   taskEXIT_CRITICAL();
   return result;
 }
-int riotee_adc_sample(int16_t *dst, riotee_adc_cfg_t *cfg) {
+riotee_rc_t riotee_adc_sample(int16_t *dst, riotee_adc_cfg_t *cfg) {
   unsigned long notification_value;
 
   taskENTER_CRITICAL();
@@ -148,8 +148,13 @@ int riotee_adc_sample(int16_t *dst, riotee_adc_cfg_t *cfg) {
   taskEXIT_CRITICAL();
 
   xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
+
   if (notification_value == EVT_ADC)
-    return 0;
-  else
-    return -1;
+    return RIOTEE_SUCCESS;
+  if (notification_value == EVT_TEARDOWN)
+    return RIOTEE_ERR_TEARDOWN;
+  if (notification_value == EVT_RESET)
+    return RIOTEE_ERR_RESET;
+
+  return RIOTEE_ERR_GENERIC;
 }

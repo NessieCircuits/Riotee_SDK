@@ -44,6 +44,28 @@
 #define PIN_C2C_CS 22
 #define PIN_C2C_GPIO 15
 
+#define RIOTEE_RC_BASE 0x00000000
+#define RIOTEE_RC_STELLA_BASE 0x01000000
+#define RIOTEE_RC_I2C_BASE 0x02000000
+
+enum {
+  /** Operation completed successfully. */
+  RIOTEE_SUCCESS = -(RIOTEE_RC_BASE + 0),
+  /** Operation failed with generic error. */
+  RIOTEE_ERR_GENERIC = -(RIOTEE_RC_BASE + 1),
+  /** One or more invalid function arguments. */
+  RIOTEE_ERR_INVALIDARG = -(RIOTEE_RC_BASE + 2),
+  /** Operation was interrupted due to critically low capacitor voltage. */
+  RIOTEE_ERR_TEARDOWN = -(RIOTEE_RC_BASE + 3),
+  /** A reset occured during the operation. Most likely due to low capacitor voltage. */
+  RIOTEE_ERR_RESET = -(RIOTEE_RC_BASE + 4),
+  /** The requested operation would overflow a buffer. */
+  RIOTEE_ERR_OVERFLOW = -(RIOTEE_RC_BASE + 5)
+};
+
+/** Common return code for Riotee SDK API functions. */
+typedef int riotee_rc_t;
+
 #if defined __cplusplus
 extern "C" {
 #endif

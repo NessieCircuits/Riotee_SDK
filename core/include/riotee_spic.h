@@ -8,6 +8,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "riotee.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -64,7 +66,7 @@ typedef struct {
  * @param cfg
  * @return int
  */
-int spic_init(riotee_spic_cfg_t* cfg);
+riotee_rc_t spic_init(riotee_spic_cfg_t* cfg);
 
 /**
  * @brief Transfers given number of bytes to and from the peripheral.
@@ -73,9 +75,12 @@ int spic_init(riotee_spic_cfg_t* cfg);
  * @param n_tx Number of bytes to transmit. Can be 0.
  * @param data_rx Pointer to RX data buffer. Can be NULL if n_rx=0.
  * @param n_rx Number of bytes to receive. Can be 0.
- * @return int 0 on success, <0 else.
+ *
+ * @retval RIOTEE_SUCCESS       Transfer successful.
+ * @retval RIOTEE_ERR_RESET    Reset occured during transfer.
+ * @retval RIOTEE_ERR_TEARDOWN Teardown occured during transfer.
  */
-int spic_transfer(uint8_t* data_tx, size_t n_tx, uint8_t* data_rx, size_t n_rx);
+riotee_rc_t spic_transfer(uint8_t* data_tx, size_t n_tx, uint8_t* data_rx, size_t n_rx);
 
 #ifdef __cplusplus
 }

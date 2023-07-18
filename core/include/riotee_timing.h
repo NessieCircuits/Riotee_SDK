@@ -1,6 +1,8 @@
 #ifndef __RIOTEE_TIMING_H_
 #define __RIOTEE_TIMING_H_
+
 #include <stdint.h>
+#include "riotee.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -20,9 +22,10 @@ void riotee_timing_init(void);
  *
  * @param ticks_32k Number of ticks on a 32kHz clock to sleep for.
  *
- * @return 0 if successful, <0 if a reset occurs while waiting for the notification.
+ * @retval RIOTEE_SUCCESS                 Successfully passed specified time sleeping.
+ * @retval RIOTEE_ERR_RESET              Reset occured while sleeping.
  */
-int riotee_sleep_ticks(unsigned int ticks_32k);
+riotee_rc_t riotee_sleep_ticks(unsigned int ticks_32k);
 
 /**
  * @brief Waits in a low power mode for the specified time.
@@ -32,14 +35,16 @@ int riotee_sleep_ticks(unsigned int ticks_32k);
  *
  * @param ms Number of milliseconds to sleep for.
  *
- * @return 0 if successful, <0 if a reset occurs while waiting for the notification.
+ * @retval RIOTEE_SUCCESS                 Successfully passed specified time sleeping.
+ * @retval RIOTEE_ERR_RESET              Reset occured while sleeping.
  */
-int riotee_sleep_ms(unsigned int ms);
+riotee_rc_t riotee_sleep_ms(unsigned int ms);
 
 /**
  * @brief Busy waits for specified number of microseconds.
  *
- * Keeps the CPU busy for the specified time. Consumes significant energy while waiting.
+ * Keeps the CPU busy for the specified time. Consumes significant energy while waiting. Note that the time passed in
+ * the function can be much longer than specified when execution is suspended due to low energy.
  *
  * @param us Number of microseconds to wait.
  */
@@ -48,7 +53,8 @@ void riotee_delay_us(unsigned int us);
 /**
  * @brief Busy waits for specified number of milliseconds.
  *
- * Keeps the CPU busy for the specified time. Consumes significant energy while waiting.
+ * Keeps the CPU busy for the specified time. Consumes significant energy while waiting. Note that the time passed in
+ * the function can be much longer than specified when execution is suspended due to low energy.
  *
  * @param ms Number of milliseconds to wait.
  */

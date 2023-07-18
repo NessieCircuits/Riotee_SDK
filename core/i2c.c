@@ -37,7 +37,7 @@ void riotee_i2c_init(unsigned int pin_sda, unsigned int pin_scl) {
   NVIC_EnableIRQ(SPIM1_SPIS1_TWIM1_TWIS1_SPI1_TWI1_IRQn);
 }
 
-int riotee_i2c_write(uint8_t dev_addr, uint8_t *data, size_t n_data) {
+riotee_rc_t riotee_i2c_write(uint8_t dev_addr, uint8_t *data, size_t n_data) {
   taskENTER_CRITICAL();
 
   NRF_TWIM1->ENABLE = TWIM_ENABLE_ENABLE_Enabled << TWIM_ENABLE_ENABLE_Pos;
@@ -60,10 +60,15 @@ int riotee_i2c_write(uint8_t dev_addr, uint8_t *data, size_t n_data) {
   NRF_TWIM1->ENABLE = TWIM_ENABLE_ENABLE_Disabled << TWIM_ENABLE_ENABLE_Pos;
   taskEXIT_CRITICAL();
 
-  return twi_status;
+  if (twi_status == TWI_STAT_STOPPED)
+    return RIOTEE_SUCCESS;
+  if (twi_status == TWI_STAT_ERROR)
+    return RIOTEE_ERR_COMMI2C;
+
+  return RIOTEE_ERR_GENERIC;
 }
 
-int riotee_i2c_read(uint8_t *buffer, size_t n_data, uint8_t dev_addr) {
+riotee_rc_t riotee_i2c_read(uint8_t *buffer, size_t n_data, uint8_t dev_addr) {
   taskENTER_CRITICAL();
   NRF_TWIM1->ENABLE = TWIM_ENABLE_ENABLE_Enabled << TWIM_ENABLE_ENABLE_Pos;
 
@@ -85,7 +90,12 @@ int riotee_i2c_read(uint8_t *buffer, size_t n_data, uint8_t dev_addr) {
   NRF_TWIM1->ENABLE = TWIM_ENABLE_ENABLE_Disabled << TWIM_ENABLE_ENABLE_Pos;
   taskEXIT_CRITICAL();
 
-  return twi_status;
+  if (twi_status == TWI_STAT_STOPPED)
+    return RIOTEE_SUCCESS;
+  if (twi_status == TWI_STAT_ERROR)
+    return RIOTEE_ERR_COMMI2C;
+
+  return RIOTEE_ERR_GENERIC;
 }
 
 void riotee_i2c_set_freq(riotee_i2c_freq_t freq) {

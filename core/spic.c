@@ -8,7 +8,7 @@
 
 TEARDOWN_FUN(spic_teardown_ptr);
 
-int spic_init(riotee_spic_cfg_t* cfg) {
+riotee_rc_t spic_init(riotee_spic_cfg_t* cfg) {
   NRF_SPIM3->PSEL.CSN = cfg->pin_cs;
   NRF_SPIM3->PSEL.MOSI = cfg->pin_copi;
   NRF_SPIM3->PSEL.MISO = cfg->pin_cipo;
@@ -32,10 +32,12 @@ int spic_init(riotee_spic_cfg_t* cfg) {
       NRF_SPIM3->CONFIG =
           (SPI_CONFIG_CPHA_Leading << SPI_CONFIG_CPHA_Pos) | (SPI_CONFIG_CPOL_ActiveLow << SPI_CONFIG_CPOL_Pos);
       break;
+    default:
+      return RIOTEE_ERR_INVALIDARG;
   }
 
   __NVIC_EnableIRQ(SPIM3_IRQn);
-  return 0;
+  return RIOTEE_SUCCESS;
 }
 
 static void teardown() {
@@ -62,7 +64,7 @@ void SPIM3_IRQHandler(void) {
   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
-int spic_transfer(uint8_t* data_tx, size_t n_tx, uint8_t* data_rx, size_t n_rx) {
+riotee_rc_t spic_transfer(uint8_t* data_tx, size_t n_tx, uint8_t* data_rx, size_t n_rx) {
   unsigned long notification_value;
 
   taskENTER_CRITICAL();
@@ -85,12 +87,16 @@ int spic_transfer(uint8_t* data_tx, size_t n_tx, uint8_t* data_rx, size_t n_rx) 
 
   xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
 
-  if (notification_value != EVT_SPIC)
-    return -1;
+  if (notification_value == EVT_RESET)
+    return RIOTEE_ERR_RESET;
+  if (notification_value == EVT_TEARDOWN)
+    return RIOTEE_ERR_TEARDOWN;
 
-  while (NRF_SPIM3->EVENTS_STOPPED == 0) {
+  if (notification_value == EVT_SPIC) {
+    while (NRF_SPIM3->EVENTS_STOPPED == 0) {
+    }
+    NRF_SPIM3->ENABLE = (SPIM_ENABLE_ENABLE_Disabled << SPIM_ENABLE_ENABLE_Pos);
+    return RIOTEE_SUCCESS;
   }
-  NRF_SPIM3->ENABLE = (SPIM_ENABLE_ENABLE_Disabled << SPIM_ENABLE_ENABLE_Pos);
-
-  return 0;
+  return RIOTEE_ERR_GENERIC;
 }

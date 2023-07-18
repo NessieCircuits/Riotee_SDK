@@ -173,26 +173,29 @@ static inline int wait_for_completion(riotee_stella_pkt_t *rx_pkt, riotee_stella
   }
 
   if (notification_value == EVT_RESET)
-    return STELLA_ERR_RESET;
+    return RIOTEE_ERR_RESET;
+
+  if (notification_value == EVT_TEARDOWN)
+    return RIOTEE_ERR_TEARDOWN;
 
   if (notification_value == EVT_STELLA_CRCERR)
-    return STELLA_ERR_NOACK;
+    return RIOTEE_ERR_STELLA_NOACK;
 
   if (notification_value == EVT_STELLA_TIMEOUT)
-    return STELLA_ERR_NOACK;
+    return RIOTEE_ERR_STELLA_NOACK;
 
   /* acknowledgment ID must match packet ID */
   if (rx_pkt->hdr.ack_id != tx_pkt->hdr.pkt_id)
-    return STELLA_ERR_GENERIC;
+    return RIOTEE_ERR_STELLA_INVALIDACK;
 
   /* acknowledgment always contains device's ID */
   if (rx_pkt->hdr.dev_id != tx_pkt->hdr.dev_id)
-    return STELLA_ERR_GENERIC;
+    return RIOTEE_ERR_STELLA_INVALIDACK;
 
-  return STELLA_ERR_OK;
+  return RIOTEE_SUCCESS;
 }
 
-int riotee_stella_transceive(riotee_stella_pkt_t *rx_pkt, riotee_stella_pkt_t *tx_pkt) {
+riotee_rc_t riotee_stella_transceive(riotee_stella_pkt_t *rx_pkt, riotee_stella_pkt_t *tx_pkt) {
   taskENTER_CRITICAL();
   /* Packet transmission will start automatically when HFXO is running */
   NRF_CLOCK->TASKS_HFCLKSTART = 1;
@@ -208,9 +211,9 @@ int riotee_stella_transceive(riotee_stella_pkt_t *rx_pkt, riotee_stella_pkt_t *t
   return wait_for_completion(rx_pkt, tx_pkt);
 }
 
-int riotee_stella_send(void *data, size_t n) {
+riotee_rc_t riotee_stella_send(void *data, size_t n) {
   if (n > RIOTEE_STELLA_MAX_DATA)
-    return STELLA_ERR_OFLOW;
+    return RIOTEE_ERR_OVERFLOW;
 
   taskENTER_CRITICAL();
   /* Packet transmission will start automatically when HFXO is running */

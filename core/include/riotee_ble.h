@@ -8,6 +8,8 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#include "riotee.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -65,18 +67,24 @@ typedef struct {
  * @param adv_name Advertising name of the device.
  * @param name_len Length of the advertising name.
  * @param data_len Size of the payload.
- * @return int Size of remaining unused payload (>=0)
+ *
+ * @retval RIOTEE_SUCCESS       Successfully prepared advertisement.
+ * @retval RIOTEE_ERR_OVERFLOW At least one argument is too long.
  */
-int riotee_ble_prepare_adv(riotee_ble_ll_addr_t *adv_addr, const char adv_name[], size_t name_len, size_t data_len);
+riotee_rc_t riotee_ble_prepare_adv(riotee_ble_ll_addr_t *adv_addr, const char adv_name[], size_t name_len,
+                                   size_t data_len);
 
 /**
  * @brief Advertises the given payload on the selected channel(s)
  *
  * @param data Pointer to payload.
  * @param ch Channel(s) on which advertisement should be sent.
- * @return int 0 on success
+ *
+ * @retval RIOTEE_SUCCESS       Advertisement successfully sent.
+ * @retval RIOTEE_ERR_RESET    Reset occured while sending advertisement.
+ * @retval RIOTEE_ERR_TEARDOWN Teardown occured while sending advertisement.
  */
-int riotee_ble_advertise(void *data, riotee_adv_ch_t ch);
+riotee_rc_t riotee_ble_advertise(void *data, riotee_adv_ch_t ch);
 
 /**
  * @brief Initializes BLE driver.

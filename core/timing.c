@@ -2,7 +2,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "runtime.h"
-
+#include "riotee_timing.h"
 #include <soc/nrfx_coredep.h>
 
 void riotee_delay_us(unsigned int us) {
@@ -40,7 +40,7 @@ void RTC0_IRQHandler(void) {
   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
-int riotee_sleep_ticks(unsigned int ticks) {
+riotee_rc_t riotee_sleep_ticks(unsigned int ticks) {
   unsigned long notification_value;
   taskENTER_CRITICAL();
   xTaskNotifyStateClearIndexed(usr_task_handle, 1);
@@ -52,12 +52,14 @@ int riotee_sleep_ticks(unsigned int ticks) {
 
   taskEXIT_CRITICAL();
   xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
-  if (notification_value != EVT_RTC)
-    return -1;
-  return 0;
+  if (notification_value == EVT_RTC)
+    return RIOTEE_SUCCESS;
+  if (notification_value == EVT_RESET)
+    return RIOTEE_ERR_RESET;
+  return RIOTEE_ERR_GENERIC;
 }
 
-int riotee_sleep_ms(unsigned int ms) {
+riotee_rc_t riotee_sleep_ms(unsigned int ms) {
   /* Roughly ms*32768/1000 */
   return riotee_sleep_ticks((ms * 33554UL) >> 10);
 }

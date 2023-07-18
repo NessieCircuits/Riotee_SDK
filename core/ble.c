@@ -55,17 +55,18 @@ void teardown(void) {
   xTaskNotifyIndexed(usr_task_handle, 1, EVT_TEARDOWN, eSetBits);
 }
 
-int riotee_ble_prepare_adv(riotee_ble_ll_addr_t *adv_addr, const char adv_name[], size_t name_len, size_t data_len) {
+riotee_rc_t riotee_ble_prepare_adv(riotee_ble_ll_addr_t *adv_addr, const char adv_name[], size_t name_len,
+                                   size_t data_len) {
+  const uint8_t payload_free = sizeof(adv_pkt.payload) - 8;
+
+  if (name_len > payload_free)
+    return RIOTEE_ERR_OVERFLOW;
+  if (data_len + name_len > payload_free)
+    return RIOTEE_ERR_OVERFLOW;
+
   adv_pkt.header.pdu_type = ADV_NONCONN_IND;
   adv_pkt.header.txadd = 1;
   memcpy((char *)&adv_pkt.adv_addr.addr_bytes, (char *)adv_addr->addr_bytes, 6);
-
-  /* constrain user-data to avoid overflow */
-  const uint8_t payload_free = sizeof(adv_pkt.payload) - 8;
-  if (name_len > payload_free)
-    name_len = payload_free;
-  if (data_len + name_len > payload_free)
-    data_len = payload_free - name_len;
 
   /* Length of advertising mode field */
   adv_pkt.payload[0] = 0x02;
@@ -91,8 +92,7 @@ int riotee_ble_prepare_adv(riotee_ble_ll_addr_t *adv_addr, const char adv_name[]
 
   adv_pkt.header.len = sizeof(riotee_ble_ll_addr_t) + 5 + name_len + 4 + data_len;
 
-  /* inform about unused payload-space */
-  return (payload_free - data_len - name_len);
+  return RIOTEE_SUCCESS;
 }
 
 /* Configure the radio for the given BLE channel index */
@@ -103,7 +103,7 @@ static inline int set_channel(unsigned int adv_ch_idx) {
   return 0;
 }
 
-int riotee_ble_advertise(void *data, riotee_adv_ch_t ch) {
+riotee_rc_t riotee_ble_advertise(void *data, riotee_adv_ch_t ch) {
   unsigned long notification_value;
 
   taskENTER_CRITICAL();
@@ -127,10 +127,15 @@ int riotee_ble_advertise(void *data, riotee_adv_ch_t ch) {
   ble_teardown_ptr = teardown;
   taskEXIT_CRITICAL();
   xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
-  if (notification_value != EVT_BLE)
-    return -1;
 
-  return 0;
+  if (notification_value == EVT_BLE)
+    return RIOTEE_SUCCESS;
+  if (notification_value == EVT_TEARDOWN)
+    return RIOTEE_ERR_TEARDOWN;
+  if (notification_value == EVT_RESET)
+    return RIOTEE_ERR_RESET;
+
+  return RIOTEE_ERR_GENERIC;
 }
 
 /* Gets called after a single packet has been transmitted and the radio has been disabled (via short) */

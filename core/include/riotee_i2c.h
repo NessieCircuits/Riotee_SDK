@@ -9,6 +9,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "riotee.h"
+
 /** I2C SCL frequency. */
 typedef enum {
   /** 100kHz SCL frequency. */
@@ -19,6 +21,11 @@ typedef enum {
   RIOTEE_I2C_FREQ_400K = 0x06400000UL,
 
 } riotee_i2c_freq_t;
+
+enum {
+  /** I2C communication error. */
+  RIOTEE_ERR_COMMI2C = -(RIOTEE_RC_I2C_BASE + 1),
+};
 
 #ifdef __cplusplus
 extern "C" {
@@ -38,9 +45,11 @@ void riotee_i2c_init(unsigned int pin_sda, unsigned int pin_scl);
  * @param dev_addr I2C address of peripheral device.
  * @param data Pointer to data.
  * @param n_data Size of data buffer.
- * @return int 0 on success, <0 otherwise
+ *
+ * @retval RIOTEE_SUCCESS           Write completed successfully.
+ * @retval RIOTEE_ERR_COMMI2C  I2C communication error.
  */
-int riotee_i2c_write(uint8_t dev_addr, uint8_t *data, size_t n_data);
+riotee_rc_t riotee_i2c_write(uint8_t dev_addr, uint8_t* data, size_t n_data);
 
 /**
  * @brief Reads the specified number of bytes from an I2C peripheral.
@@ -48,9 +57,11 @@ int riotee_i2c_write(uint8_t dev_addr, uint8_t *data, size_t n_data);
  * @param buffer Pointer to a destination buffer where data gets stored.
  * @param n_data Number of bytes to read.
  * @param dev_addr I2C address of peripheral device.
- * @return int 0 on success, <0 otherwise
+ *
+ * @retval RIOTEE_SUCCESS           Read completed successfully.
+ * @retval RIOTEE_ERR_COMMI2C  I2C communication error.
  */
-int riotee_i2c_read(uint8_t *buffer, size_t n_data, uint8_t dev_addr);
+riotee_rc_t riotee_i2c_read(uint8_t* buffer, size_t n_data, uint8_t dev_addr);
 
 /**
  * @brief Sets the I2C clock frequency.
