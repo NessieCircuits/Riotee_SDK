@@ -1,5 +1,5 @@
-#ifndef __BOARD_H_
-#define __BOARD_H_
+#ifndef __RIOTEE_H_
+#define __RIOTEE_H_
 
 #define PIN_SYS_SCL 40
 #define PIN_SYS_SDA 6
@@ -89,4 +89,4 @@ int riotee_wait_cap_charged(void);
 }
 #endif
 
-#endif /* __BOARD_H_ */
+#endif /* __RIOTEE_H_ */

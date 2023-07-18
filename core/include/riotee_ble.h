@@ -96,4 +96,4 @@ void riotee_ble_init(void);
 }
 #endif
 
-#endif /** @} __BLE_H__ */
+#endif /** @} __RIOTEE_BLE_H__ */

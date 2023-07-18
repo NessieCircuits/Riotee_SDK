@@ -3,7 +3,7 @@
  * @{
  */
 
-#ifndef __ROPTEE_ADC_H_
+#ifndef __RIOTEE_ADC_H_
 #define __RIOTEE_ADC_H_
 
 #include <stdint.h>
