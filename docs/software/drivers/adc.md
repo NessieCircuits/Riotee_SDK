@@ -6,6 +6,8 @@ Additionally, the ADC can be used to sample the supply voltage and the capacitor
 
 The API supports simple reading of single samples with a default configuration and more sophisticated periodic sampling with custom configuration.
 
+Always check the return code of `riotee_adc_sample(...)` to ensure that sampling has actually completed (`RIOTEE_SUCCESS`) before working with the data.
+
 ## Example usage
 
 ```{eval-rst}
