@@ -6,5 +6,7 @@
 
    gpio
    adc
+   spic
+   uart
 
 ```
