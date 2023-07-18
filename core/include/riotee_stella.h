@@ -8,6 +8,8 @@
 #include <stdint.h>
 #include <stddef.h>
 
+#include "riotee.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -74,8 +76,9 @@ riotee_rc_t riotee_stella_send(void *data, size_t n);
 void riotee_stella_set_id(uint32_t dev_id);
 
 enum {
-  /** No acknowledgment received. */
+  /** No acknowledgement received. */
   RIOTEE_ERR_STELLA_NOACK = -(RIOTEE_RC_STELLA_BASE + 1),
+  /** Invalid acknowledgement received*/
   RIOTEE_ERR_STELLA_INVALIDACK = -(RIOTEE_RC_STELLA_BASE + 2)
 };
 
