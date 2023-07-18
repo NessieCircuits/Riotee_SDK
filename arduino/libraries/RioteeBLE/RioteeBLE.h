@@ -4,10 +4,9 @@
 #include <cstddef>
 
 class RioteeBLE {
-
-public:
-  void begin(const char adv_name[], size_t data_len);
-  void advertise(void *data);
+ public:
+  void begin(const char adv_name[], void *data, size_t data_len);
+  void advertise();
 };
 
 extern RioteeBLE BLE;

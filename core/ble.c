@@ -21,8 +21,9 @@
 static riotee_adv_pck_t adv_pkt;
 
 /* pointer to custom user data within adv_pkt */
-static uint8_t *adv_data_address;
-
+static uint8_t *adv_data_pkt;
+/* user-provided pointer to custom user data */
+static void *adv_data_usr;
 /* length of custom user data within adv_pkt */
 static size_t adv_data_len;
 
@@ -55,18 +56,17 @@ void teardown(void) {
   xTaskNotifyIndexed(usr_task_handle, 1, EVT_TEARDOWN, eSetBits);
 }
 
-riotee_rc_t riotee_ble_prepare_adv(riotee_ble_ll_addr_t *adv_addr, const char adv_name[], size_t name_len,
-                                   size_t data_len) {
-  const uint8_t payload_free = sizeof(adv_pkt.payload) - 8;
+riotee_rc_t riotee_ble_adv_cfg(riotee_ble_adv_cfg_t *cfg) {
+  const unsigned int payload_free = sizeof(adv_pkt.payload) - 8;
 
-  if (name_len > payload_free)
+  if (cfg->name_len > payload_free)
     return RIOTEE_ERR_OVERFLOW;
-  if (data_len + name_len > payload_free)
+  if (cfg->data_len + cfg->name_len > payload_free)
     return RIOTEE_ERR_OVERFLOW;
 
   adv_pkt.header.pdu_type = ADV_NONCONN_IND;
   adv_pkt.header.txadd = 1;
-  memcpy((char *)&adv_pkt.adv_addr.addr_bytes, (char *)adv_addr->addr_bytes, 6);
+  memcpy((char *)&adv_pkt.adv_addr.addr_bytes, &cfg->addr->addr_bytes, 6);
 
   /* Length of advertising mode field */
   adv_pkt.payload[0] = 0x02;
@@ -75,22 +75,22 @@ riotee_rc_t riotee_ble_prepare_adv(riotee_ble_ll_addr_t *adv_addr, const char ad
   /* BR/EDR not supported | LE general discoverability mode */
   adv_pkt.payload[2] = (1UL << 2) | (1UL << 1);
   /* Length of name field */
-  adv_pkt.payload[3] = name_len + 1;
+  adv_pkt.payload[3] = cfg->name_len + 1;
   /* Type for name field */
   adv_pkt.payload[4] = 0x09;
-  memcpy(&adv_pkt.payload[5], adv_name, name_len);
+  memcpy(&adv_pkt.payload[5], cfg->name, cfg->name_len);
   /* MNF data length: 3B header + length of custom data */
-  adv_pkt.payload[5 + name_len] = 3 + data_len;
+  adv_pkt.payload[5 + cfg->name_len] = 3 + cfg->data_len;
   /* Type for MNF-specific data field */
-  adv_pkt.payload[5 + name_len + 1] = 0xFF;
+  adv_pkt.payload[5 + cfg->name_len + 1] = 0xFF;
   /* Two byte company ID (Nordic Semiconductor) */
-  adv_pkt.payload[5 + name_len + 2] = 0x59;
-  adv_pkt.payload[5 + name_len + 3] = 0x00;
+  memcpy(adv_pkt.payload + 5 + cfg->name_len + 2, &cfg->manufacturer_id, 2);
 
-  adv_data_address = &adv_pkt.payload[5 + name_len + 4];
-  adv_data_len = data_len;
+  adv_data_pkt = &adv_pkt.payload[5 + cfg->name_len + 4];
+  adv_data_usr = cfg->data;
+  adv_data_len = cfg->data_len;
 
-  adv_pkt.header.len = sizeof(riotee_ble_ll_addr_t) + 5 + name_len + 4 + data_len;
+  adv_pkt.header.len = sizeof(riotee_ble_adv_addr_t) + 5 + cfg->name_len + 4 + cfg->data_len;
 
   return RIOTEE_SUCCESS;
 }
@@ -103,10 +103,12 @@ static inline int set_channel(unsigned int adv_ch_idx) {
   return 0;
 }
 
-riotee_rc_t riotee_ble_advertise(void *data, riotee_adv_ch_t ch) {
+riotee_rc_t riotee_ble_advertise(riotee_adv_ch_t ch) {
   unsigned long notification_value;
 
-  taskENTER_CRITICAL();
+  /* Copy user data into advertisement packet */
+  memcpy(adv_data_pkt, adv_data_usr, adv_data_len);
+
   if (ch == ADV_CH_ALL) {
     adv_chs[0] = 39;
     adv_chs[1] = 38;
@@ -117,9 +119,9 @@ riotee_rc_t riotee_ble_advertise(void *data, riotee_adv_ch_t ch) {
     current_adv_ch_idx = 0;
   }
 
+  taskENTER_CRITICAL();
   set_channel(current_adv_ch_idx);
 
-  memcpy(adv_data_address, data, adv_data_len);
   radio_start();
   xTaskNotifyStateClearIndexed(usr_task_handle, 1);
 

@@ -10,9 +10,7 @@
 
 #include "riotee.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#define RIOTEE_BLE_ADV_MNF_NORDIC 0x0059
 
 /**
  * @brief Type of advertisement
@@ -39,7 +37,7 @@ typedef enum { ADV_CH_37 = 37, ADV_CH_38 = 38, ADV_CH_39 = 39, ADV_CH_ALL = 255 
 
 typedef struct {
   uint8_t addr_bytes[6];
-} __attribute__((__packed__)) riotee_ble_ll_addr_t;
+} __attribute__((__packed__)) riotee_ble_adv_addr_t;
 
 typedef struct {
   riotee_adv_pdu_type_t pdu_type : 4;
@@ -48,43 +46,61 @@ typedef struct {
   unsigned int txadd : 1;
   unsigned int rxadd : 1;
   uint8_t len;
-} __attribute__((__packed__)) riotee_ble_ll_header_t;
+} __attribute__((__packed__)) riotee_ble_adv_header_t;
 
 /**
  * @brief Common packet format for some ADV PDU types
  *
  */
 typedef struct {
-  riotee_ble_ll_header_t header;
-  riotee_ble_ll_addr_t adv_addr;
+  riotee_ble_adv_header_t header;
+  riotee_ble_adv_addr_t adv_addr;
   uint8_t payload[31];
 } __attribute__((__packed__)) riotee_adv_pck_t;
+
+/** BLE advertising configuration. */
+typedef struct {
+  /** Pointer to advertising address. */
+  const riotee_ble_adv_addr_t *addr;
+  /** Advertising name of the device. */
+  const char *name;
+  /** Size of 'name' in bytes. */
+  size_t name_len;
+  /** Pointer to custom payload data. */
+  void *data;
+  /** Size of 'data' in bytes. */
+  size_t data_len;
+  /** Manufacturer ID. */
+  uint16_t manufacturer_id;
+} riotee_ble_adv_cfg_t;
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @brief Sets up the internal packet buffer for advertisting with given name, address and payload size.
  *
  * @param adv_addr Pointer to address buffer.
  * @param adv_name Advertising name of the device.
- * @param name_len Length of the advertising name.
+ * @param data Pointer to payload.
  * @param data_len Size of the payload.
  *
  * @retval RIOTEE_SUCCESS       Successfully prepared advertisement.
- * @retval RIOTEE_ERR_OVERFLOW At least one argument is too long.
+ * @retval RIOTEE_ERR_OVERFLOW  At least one argument is too long.
  */
-riotee_rc_t riotee_ble_prepare_adv(riotee_ble_ll_addr_t *adv_addr, const char adv_name[], size_t name_len,
-                                   size_t data_len);
+riotee_rc_t riotee_ble_adv_cfg(riotee_ble_adv_cfg_t *cfg);
 
 /**
  * @brief Advertises the given payload on the selected channel(s)
  *
- * @param data Pointer to payload.
  * @param ch Channel(s) on which advertisement should be sent.
  *
  * @retval RIOTEE_SUCCESS       Advertisement successfully sent.
- * @retval RIOTEE_ERR_RESET    Reset occured while sending advertisement.
- * @retval RIOTEE_ERR_TEARDOWN Teardown occured while sending advertisement.
+ * @retval RIOTEE_ERR_RESET     Reset occured while sending advertisement.
+ * @retval RIOTEE_ERR_TEARDOWN  Teardown occured while sending advertisement.
  */
-riotee_rc_t riotee_ble_advertise(void *data, riotee_adv_ch_t ch);
+riotee_rc_t riotee_ble_advertise(riotee_adv_ch_t ch);
 
 /**
  * @brief Initializes BLE driver.
