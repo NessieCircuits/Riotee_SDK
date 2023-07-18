@@ -27,11 +27,13 @@ Riotee products are available for purchase on [CrowdSupply](https://www.crowdsup
    :maxdepth: 2
    :caption: Contents:
 
-   quickstart
    basics
+   quickstart
    hardware/index
    software/index
    networking/index
-   miscellaneous
+   development_setup
+   current_consumption
+   support
    legal_notice
 ```
