@@ -16,14 +16,11 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-menu.chip=Chip
-menu.softdevice=Softdevice
-menu.version=Version
-menu.lfclk=Low Frequency Clock
-menu.board_variant=Board Variant
+# CAUTION: Arduino cashes the board definitions in ~/.config/arduino-ide (Linux).
+# You must delete this directory in order for changes in boards.txt to be applied.
 
-# nRF52833 variants
-###################
+menu.stacksize=StackSize
+menu.retainedsize=Retained Memory Size
 
 RioteeBoard.name=Riotee Board
 
@@ -46,5 +43,25 @@ RioteeBoard.build.variant=RioteeBoard
 RioteeBoard.build.variant_system_lib=
 RioteeBoard.build.extra_flags=-DNRF52833_XXAA
 RioteeBoard.build.float_flags=-mabi=aapcs -mfloat-abi=hard -mfpu=fpv4-sp-d16
-RioteeBoard.build.ldscript={build.core.path}/linker.ld
+RioteeBoard.build.ldscript={build.core.path}/external/linker.ld
 RioteeBoard.build.openocdscript=openocd_scripts/riotee_board.cfg
+RioteeBoard.build.stacksize=1024
+RioteeBoard.build.retainedsize=8192
+
+RioteeBoard.menu.stacksize.512=512B
+RioteeBoard.menu.stacksize.512.build.stacksize=512
+RioteeBoard.menu.stacksize.1024=1kB
+RioteeBoard.menu.stacksize.1024.build.stacksize=1024
+RioteeBoard.menu.stacksize.2048=2kB
+RioteeBoard.menu.stacksize.2048.build.stacksize=2048
+RioteeBoard.menu.stacksize.2048=4kB
+RioteeBoard.menu.stacksize.2048.build.stacksize=4096
+
+RioteeBoard.menu.retainedsize.8192=8kB
+RioteeBoard.menu.retainedsize.8192.build.retainedsize=8192
+RioteeBoard.menu.retainedsize.16384=16kB
+RioteeBoard.menu.retainedsize.16384.build.retainedsize=16384
+RioteeBoard.menu.retainedsize.32768=32kB
+RioteeBoard.menu.retainedsize.32768.build.retainedsize=32768
+RioteeBoard.menu.retainedsize.65536=64kB
+RioteeBoard.menu.retainedsize.65536.build.retainedsize=65536

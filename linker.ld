@@ -1,12 +1,5 @@
 /* This linker script must first run through gcc preprocessor */
 
-#if __has_include("riotee_config.h")
-#include "riotee_config.h"
-#endif
-
-#ifndef RIOTEE_RAM_RETAINED_SIZE
-#define RIOTEE_RAM_RETAINED_SIZE 8192
-#endif
 
 SEARCH_DIR(.)
 

@@ -12,7 +12,6 @@ extern "C" {
 
 int gpint_register(unsigned int pin, riotee_gpio_level_t level, riotee_gpio_in_pull_t pull, GPINT_CALLBACK cb);
 int gpint_unregister(unsigned int pin);
-int riotee_gpint_wait(unsigned int pin, riotee_gpio_level_t level, riotee_gpio_in_pull_t pull);
 
 #ifdef __cplusplus
 }

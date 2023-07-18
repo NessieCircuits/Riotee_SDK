@@ -7,6 +7,8 @@ CMSIS_DIR := $(RIOTEE_SDK_ROOT)/external/CMSIS_5
 LINKER_SCRIPT:= $(RIOTEE_SDK_ROOT)/linker.ld
 NRF_DEV_NUM := 52833
 
+RIOTEE_STACK_SIZE ?= 2048
+RIOTEE_RAM_RETAINED_SIZE ?= 8192
 
 SDK_SRC_FILES += \
   $(CORE_DIR)/startup.c \
@@ -60,6 +62,7 @@ OPT = -O3 -g3
 CFLAGS = ${INCLUDES}
 CFLAGS += $(OPT)
 CFLAGS += -DNRF${NRF_DEV_NUM}_XXAA
+CFLAGS += -DRIOTEE_STACK_SIZE=${RIOTEE_STACK_SIZE}
 CFLAGS += -DARM_MATH_CM4
 CFLAGS += -DFLOAT_ABI_HARD
 CFLAGS += -Wall
@@ -91,6 +94,7 @@ LDFLAGS += $(LIBS)
 LDFLAGS += -Wl,--gc-sections,-Map=${OUTPUT_DIR}/build.map
 # use newlib in nano version and system call stubs
 LDFLAGS += --specs=nano.specs
+LDFLAGS += -Wl,--defsym=RIOTEE_RAM_RETAINED_SIZE=${RIOTEE_RAM_RETAINED_SIZE}
 
 LIB_FILES += -lm
 

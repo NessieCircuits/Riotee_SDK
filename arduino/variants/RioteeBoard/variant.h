@@ -27,7 +27,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif // __cplusplus
+#endif  // __cplusplus
 
 // Number of pins defined in PinDescription array
 #define PINS_COUNT (26u)
@@ -60,14 +60,14 @@ extern "C" {
 #define PIN_A6 (20) /* AIN3 (P0.05)        */
 #define PIN_A7 (21) /* AIN0 (P0.02) / AREF */
 
-static const uint8_t A0 = PIN_A0; // AIN1
-static const uint8_t A1 = PIN_A1; // AIN2
-static const uint8_t A2 = PIN_A2; // AIN4
-static const uint8_t A3 = PIN_A3; // AIN5
-static const uint8_t A4 = PIN_A4; // AIN6
-static const uint8_t A5 = PIN_A5; // AIN7
-static const uint8_t A6 = PIN_A6; // AIN3 (P0.05)
-static const uint8_t A7 = PIN_A7; // AIN0 (P0.02) / AREF
+static const uint8_t A0 = PIN_A0;  // AIN1
+static const uint8_t A1 = PIN_A1;  // AIN2
+static const uint8_t A2 = PIN_A2;  // AIN4
+static const uint8_t A3 = PIN_A3;  // AIN5
+static const uint8_t A4 = PIN_A4;  // AIN6
+static const uint8_t A5 = PIN_A5;  // AIN7
+static const uint8_t A6 = PIN_A6;  // AIN3 (P0.05)
+static const uint8_t A7 = PIN_A7;  // AIN0 (P0.02) / AREF
 #define ADC_RESOLUTION 14
 
 // Other pins
