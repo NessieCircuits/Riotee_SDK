@@ -51,7 +51,7 @@ compiler.elf2hex.cmd=arm-none-eabi-objcopy
 compiler.size.cmd=arm-none-eabi-size
 compiler.define=-DARDUINO=
 
-# this can be overriden in boards.txt
+# this can be overridden in boards.txt
 build.extra_flags=
 
 compiler.riotee.includes = "-I{build.core.path}/external/core" "-I{build.core.path}/external/core/include" "-I{build.core.path}/external/drivers/include" "-I{build.core.path}/external/freertos/include" "-I{build.core.path}/external/freertos/portable/GCC/ARM_CM4F" "-I{build.core.path}/external/nrfx" "-I{build.core.path}/external/nrfx/hal" "-I{build.core.path}/external/nrfx/mdk" "-I{build.core.path}/external/nrfx/templates" "-I{build.core.path}/external/CMSIS_5/CMSIS/Core/Include"

@@ -31,8 +31,14 @@ int vm1010_init(vm1010_cfg_t *cfg) {
     return rc;
 
   riotee_gpio_cfg_output(pin_mode);
+  riotee_gpio_clear(pin_mode);
   riotee_gpio_cfg_input(pin_dout, RIOTEE_GPIO_IN_NOPULL);
   return rc;
+}
+
+void vm1010_exit(void) {
+  /* pin alone can power the microphone */
+  riotee_gpio_clear(pin_mode);
 }
 
 int vm1010_sample(int16_t *result, unsigned int n_samples, unsigned int sample_interval_ticks32) {
@@ -53,24 +59,48 @@ int vm1010_wait4sound(void) {
   int rc;
   unsigned long notification_value;
   volatile unsigned int reset_counter = runtime_stats.n_reset;
+  const uint8_t use_gpint = 0u;
 
   /* Enter Wake on Sound mode */
   riotee_gpio_set(pin_mode);
 
   /* Wait 5ms according to datasheet */
-  if ((rc = riotee_sleep_ms(5)) != 0)
+  if ((rc = riotee_sleep_ms(5)) != 0) {
+    riotee_gpio_clear(pin_mode);
     return rc;
+  }
 
   taskENTER_CRITICAL();
   /* Check if there was a reset since we entered WoS mode */
   if (reset_counter != runtime_stats.n_reset) {
     taskEXIT_CRITICAL();
+    riotee_gpio_clear(pin_mode);
     return -1;
   }
-  xTaskNotifyStateClearIndexed(usr_task_handle, 1);
-  gpint_register(pin_dout, RIOTEE_GPIO_LEVEL_HIGH, RIOTEE_GPIO_IN_NOPULL, wos_callback);
-  taskEXIT_CRITICAL();
-  xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
+
+  if (use_gpint) {
+    /* WARNING:
+     * code is identical to riotee_gpint_wait() but does not work here
+     * as pin is on bank P1, which is currently not supported
+     * it just drains the cap when int arrives (without returning xTaskNotifyWaitIndexed())
+     */
+    xTaskNotifyStateClearIndexed(usr_task_handle, 1);
+    gpint_register(pin_dout, RIOTEE_GPIO_LEVEL_HIGH, RIOTEE_GPIO_IN_NOPULL, wos_callback);
+    taskEXIT_CRITICAL();
+    xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
+  }
+  else  {
+    taskEXIT_CRITICAL();
+    while (!riotee_gpio_read(pin_dout)) {
+      if ((rc = riotee_sleep_ms(5)) != 0) {
+        /* interrupt polling on errors */
+        riotee_gpio_clear(pin_mode);
+        return rc;
+      }
+    }
+    notification_value = EVT_GPINT;
+  }
+
   /* Exit Wake on Sound mode */
   riotee_gpio_clear(pin_mode);
 

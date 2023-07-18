@@ -60,6 +60,13 @@ int riotee_ble_prepare_adv(riotee_ble_ll_addr_t *adv_addr, const char adv_name[]
   adv_pkt.header.txadd = 1;
   memcpy((char *)&adv_pkt.adv_addr.addr_bytes, (char *)adv_addr->addr_bytes, 6);
 
+  /* constrain user-data to avoid overflow */
+  const uint8_t payload_free = sizeof(adv_pkt.payload) - 8;
+  if (name_len > payload_free)
+    name_len = payload_free;
+  if (data_len + name_len > payload_free)
+    data_len = payload_free - name_len;
+
   /* Length of advertising mode field */
   adv_pkt.payload[0] = 0x02;
   /* Type for advertising mode field */
@@ -84,7 +91,8 @@ int riotee_ble_prepare_adv(riotee_ble_ll_addr_t *adv_addr, const char adv_name[]
 
   adv_pkt.header.len = sizeof(riotee_ble_ll_addr_t) + 5 + name_len + 4 + data_len;
 
-  return 0;
+  /* inform about unused payload-space */
+  return (payload_free - data_len - name_len);
 }
 
 /* Configure the radio for the given BLE channel index */

@@ -33,7 +33,7 @@ static uint32_t _dev_id __attribute__((section(".retained_bss")));
 
 TEARDOWN_FUN(stella_teardown_ptr);
 
-/* Valid acknowledgement received */
+/* Valid acknowledgment received */
 static void radio_crc_ok(void) {
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
@@ -43,7 +43,7 @@ static void radio_crc_ok(void) {
 
   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
-/* Invalid acknowledgement received */
+/* Invalid acknowledgment received */
 static void radio_crc_err(void) {
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
@@ -65,7 +65,7 @@ static void radio_txready(void) {
   NRF_RADIO->PACKETPTR = (uint32_t)rx_buf_ptr;
 }
 
-/* Radio has ramped up for reception of an acknowledgement */
+/* Radio has ramped up for reception of an acknowledgment */
 static void radio_rxready(void) {
   NRF_RADIO->SHORTS &= ~(RADIO_SHORTS_DISABLED_RXEN_Msk);
 
@@ -76,11 +76,11 @@ static void radio_rxready(void) {
   NRF_TIMER2->TASKS_START = 1;
 }
 
-/* Initializes a timer used for timing out reception of an acknowledgement */
+/* Initializes a timer used for timing out reception of an acknowledgment */
 static int timer_init(void) {
   /* 1us period */
   NRF_TIMER2->PRESCALER = 4;
-  /* 100us timeout for receiving the address of the acknowledgement */
+  /* 100us timeout for receiving the address of the acknowledgment */
   NRF_TIMER2->CC[0] = 100;
   NRF_TIMER2->INTENSET |= TIMER_INTENSET_COMPARE0_Msk;
   NRF_TIMER2->SHORTS |= TIMER_SHORTS_COMPARE0_STOP_Msk;
@@ -139,7 +139,7 @@ void riotee_stella_init() {
   NRF_PPI->CHENSET = PPI_CHENSET_CH18_Msk;
 }
 
-/* Timeout for reception of the acknowledgement */
+/* Timeout for reception of the acknowledgment */
 void TIMER2_IRQHandler(void) {
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
@@ -165,7 +165,7 @@ static void teardown(void) {
 static inline int wait_for_completion(riotee_stella_pkt_t *rx_pkt, riotee_stella_pkt_t *tx_pkt) {
   unsigned long notification_value;
 
-  /* Wait until acknowledgement is received/expired */
+  /* Wait until acknowledgment is received/expired */
   xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
 
   /* Make sure HFXO has stopped so the next packet can be sent right after returning. */
@@ -181,11 +181,11 @@ static inline int wait_for_completion(riotee_stella_pkt_t *rx_pkt, riotee_stella
   if (notification_value == EVT_STELLA_TIMEOUT)
     return STELLA_ERR_NOACK;
 
-  /* Acknowledgement ID must match packet ID */
+  /* acknowledgment ID must match packet ID */
   if (rx_pkt->hdr.ack_id != tx_pkt->hdr.pkt_id)
     return STELLA_ERR_GENERIC;
 
-  /* Acknowledgement always contains device's ID */
+  /* acknowledgment always contains device's ID */
   if (rx_pkt->hdr.dev_id != tx_pkt->hdr.dev_id)
     return STELLA_ERR_GENERIC;
 
@@ -210,7 +210,7 @@ int riotee_stella_transceive(riotee_stella_pkt_t *rx_pkt, riotee_stella_pkt_t *t
 
 int riotee_stella_send(void *data, size_t n) {
   if (n > RIOTEE_STELLA_MAX_DATA)
-    return STELLA_ERR_GENERIC;
+    return STELLA_ERR_OFLOW;
 
   taskENTER_CRITICAL();
   /* Packet transmission will start automatically when HFXO is running */

@@ -55,7 +55,8 @@ You are responsible for keeping data and application flow consistent in this cas
 2. Increase the retained memory area.
 
 You may increase the memory area where retained variables are stored by defining `RIOTEE_RAM_RETAINED_SIZE` in your application's Makefile.
-The SDK will reserve a memory area of the specifed size for your variables and the runtime will automatically checkpoint all variables to non-volatile RAM.
+The SDK will reserve a memory area of the specified size for your variables and the runtime will automatically checkpoint all variables to non-volatile RAM.
+
 The drawback is that, depending on the specified size, the checkpointing may take significantly longer and consume significantly more energy.
 You must chose the capacitance of your device such that the checkpoint can still safely complete before the power supply gets interrupted.
 
@@ -80,9 +81,9 @@ Really only do what's necessary to reduce the power consumption and do the remai
 ## Teardown
 
 
-## Ressources used by the runtime 
+## Resources used by the runtime 
 
-The SDK uses a number of peripherals and hardware ressources on the nRF52. The user may not access these peripherals to avoid interference with the runtime and drivers:
+The SDK uses a number of peripherals and hardware resources on the nRF52. The user may not access these peripherals to avoid interference with the runtime and drivers:
  - Timer4 (core/nvm.c)
  - UART0 (core/uart.c)
  - PPI
@@ -135,7 +136,7 @@ Next, the runtime is initialized and started in `runtime_start()` in `src/runtim
 Next, the system task calls `reset_callback` where a user may perform hardware initialization necessary after every reset. The system task resumes the user task (does not run, yet because of lower priority) installs a handler to react to a *low* threshold and blocks for the corresponding notification. At this point, the user task becomes the highest priority task that is able to run and gets swapped in. It executes until the *low* threshold handler is called. The handler wakes up the system task which suspends the user task and executes the `teardown` function.
 This function iterates a table of function pointers where device drivers can register functions that abort any power-intensive process like transmitting a packet and inform the application that the operation has failed.
 
-Next, the system task registers a callback for detection of a *high* threshold. If the application was already waiting on a high threshold, it is overriden as it will anyways only continue execution after the *high* threshold is reached again.
+Next, the system task registers a callback for detection of a *high* threshold. If the application was already waiting on a high threshold, it is overridden as it will anyways only continue execution after the *high* threshold is reached again.
 The system task starts a 10ms timer and transitions to sleep mode.
 If the harvested power is much greater than the sleep power, the system recovers above the *high* threshold before the timer expires. The timer gets stopped and the execution of user code continues.
 If the capacitor voltage is still below the *low* threshold when the timer expires, a snapshot of the application data is stored to non-volatile RAM (`checkpoint_write(..)`).
