@@ -36,10 +36,10 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
 }
 void loop() {
+  riotee_wait_cap_charged();
   digitalWrite(LED_BUILTIN, HIGH);
   delay(1);
   digitalWrite(LED_BUILTIN, LOW);
-  delay(1000);
 }
 
 ```
@@ -52,6 +52,6 @@ void loop() {
 
 ## Test your battery-free device
 
-Put both sliders on the DIP switch on top of the solar shield to the position close to the text "ON ADE02S". In this configuration, all four panels provide power. Does your device start blinking, yet? If not, it may be too dark. This is bad for your eyes and even worse for a solar-powered device! Unplug the USB cable and take the device to a brighter location. This can be close to a lamp or anywhere outside. You should now see your device blink once per second.
+Put both sliders on the DIP switch on top of the solar shield to the position close to the text "ON ADE02S". In this configuration, all four panels provide power. Does your device start blinking, yet? If not, it may be too dark. This is bad for your eyes and even worse for a solar-powered device! Unplug the USB cable and take the device to a brighter location. This can be close to a lamp or anywhere outside. You should now see your device blink with a frequency depending on the incident light.
 
 Congratulations, you've just built your first battery-free device!
