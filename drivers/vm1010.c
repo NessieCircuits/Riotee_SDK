@@ -51,7 +51,7 @@ int vm1010_sample(int16_t *result, unsigned int n_samples, unsigned int sample_i
 static void wos_callback(unsigned int pin) {
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
-  xTaskNotifyIndexedFromISR(usr_task_handle, 1, EVT_GPINT, eSetBits, &xHigherPriorityTaskWoken);
+  xTaskNotifyIndexedFromISR(usr_task_handle, 1, EVT_DRV, eSetBits, &xHigherPriorityTaskWoken);
   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
@@ -88,8 +88,7 @@ int vm1010_wait4sound(void) {
     gpint_register(pin_dout, RIOTEE_GPIO_LEVEL_HIGH, RIOTEE_GPIO_IN_NOPULL, wos_callback);
     taskEXIT_CRITICAL();
     xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
-  }
-  else  {
+  } else {
     taskEXIT_CRITICAL();
     while (!riotee_gpio_read(pin_dout)) {
       if ((rc = riotee_sleep_ms(5)) != 0) {
@@ -98,13 +97,13 @@ int vm1010_wait4sound(void) {
         return rc;
       }
     }
-    notification_value = EVT_GPINT;
+    notification_value = EVT_DRV;
   }
 
   /* Exit Wake on Sound mode */
   riotee_gpio_clear(pin_mode);
 
-  if (notification_value != EVT_GPINT)
+  if (notification_value != EVT_DRV)
     return -1;
   return 0;
 }

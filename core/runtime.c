@@ -293,7 +293,7 @@ static void sys_task(void *pvParameter) {
     /* Set a high threshold - upon reaching this threshold, execution continues */
     /* If the user task was already waiting on high threshold, we have to notify it here */
     if (gpint_unregister(PIN_PWRGD_H) == RIOTEE_GPIO_ERR_OK)
-      xTaskNotifyIndexed(usr_task_handle, 1, EVT_GPINT, eSetValueWithOverwrite);
+      xTaskNotifyIndexed(usr_task_handle, 1, EVT_GPIO, eSetValueWithOverwrite);
     gpint_register(PIN_PWRGD_H, RIOTEE_GPIO_LEVEL_HIGH, RIOTEE_GPIO_IN_NOPULL, threshold_callback);
 
     /* Set a 10ms timer*/
