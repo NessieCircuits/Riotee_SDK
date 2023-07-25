@@ -48,6 +48,12 @@
 #define RIOTEE_RC_STELLA_BASE 0x01000000
 #define RIOTEE_RC_I2C_BASE 0x02000000
 
+/**
+ * @defgroup riotee Riotee basics
+ *  @{
+ */
+
+/** API return codes. */
 enum {
   /** Operation completed successfully. */
   RIOTEE_SUCCESS = -(RIOTEE_RC_BASE + 0),
@@ -70,23 +76,71 @@ typedef int riotee_rc_t;
 extern "C" {
 #endif
 
-/* This gets called right after startup */
+/**
+ * @brief User provided startup callback.
+ *
+ * \ingroup riotee
+ *
+ * This callback is called immediately after every reset. It is called early during the startup process before the
+ * system is fully initialized. Use this callback to put any power-hungry peripherals into a low-power mode. You must
+ * not run any code that uses static/global variables, as they are not yet initialized. Keep this callback as short as
+ * possible.
+ *
+ */
 void startup_callback(void);
-/* This gets called one time after flashing new firmware */
+
+/**
+ * @brief User-provided bootstrap callback.
+ *
+ * \ingroup riotee
+ *
+ * This callback is called once at the first reset after programming the device. It is called right before the first
+ * reset_callback. Use this callback to do any one-time initilization like setting an RTC or writing configuration to
+ * the NVM.
+ *
+ */
 void bootstrap_callback(void);
-/* This gets called after every reset */
+
+/**
+ * @brief User-provided reset callback.
+ *
+ * \ingroup riotee
+ *
+ * This callback is called after every reset of the device. Use this callback to initializer peripherals and drivers.
+ *
+ */
 void reset_callback(void);
-/* This gets called right before user code is suspended */
+
+/**
+ * @brief User-provided turnoff callback.
+ *
+ * \ingroup riotee
+ *
+ * This callback is called when the capacitor voltage drops below a threshold. If your application uses power-hungry
+ * peripherals, power them off immediately in this callback. Keep the callback as short as possible.
+ */
 void turnoff_callback(void);
 
-/* Waits until capacitor is fully charged as indicated by PWRGD_H pin */
-int riotee_wait_cap_charged(void);
+/**
+ * @brief Waits until the capacitor is charged.
+ *
+ * \ingroup riotee
+ *
+ * Puts the device into a low-power mode until the capacitor voltage reaches a software-defined 'high' threshold.
+ * Returns immediately if the capacitor voltage already exceeds the threshold.
+ *
+ * @retval RIOTEE_SUCCESS       Capacitor voltage is above the 'high' threshold.
+ * @retval RIOTEE_ERR_RESET     Reset occured while waiting.
+ */
+riotee_rc_t riotee_wait_cap_charged(void);
 
-#define __VOLATILE_INITIALIZED __attribute__((section(".volatile.data")))
-#define __VOLATILE_UNINITIALIZED __attribute__((section(".volatile.bss")))
+/** Data is set to initial value after every reset. */
+#define __NONRETAINED_INITIALIZED__ __attribute__((section(".volatile.data")))
+/** Data is set to zero after every reset. */
+#define __NONRETAINED_ZEROED__ __attribute__((section(".volatile.bss")))
 
 #if defined __cplusplus
 }
 #endif
 
-#endif /* __RIOTEE_H_ */
+#endif /** @} __RIOTEE_H_ */

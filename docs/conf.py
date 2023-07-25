@@ -15,6 +15,7 @@ release = "0.0.4"
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = ["myst_parser", "breathe"]
+myst_enable_extensions = ["colon_fence"]
 
 templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]

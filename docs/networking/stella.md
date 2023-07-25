@@ -9,6 +9,11 @@ After transmitting the packet, the device transitions into RX mode and listens f
 The basestation continuously listens for incoming packets.
 Upon reception of a packet from a device, the basestation responds with an acknowledgment packet containing the device's ID, the packet ID of the received packet that is being acknowledged, the packet ID of the current packet and a payload with a maximum size of 247 Byte.
 
+:::{important}
+   Always check the return code of `riotee_stella_send(...)` and `riotee_stella_transceive(...)` to distinguish between a power failure (RIOTEE_ERR_RESET)and  successful communication (RIOTEE_SUCCESS).
+:::
+
+
 ## Riotee Gateway
 
 We provide a reference implementation for a basestation using a Nordic Semiconductor nRF52840-Dongle [here](https://github.com/NessieCircuits/Riotee_Gateway).

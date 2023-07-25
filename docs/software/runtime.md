@@ -9,7 +9,7 @@ If the power supply is interrupted, the stack and all static and global variable
 
 ### Task management
 
-The runtime is based on FreeRTOS. This allows suspending and resuming execution of user code and facilitates a highly portable implementation of [*checkpointing*](#checkpointing). This does not mean that user code can make use of FreeRTOS features such as multi-threading. Instead, user code is run in one dedicated task that is managed by the runtime.
+The runtime is based on FreeRTOS. This allows suspending and resuming execution of user code and facilitates a highly portable implementation of [*checkpointing*](###checkpointing). This does not mean that user code can make use of FreeRTOS features such as multi-threading. Instead, user code is run in one dedicated task that is managed by the runtime.
 
 ### Capacitor voltage monitoring
 
@@ -26,7 +26,7 @@ There are two possible scenarios for what happens next: 1. The capacitor dischar
 There are a number of callbacks that your application can implement:
 
  - `bootstrap_callback()`: Called once after programming the device.
- - `startup_callback()`: Called right after every reset. Perform early stage initizialization required for low-power operation here
+ - `startup_callback()`: Called right after every reset. Perform early stage initizialization required for low-power operation here.
  - `reset_callback()`: Called later after every reset. Initialize peripherals here.
  - `turnoff_callback()`: Called right before the application gets suspended. Abort any energy-intensive operation immediately.
 
@@ -43,12 +43,13 @@ There are two things you can do to increase the memory your application can use.
 
 1. Place your variables outside the retained memory area.
 
-You can use the two macros `__VOLATILE_UNINITALIZED` and `__VOLATILE_INITALIZED` to declare variables as non-retained.
+You can use the two macros `__NONRETAINED_INITIALIZED__` and `__NONRETAINED_ZEROED__` to declare variables as non-retained.
 For example:
 
 ```C
-static uint32_t myarr[1024] __VOLATILE_UNINITALIZED;
+static uint32_t myarr[1024] __NONRETAINED_ZEROED__;
 ```
+
 defines an array that will be initialized to zero on every reset. The values stored in the array will **not** be retained across power failures.
 You are responsible for keeping data and application flow consistent in this case.
 
@@ -78,24 +79,18 @@ This callback is executed almost immediately after reset and allows you to put a
 Note that during the `startup_callback()`, the system is not yet setup and you cannot use static or global variables.
 Really only do what's necessary to reduce the power consumption and do the remaining initialization later in the `reset_callback` when the capacitor has charged up sufficiently.
 
-## Teardown
-
 
 ## Resources used by the runtime 
 
 The SDK uses a number of peripherals and hardware resources on the nRF52. The user may not access these peripherals to avoid interference with the runtime and drivers:
  - Timer4 (core/nvm.c)
+ - SPIM0 (core/spic.c)
+ - SPIM3 (core/nvm.c)
+ - TWIM1 (core/i2c.c)
  - UART0 (core/uart.c)
  - PPI
  - Timer2 (core/stella.c)
-
-## Developer docs
-
-### Driver models
-
-### Linker script generation
-
-To make the size of the retained memory section user-configurable, the linkerscript is generated with gcc by running it through the preprocessor and replacing the 
+ - Radio (core/ble.c and core/stella.c)
 
 
 ## Peripheral drivers
@@ -143,4 +138,13 @@ If the capacitor voltage is still below the *low* threshold when the timer expir
 If the capacitor voltage is above the *low* threshold when the timer expires, the system task registers a callback for detection of a *low* threshold.
 If the capacitor voltage falls below the *low* threshold again, a snapshot is taken and the system task waits until the *high* threshold is reached.
 If the capacitor voltage recovers above the *high* threshold, the user task is resumed and execution continues.
- If power supply fails, the system starts from `c_startup` again, restores the user task and continues execution.
+If power supply fails, the system starts from `c_startup` again, restores the user task and continues execution.
+
+
+## API reference
+
+```{eval-rst}
+.. doxygengroup:: riotee
+   :project: riotee
+   :content-only:
+```

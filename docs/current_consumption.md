@@ -6,15 +6,16 @@ There are three main modes with distinct current consumption figures.
 In the *active* mode, the current consumption depends on the used peripherals and the state of the CPU. For example, the nRF52833 draws around 4.7mA when the CPU is active.
 When the 2.4GHz wireless radio is listening for incoming packets in RX mode, it draws 9.6mA.
 
-While waiting for the capacitor voltage to reach the turn-on threshold, the Riotee module is in *idle* mode and consumes a total of around 4.5uA.
+While waiting for the capacitor voltage to recharge and reach the turn-on threshold, the Riotee module consumes a total of around 4.5uA.
 This includes the current consumption for the comparators, the MSP430 in sleep mode, the AM1805 RTC and the nRF52833 with an active 32kHz crystal oscillator.
 
 The following table lists the current consumption with respect to the capacitor voltage:
 
-Mode,Current Consumption
-RTC-only,~45nA
-Idle,~4.5uA
-Active,>4.5uA
+| Mode       | Current Consumption |
+|------------|---------------------|
+| RTC-only   | 45nA                |
+| Recharging | 4.5uA               |
+| Active     | >4.5uA              |
 
 The capacitor discharge current is between 60nA and 120nA higher than the values in the table as it also includes the quiescent current of the 2V regulator.
 
