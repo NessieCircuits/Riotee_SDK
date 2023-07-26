@@ -31,11 +31,12 @@ pip install riotee-probe
  - Install `make` via Cygwin or Chocolatey following the instructions [here](https://earthly.dev/blog/makefiles-on-windows/).
  - Add the path to `make`  (e.g. `C:/cygwin64/bin` for Cygwin) to your `Path` variable ([Instructions](https://www.architectryan.com/2018/03/17/add-to-the-path-on-windows-10/)).
  - Install the `GNU Arm Embedded Toolchain` from the [official website](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads).
- - For uploading firmware to your Riotee device install the [riotee-probe](https://github.com/NessieCircuits/Riotee_ProbeSoftware) Python package with
+ - For uploading firmware to your Riotee device install the [riotee-probe](https://github.com/NessieCircuits/Riotee_ProbeSoftware) Python package globally with
 
 ```bash
-pip install riotee-probe
+pipx install riotee-probe
 ```
+
 ## Usage
 
 Take a look at the [examples](./examples) for how you can use this SDK. We also provide a [template project](https://github.com/NessieCircuits/Riotee_AppTemplate) to get you started with your first Riotee project using the SDK.
