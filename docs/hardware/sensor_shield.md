@@ -13,10 +13,17 @@ To minimize the power consumption of the shield, disable the microphone by setti
 
 For an example, take a look at the [VM1010 example](https://github.com/NessieCircuits/Riotee_Runtime/examples/vm1010).
 
+## Microphone bias voltage
+
+The analog output of the microphone is developed with respect to a 800mV offset voltage and swings often just a few millivolts for low sound levels.
+To enable measuring these small voltage swings, the sensor shield has an 810mV bias voltage output.
+Configuring the ADC in differential mode and measuring the output voltage with respect to this bias voltage significantly increases the resolution and may also reduce noise that gets coupled in on the way from the shield to the ADC.
+
 ## Pinout
 
 ![Board Pinout](./img/riotee-sensor-shield-pinout.svg)
 
+## Pin description
 
 | Pin      | Description                                                                                 |
 |----------|---------------------------------------------------------------------------------------------|

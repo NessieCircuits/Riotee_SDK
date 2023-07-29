@@ -16,12 +16,38 @@ Our Riotee Board combines a Riotee Module with a USB Type-C connector and circui
 
 ![Board Pinout](./img/riotee-board-pinout.svg)
 
+## Pin description
+
+
+| Pad        | Description                                                                         |
+|------------|-------------------------------------------------------------------------------------|
+| D0/RX      | Digital Input/Ouptut. Connected to USB-UART on the Board.                           |
+| D1/TX      | Digital Input/Ouptut. Connected to USB-UART on the Board.                           |
+| D2/A0      | Digital Input/Ouptut or analog input.                                               |
+| D3/A1      | Digital Input/Ouptut or analog input.                                               |
+| D4         | Digital Input/Ouptut.                                                               |
+| D5         | Digital Input/Ouptut. Connected to board LED. 1M pulldown.                          |
+| D6         | Digital Input/Ouptut. Connected to push button. 1M pullup.                          |
+| D7         | Digital Input/Ouptut                                                                |
+| D8         | Digital Input/Ouptut.                                                               |
+| D9         | Digital Input/Ouptut.                                                               |
+| D10        | Digital Input/Ouptut.                                                               |
+| SCL        | I2C Clock. Connected to AM1805 RTC and MAX20361 boost. Connect I2C devices here.    |
+| SDA        | I2C Data. Connected to AM1805 RTC and MAX20361 boost. Connect I2C devices here.     |
+| VcapMon    | Buffered capacitor voltage. Use this to measure capacitor voltage with peripherals. |
+| Vin        | Harvesting input. Connect a DC voltage between 0.25V and 2.5V.                      |
+| Vcap       | Capacitor voltage. Connect additional capacitance to this pin.                      |
+| +2V        | Main power supply. Connect peripherals to this pin.                                 |
+| +2V (Aon)  | Output of the Buck converter. Not disabled by power switches.                       |
+| +3V3       | 3.3V supplied from USB. Only present when USB is connected.                         |
+| SwdClk     | ARM Serial Wire Debug (SWD) Clock for programming nRF52.                            |
+| SwdIO      | ARM Serial Wire Debug (SWD) I/O for programming nRF52.                              |
+| SbwClk     | TI Spy-bi-wire (SBW) Clock for programming MSP430FR.                                |
+| SbwIO      | TI Spy-bi-wire (SBW) I/O for programming MSP430FR.                                  |
 
 ## Button
 
-The Board has a button and an LED that are connected to the Riotee Module's pins.
-
-The Button is connected to pin D6 and is pulled high with a 1M resistor.
+The Board has a push button connected to pin D6 that is pulled high with a 1M resistor.
 This leads to an additional current consumption of around 2uA when pin D6 is driven low (default configuration).
 
 ## LED
@@ -30,12 +56,38 @@ The LED is powered from the USB supply and is controlled with pin D5 via an n-ch
 The LED only works when the Riotee Board is connected to USB and does not consume energy from the capacitor.
 D5 is pulled low with a 1M resistor, leading to an additional current consumption of around 2uA when pin D5 is driven high.
 
-## UART output
+## UART Output
 
 The UART output from pin D1/TX of the Riotee Module is being made available via USB by the RP2040 on the Riotee board.
 When connecting the Riotee Board to your computer, a serial port should appear.
 Use your favorite terminal application (e.g. minicom on Linux or putty on Windows) to connect to the serial port.
 The default baudrate of the UART driver is 1000000bps, but this can be changed via the API.
+
+## Programming
+
+Install the `riotee-probe` Python package with
+
+```bash
+pipx install riotee-probe
+```
+
+Flash new firmware with
+
+```bash
+riotee-probe program -d nrf52 -f firmware_nrf52.hex
+```
+
+and 
+
+```bash
+riotee-probe program -d msp430 -f firmware_msp430.hex
+```
+
+## Updating Firmware
+
+Connect a jumper wire from one of the ground pins to the pad labelled 'USB_BOOT' on the bottom of the board, while plugging in the USB cable.
+A removable storage drive should appear on your PC.
+Download the latest firmware (*probe_riotee_board_[version].uf2*) from the [release page](https://github.com/NessieCircuits/Riotee_ProbeSoftware/releases/latest) and drop it into the drive.
 
 ## Resources
  - [Schematics](https://www.riotee.nessie-circuits.de/artifacts/board/latest/schematics.pdf)

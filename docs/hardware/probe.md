@@ -4,7 +4,9 @@ Programming battery-free devices is tricky. The power from a harvester is genera
 
 With the Riotee Probe the process becomes much easier: When programming/debugging is requested, the Probe automatically switches on a constant power supply and supplies the microcontrollers on the Riotee Module throughout the transfer. After programming, the power supply as well as the programming pins are automatically disconnected from the Riotee Module with analog switches. The device returns to harvesting operation and you can immediately observe the new software without interference from the programming dongle.
 
-The Riotee probe supports programming both, the MSP430 and the nRF52 on the Riotee Module after you've soldered it onto your PCB or plugged it into a breadboard. It has a standard, 10-pin, 0.1-inch connector and is compatible with Tag-Connect cables that support in-circuit debugging.
+The Riotee Probe supports programming both, the MSP430 and the nRF52 on the Riotee Module after you've soldered it onto your PCB or plugged it into a breadboard. It has a standard, 10-pin, 0.1-inch connector and is compatible with Tag-Connect cables that support in-circuit debugging.
+
+Additionally, the Riotee Probe has four GPIOs that can be controlled via USB from the CLI or API interfaces. This allows, for example, building test jigs to automatically program and test your Riotee-based devices.
 
 ## Features & Specifications
 
@@ -14,9 +16,37 @@ The Riotee probe supports programming both, the MSP430 and the nRF52 on the Riot
 - CMSIS-DAP compatible for programming the Riotee Module via pyOCD or OpenOCD
 - Makes UART output from Riotee module available via USB
 
+## Software
+
+The [Riotee Probe software](https://github.com/NessieCircuits/Riotee_ProbeSoftware) consists of two parts:
+The *firmware* is running on the RP2040 on-board the Riotee Probe and exposes a USB interface for interfacing with the Riotee Module via UART, ARM SWD and TI SBW.
+The *Python package* runs on a computer and offers a CLI and API that talks to the Riotee Probe over USB.
+
+
+## Pinout
+
+![Probe Pinout](./img/riotee-probe-pinout.svg)
+
+## Pin Description
+
+| Pin       |                                                                                 |
+|-----------|---------------------------------------------------------------------------------|
+| Gpio0     | General purpose Input/Output. Can be controlled via CLI/API.                    |
+| Gpio1     | General purpose Input/Output. Can be controlled via CLI/API.                    |
+| Gpio2     | General purpose Input/Output. Can be controlled via CLI/API.                    |
+| Gpio3     | General purpose Input/Output. Can be controlled via CLI/API.                    |
+| UartTx    | UART data sent from a PC via USB to the Riotee device. Not yet implemented.     |
+| UartRx    | UART data sent from the Riotee device to a computer.                            |
+| SwdClk    | ARM Serial Wire Debug Clock for programming nRF52 on the Riotee Module.         |
+| SwdIO     | ARM Serial Wire Debug I/O for programming nRF52 on the Riotee Module.           |
+| SbwClk    | TI Spy-bi-wire Clock for programming MSP430FR on the Riotee Module.             |
+| SbwIO     | TI Spy-bi-wire I/O for programming MSP430FR on the Riotee Module.               |
+| +3V3      | Auxiliary +3.3V power supply.                                                   |
+| VccTarget | Target power supply. Enabled during programming. Can be controlled via CLI/API. |
 
 ## Resources
  - [Schematics](https://www.riotee.nessie-circuits.de/artifacts/probe_hardware/latest/schematics.pdf)
  - [Layout](https://www.riotee.nessie-circuits.de/artifacts/probe_hardware/latest/pcb.pdf)
  - [Assembly plan](https://www.riotee.nessie-circuits.de/artifacts/probe_hardware/latest/assembly.pdf)
  - [3D rendering](https://www.riotee.nessie-circuits.de/artifacts/probe_hardware/latest/3drendering.png)
+ - [Software](https://github.com/NessieCircuits/Riotee_ProbeSoftware)

@@ -19,15 +19,15 @@ The following table lists the current consumption with respect to the capacitor 
 
 The capacitor discharge current is between 60nA and 120nA higher than the values in the table as it also includes the quiescent current of the 2V regulator.
 
-
+(measuring_current)=
 ## Measuring current consumption
 
 The Riotee Module and Riotee Board allow measuring the current consumption drawn from the 2V supply.
 
-Setting high pin *BYPASS* activates a bypass switch and reroutes the current between *Vbuck* and *Vshunt* on the Riotee Module.
+Setting high pin *Bypass* activates a bypass switch and reroutes the current between *Vbuck* and *Vshunt* on the Riotee Module.
 Connect an amperemeter between *Vbuck* and *Vshunt* to measure the current consumption on the 2V supply.
 
-On the Riotee Board, the bypass switch can easily be activated with the `riotee-probe` command line utility.
+On the Riotee Board, the bypass switch can be activated with the `riotee-probe` command line utility.
 Connect an amperemeter between *Vbuck* and *Vcc* to measure the current consumption on the 2V supply.
 Note that with this measurement setup, the AM1805 on-board the Riotee Module is not supplied with power.
 
