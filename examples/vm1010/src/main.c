@@ -23,8 +23,6 @@ void startup_callback(void) {
 /* This gets called after every reset */
 void reset_callback(void) {
   riotee_stella_init();
-  /* Required for VM1010 */
-  riotee_adc_init();
 
   vm1010_cfg_t cfg = {.pin_vout = PIN_D2, .pin_vbias = PIN_D3, .pin_mode = PIN_D10, .pin_dout = PIN_D4};
   vm1010_init(&cfg);
