@@ -28,6 +28,7 @@ extern unsigned long __bss_retained_end__;
 extern unsigned long __data_retained_start__;
 extern unsigned long __data_retained_end__;
 extern unsigned long __data_start__;
+extern unsigned long __data_end__;
 
 /* Linker section where drivers register their teardown functions */
 extern unsigned long __teardown_start__;
@@ -98,7 +99,7 @@ typedef struct {
   uint32_t bss_size;
 } checkpoint_header;
 
-enum { NVM_SIG_VALID = 0x0D15EA5E, NVM_SIG_INVALID = 0x8BADF00D };
+enum { NVM_SIG_VALID = 0xCAFED00D, NVM_SIG_INVALID = 0x8BADF00D };
 
 /* Stores task stack and static/global variables in non-volatile memory. */
 static int checkpoint_store() {
@@ -217,7 +218,8 @@ static void threshold_callback(unsigned int pin_no) {
 /* Initializes 'retained' section when no checkpoint exists. */
 static void initialize_retained(void) {
   volatile unsigned long *src, *dst;
-  src = &__etext + (&__data_retained_start__ - &__data_start__);
+  /* Get LMA of the data_retained section in flash. */
+  src = &__etext + (&__data_end__ - &__data_start__);
   dst = &__data_retained_start__;
   while (dst < &__data_retained_end__)
     *(dst++) = *(src++);

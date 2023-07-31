@@ -10,13 +10,14 @@ EXTERN(vectors)
 RAM_SIZE = 131072;
 RAM_ORIGIN = 0x20000000;
 
+RAM_VOLATILE_ORIGIN = RAM_ORIGIN;
 RAM_VOLATILE_SIZE = RAM_SIZE - RIOTEE_RAM_RETAINED_SIZE;
-RAM_VOLATILE_ORIGIN = RAM_ORIGIN + RIOTEE_RAM_RETAINED_SIZE;
+RAM_RETAINED_ORIGIN = RAM_ORIGIN + RAM_VOLATILE_SIZE;
 
 MEMORY {
   FLASH (rx) : ORIGIN = 0x0, LENGTH = 512k
-  RAM_RETAINED (rwx) :  ORIGIN = 0x20000000, LENGTH = RIOTEE_RAM_RETAINED_SIZE
-  RAM (rwx) :  ORIGIN = RAM_VOLATILE_ORIGIN, LENGTH = RAM_VOLATILE_SIZE
+  RAM_VOLATILE (rwx) :  ORIGIN = RAM_VOLATILE_ORIGIN, LENGTH = RAM_VOLATILE_SIZE
+  RAM_RETAINED (rwx) :  ORIGIN = RAM_RETAINED_ORIGIN, LENGTH = RIOTEE_RAM_RETAINED_SIZE
 }
 
 
@@ -111,7 +112,7 @@ SECTIONS {
                 /* All data end */
                 __data_end__ = .;
 
-        } >RAM AT>FLASH
+        } >RAM_VOLATILE AT>FLASH
 
         .data_retained : {
                 . = ALIGN(4);
@@ -146,7 +147,7 @@ SECTIONS {
                 *(.teardown)
                 __teardown_end__ = .;
                 __bss_end__ = .;
-        } >RAM
+        } >RAM_VOLATILE
 
         .bss_retained (NOLOAD) : {
                 . = ALIGN(4);
