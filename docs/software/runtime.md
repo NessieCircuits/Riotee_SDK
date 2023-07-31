@@ -1,4 +1,4 @@
-
+(runtime_documentation)=
 # Riotee Runtime
 
 The Riotee runtime allows executing user-code on battery-free devices built around the Riotee Module.
@@ -9,12 +9,13 @@ If the power supply is interrupted, the stack and all static and global variable
 
 ### Task management
 
-The runtime is based on FreeRTOS. This allows suspending and resuming execution of user code and facilitates a highly portable implementation of [*checkpointing*](###checkpointing). This does not mean that user code can make use of FreeRTOS features such as multi-threading. Instead, user code is run in one dedicated task that is managed by the runtime.
+The runtime is based on FreeRTOS. This allows suspending and resuming execution of user code and facilitates a highly portable implementation of [*checkpointing*](checkpointing). This does not mean that user code can make use of FreeRTOS features such as multi-threading. Instead, user code is run in one dedicated task that is managed by the runtime.
 
 ### Capacitor voltage monitoring
 
 The state of the device and the execution of code is mainly dictated by energy availability. The runtime continuously monitors the capacitor voltage with the two comparators on the Riotee module. The output of one of the comparators defines a *low* threshold. When the runtime detects this threshold it will halt execution and prepare the system for a potential power supply failure. The output of the second comparator defines a *high* threshold that indicates that the capacitor is sufficiently charged to start executing again. The voltage thresholds of these comparators can be set in discrete steps by the software.
 
+(checkpointing)=
 ### Checkpointing
 
 When the runtime detects a *low* capacitor voltage level, it suspends user code execution and puts the system to a deep sleep mode.

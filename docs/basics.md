@@ -38,6 +38,7 @@ The timer is stopped and not trivially restored after a reset.
 The application instead is restored in the loop waiting for the flag which will never be set.
 The system fails.
 The Riotee runtime implements a driver model that is able to detect and handle such inconsistencies.
+Head over to the [runtime documentation](runtime_documentation) to learn more about this.
 
 To address the timekeeping challenge, the Riotee Module has an ultra-low power RTC with additional backup capacitors.
 When the supply voltage fails, these capacitors can supply the RTC for multiple minutes during which it keeps counting up its internal timers.
