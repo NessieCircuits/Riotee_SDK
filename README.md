@@ -24,7 +24,7 @@ git clone --recursive git@github.com:NessieCircuits/Riotee_Runtime.git
  - For uploading firmware to your Riotee device install the [riotee-probe](https://github.com/NessieCircuits/Riotee_ProbeSoftware) Python package with
 
 ```bash
-pip install riotee-probe
+pipx install riotee-probe
 ```
 
 ### Windows
