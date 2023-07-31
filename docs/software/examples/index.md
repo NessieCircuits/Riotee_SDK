@@ -5,6 +5,7 @@
    :maxdepth: 3
 
    blinky
+   gpio
    spic
 
 ```

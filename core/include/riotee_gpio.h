@@ -130,6 +130,19 @@ static inline void riotee_gpio_cfg_input(unsigned int pin, riotee_gpio_in_pull_t
 }
 
 /**
+ * @brief Configures the pin for high impedance and disconnects the input buffer.
+ *
+ * @param pin Pin number.
+ * \ingroup gpio
+ */
+static inline void riotee_gpio_cfg_disable(unsigned int pin) {
+  riotee_gpio_port_t* reg = riotee_gpio_get_port(pin);
+  int pin_idx = riotee_gpio_get_pin_idx(pin);
+  /* Disconnect input buffer. */
+  reg->PIN_CNF[pin_idx] = (1UL << 1);
+}
+
+/**
  * @brief Sets output pin to logic high.
  *
  * @param pin Pin number.

@@ -9,7 +9,13 @@ Inputs can always be read with `riotee_gpio_read(unsigned int pin)` or the appli
    Always check the return code of `riotee_gpio_wait_level(...)` to distinguish between a power failure (RIOTEE_ERR_RESET) and an actual level detection event (RIOTEE_SUCCESS).
 :::
 
+## Example usage
 
+```{eval-rst}
+.. literalinclude:: ../../../examples/gpio/src/main.c
+   :language: c
+   :linenos:
+```
 
 ## API Reference
 
