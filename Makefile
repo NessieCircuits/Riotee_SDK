@@ -86,6 +86,7 @@ ASMFLAGS += -DFLOAT_ABI_HARD
 ASMFLAGS += -DNRF${NRF_DEV_NUM}_XXAA
 
 LDFLAGS += $(OPT)
+LDFLAGS += -T$(LINKER_SCRIPT)
 LDFLAGS += -mthumb -mabi=aapcs
 LDFLAGS += -mcpu=cortex-m4
 LDFLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16
@@ -100,16 +101,11 @@ LIB_FILES += -lm
 
 ARFLAGS = -rcs
 
-.PHONY: clean flash erase app ${OUTPUT_DIR}/linker.ld
+.PHONY: clean flash erase app
 
 all: app
 
 app: ${OUTPUT_DIR}/build.hex
-
-# Create the linkerscript using gcc preprocessor to parse config
-${OUTPUT_DIR}/linker.ld: $(LINKER_SCRIPT)
-	@${PREFIX}gcc -E -P -x c ${INCLUDES} $< > $@
-	@echo "Generating linker file"
 
 ${OUTPUT_DIR}/%.c.o: ${RIOTEE_SDK_ROOT}/%.c
 	@mkdir -p $(@D)
@@ -126,8 +122,8 @@ ${OUTPUT_DIR}/%.cpp.o: ${PRJ_ROOT}/%.cpp
 	@${PREFIX}c++ ${CPPFLAGS} -c $< -o $@
 	@echo "CC $<"
 
-${OUTPUT_DIR}/build.elf: $(OBJS) ${OUTPUT_DIR}/linker.ld
-	@${PREFIX}c++ ${LDFLAGS} -T${OUTPUT_DIR}/linker.ld $(OBJS) -o $@ ${LIB_FILES}
+${OUTPUT_DIR}/build.elf: $(OBJS)
+	@${PREFIX}c++ ${LDFLAGS} $(OBJS) -o $@ ${LIB_FILES}
 	@${PREFIX}size $@
 
 
