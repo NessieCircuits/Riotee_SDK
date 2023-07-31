@@ -8,6 +8,13 @@ Any of the 11 GPIOs can be mapped to any of the four signals.
 Always check the return code of `riotee_spic_transfer(...)` to check for a potential reset/teardown during the transfer.
 :::
 
+## Example usage
+
+```{eval-rst}
+.. literalinclude:: ../../../examples/spic/src/main.c
+   :language: c
+   :linenos:
+```
 
 ## API Reference
 

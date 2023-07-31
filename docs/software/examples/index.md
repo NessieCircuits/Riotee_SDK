@@ -5,5 +5,6 @@
    :maxdepth: 3
 
    blinky
+   spic
 
 ```
