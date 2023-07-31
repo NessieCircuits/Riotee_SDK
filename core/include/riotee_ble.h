@@ -54,14 +54,14 @@ typedef struct {
  */
 typedef struct {
   riotee_ble_adv_header_t header;
-  riotee_ble_adv_addr_t adv_addr;
+  uint8_t adv_addr[6];
   uint8_t payload[31];
 } __attribute__((__packed__)) riotee_adv_pck_t;
 
 /** BLE advertising configuration. */
 typedef struct {
   /** Pointer to advertising address. */
-  const riotee_ble_adv_addr_t *addr;
+  const uint8_t *addr;
   /** Advertising name of the device. */
   const char *name;
   /** Size of 'name' in bytes. */

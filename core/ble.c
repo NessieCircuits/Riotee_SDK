@@ -1,6 +1,4 @@
 #include "nrf.h"
-
-#include "nrf_ppi.h"
 #include "nrf_radio.h"
 
 #include <stdbool.h>
@@ -10,10 +8,8 @@
 #include "riotee_ble.h"
 #include "radio.h"
 
-#include "FreeRTOS.h"
-#include "semphr.h"
-
 #include "runtime.h"
+#include "printf.h"
 
 /* Bluetooth Core Spec 5.2 Section 2.1.2 */
 #define ADV_CHANNEL_AA 0x8E89BED6
@@ -66,7 +62,7 @@ riotee_rc_t riotee_ble_adv_cfg(riotee_ble_adv_cfg_t *cfg) {
 
   adv_pkt.header.pdu_type = ADV_NONCONN_IND;
   adv_pkt.header.txadd = 1;
-  memcpy((char *)&adv_pkt.adv_addr.addr_bytes, &cfg->addr->addr_bytes, 6);
+  memcpy(adv_pkt.adv_addr, cfg->addr, 6);
 
   /* Length of advertising mode field */
   adv_pkt.payload[0] = 0x02;
