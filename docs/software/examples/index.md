@@ -7,5 +7,6 @@
    blinky
    gpio
    spic
+   stella
 
 ```
