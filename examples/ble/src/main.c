@@ -2,7 +2,6 @@
 #include "riotee.h"
 #include "riotee_ble.h"
 #include "riotee_timing.h"
-#include "printf.h"
 
 const uint8_t adv_address[] = {0x01, 0xEE, 0xC0, 0xFF, 0x03, 0x02};
 const char adv_name[] = "RIOTEE";
@@ -30,6 +29,5 @@ int main() {
     ble_data.counter++;
     /* Sleep at least 250ms before next advertising round */
     riotee_sleep_ms(250);
-    printf("%u", ble_data.counter);
   }
 }
