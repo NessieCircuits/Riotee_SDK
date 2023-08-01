@@ -19,6 +19,8 @@ The analog output of the microphone is developed with respect to a 800mV offset 
 To enable measuring these small voltage swings, the sensor shield has an 810mV bias voltage output.
 Configuring the ADC in differential mode and measuring the output voltage with respect to this bias voltage significantly increases the resolution and may also reduce noise that gets coupled in on the way from the shield to the ADC.
 
+Due to the design of the bias voltage circuit, it takes around 4ms for the bias voltage to reach 99% of its value after the microphone is enabled via pin D5.
+
 ## Pinout
 
 ![Board Pinout](./img/riotee-sensor-shield-pinout.svg)
