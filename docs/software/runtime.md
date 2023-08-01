@@ -64,7 +64,7 @@ You must chose the capacitance of your device such that the checkpoint can still
 
 The runtime only checkpoints the part of the retained memory area that is actually occupied by the variables and the stack so don't worry about reducing RIOTEE_RAM_RETAINED_SIZE beyond the default value of 8192B.
 However you may find that you can fit more static/global variables into the retained memory when you reduce the (generous) default `RIOTEE_STACK_SIZE` in your application's Makefile.
-For an example, take a look at the [dsp example's Makefile](https://github.com/NessieCircuits/Riotee_Runtime/blob/main/examples/dsp/Makefile).
+For an example, take a look at the [dsp example's Makefile](https://github.com/NessieCircuits/Riotee_SDK/blob/main/examples/dsp/Makefile).
 
 ## Early startup
 

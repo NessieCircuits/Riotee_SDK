@@ -19,7 +19,7 @@ Riotee products are available for purchase on [CrowdSupply](https://www.crowdsup
 ## Software support
 
  - For a quickstart with Riotee, use the Arduino package.
- - For more involved development, use the [SDK](https://github.com/NessieCircuits/Riotee_Runtime) and the [template project](https://github.com/NessieCircuits/Riotee_AppTemplate).
+ - For more involved development, use the [SDK](https://github.com/NessieCircuits/Riotee_SDK) and the [template project](https://github.com/NessieCircuits/Riotee_AppTemplate).
 
 
 ```{eval-rst}

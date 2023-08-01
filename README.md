@@ -1,4 +1,4 @@
-[![Build](https://github.com/NessieCircuits/Riotee_Runtime/actions/workflows/build.yml/badge.svg)](https://github.com/NessieCircuits/Riotee_Runtime/actions/workflows/build.yml)
+[![Build](https://github.com/NessieCircuits/Riotee_SDK/actions/workflows/build.yml/badge.svg)](https://github.com/NessieCircuits/Riotee_SDK/actions/workflows/build.yml)
 
 # Riotee Software Development Kit
 
@@ -9,12 +9,12 @@ For a quickstart with Riotee you can use our Arduino package which internally ma
 
 ## Installation
 
-Download the [latest zip release](https://github.com/NessieCircuits/Riotee_Runtime/releases/latest) and unpack it to a path on your machine.
+Download the [latest zip release](https://github.com/NessieCircuits/Riotee_SDK/releases/latest) and unpack it to a path on your machine.
 
 Alternatively, clone this repository to get the latest development version of the SDK:
 
 ```bash
-git clone --recursive git@github.com:NessieCircuits/Riotee_Runtime.git
+git clone --recursive git@github.com:NessieCircuits/Riotee_SDK.git
 ```
 
 ### Linux
