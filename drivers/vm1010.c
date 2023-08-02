@@ -10,6 +10,7 @@
 #include "gpint.h"
 #include "riotee_gpio.h"
 #include "riotee_timing.h"
+#include "riotee.h"
 
 static unsigned int pin_mode;
 static unsigned int pin_dout;
@@ -43,7 +44,7 @@ void vm1010_exit(void) {
   riotee_gpio_clear(pin_mode);
 }
 
-int vm1010_sample(int16_t *result, unsigned int n_samples, unsigned int sample_interval_ticks32) {
+riotee_rc_t vm1010_sample(int16_t *result, unsigned int n_samples, unsigned int sample_interval_ticks32) {
   adc_cfg.n_samples = n_samples;
   adc_cfg.sample_interval_ticks32 = sample_interval_ticks32;
 
@@ -57,11 +58,10 @@ static void wos_callback(unsigned int pin) {
   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
-int vm1010_wait4sound(void) {
+riotee_rc_t vm1010_wait4sound(void) {
   int rc;
   unsigned long notification_value;
   volatile unsigned int reset_counter = runtime_stats.n_reset;
-  const uint8_t use_gpint = 0u;
 
   /* Enter Wake on Sound mode */
   riotee_gpio_set(pin_mode);
@@ -77,35 +77,22 @@ int vm1010_wait4sound(void) {
   if (reset_counter != runtime_stats.n_reset) {
     taskEXIT_CRITICAL();
     riotee_gpio_clear(pin_mode);
-    return -1;
+    return RIOTEE_ERR_RESET;
   }
 
-  if (use_gpint) {
-    /* WARNING:
-     * code is identical to riotee_gpint_wait() but does not work here
-     * as pin is on bank P1, which is currently not supported
-     * it just drains the cap when int arrives (without returning xTaskNotifyWaitIndexed())
-     */
-    xTaskNotifyStateClearIndexed(usr_task_handle, 1);
-    gpint_register(pin_dout, RIOTEE_GPIO_LEVEL_HIGH, RIOTEE_GPIO_IN_NOPULL, wos_callback);
-    taskEXIT_CRITICAL();
-    xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
-  } else {
-    taskEXIT_CRITICAL();
-    while (!riotee_gpio_read(pin_dout)) {
-      if ((rc = riotee_sleep_ms(5)) != 0) {
-        /* interrupt polling on errors */
-        riotee_gpio_clear(pin_mode);
-        return rc;
-      }
-    }
-    notification_value = EVT_DRV;
-  }
+  xTaskNotifyStateClearIndexed(usr_task_handle, 1);
+  gpint_register(pin_dout, RIOTEE_GPIO_LEVEL_HIGH, RIOTEE_GPIO_IN_NOPULL, wos_callback);
+  taskEXIT_CRITICAL();
+  xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
 
   /* Exit Wake on Sound mode */
   riotee_gpio_clear(pin_mode);
 
-  if (notification_value != EVT_DRV)
-    return -1;
-  return 0;
+  if (notification_value == EVT_RESET)
+    return RIOTEE_ERR_RESET;
+
+  if (notification_value == EVT_DRV)
+    return RIOTEE_SUCCESS;
+
+  return RIOTEE_ERR_GENERIC;
 }

@@ -8,5 +8,6 @@
    gpio
    spic
    stella
+   vm1010
 
 ```
