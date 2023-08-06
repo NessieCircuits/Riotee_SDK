@@ -1,11 +1,17 @@
 #include "riotee.h"
 #include "riotee_i2c.h"
+#include "printf.h"
 
 #include "Wire.h"
 
 void RioteeI2C::begin() {
-  tx_buffer_idx = 0;
-  rx_buffer_idx = 0;
+  tx_ringbuf.clear();
+  rx_ringbuf.clear();
+  return;
+}
+
+void RioteeI2C::begin(uint8_t address) {
+  /* Peripheral mode not implemented. */
   return;
 }
 
@@ -26,23 +32,26 @@ void RioteeI2C::setClock(uint32_t freq) {
   }
 }
 size_t RioteeI2C::requestFrom(uint8_t address, size_t len) {
-  unsigned int rx_space = I2C_BUFFER_SIZE - rx_buffer_idx;
-  if (len > rx_space)
-    len = rx_space;
+  uint8_t rx_buf_tmp[I2C_BUFFER_SIZE];
+  if (len > rx_ringbuf.availableForStore())
+    len = rx_ringbuf.availableForStore();
 
-  int rc = riotee_i2c_read(rx_buffer + rx_buffer_idx, len, address);
-  if (rc != 0)
+  if (riotee_i2c_read(rx_buf_tmp, len, address) != RIOTEE_SUCCESS)
     return 0;
 
-  rx_buffer_idx += len;
+  for (unsigned int i = 0; i < len; i++)
+    rx_ringbuf.store_char(rx_buf_tmp[i]);
+
   return len;
 }
 
-int RioteeI2C::read(void) {
-  if (rx_buffer_idx == 0)
-    return -1;
+size_t RioteeI2C::requestFrom(uint8_t address, size_t len, bool stopBit) {
+  /* Peripheral mode not implemented. */
+  return 0xFFFFFFFF;
+}
 
-  return rx_buffer[--rx_buffer_idx];
+int RioteeI2C::read(void) {
+  return rx_ringbuf.read_char();
 }
 
 void RioteeI2C::beginTransmission(uint8_t address) {
@@ -50,23 +59,44 @@ void RioteeI2C::beginTransmission(uint8_t address) {
 }
 
 uint8_t RioteeI2C::endTransmission(void) {
-  riotee_i2c_write(tx_address, tx_buffer, tx_buffer_idx);
-  tx_buffer_idx = 0;
+  size_t tx_size = tx_ringbuf.available();
+  for (int i = 0; i < tx_size; i++) {
+    uint8_t data = tx_ringbuf.read_char();
+    if (riotee_i2c_write(tx_address, &data, 1) != RIOTEE_SUCCESS)
+      return i;
+  }
+  return tx_size;
+}
+
+uint8_t RioteeI2C::endTransmission(bool stopBit) {
+  /** Peripheral mode not implemented. */
+  return 0xFF;
 }
 
 size_t RioteeI2C::write(uint8_t* data, size_t len) {
-  unsigned int tx_space = I2C_BUFFER_SIZE - tx_buffer_idx;
+  size_t tx_space = tx_ringbuf.availableForStore();
   if (len > tx_space)
     len = tx_space;
 
-  memcpy(tx_buffer + tx_buffer_idx, data, len);
+  for (int i = 0; i < len; i++)
+    tx_ringbuf.store_char(data[i]);
 
   return len;
 }
 
 size_t RioteeI2C::write(uint8_t data) {
-  if (tx_buffer_idx == I2C_BUFFER_SIZE)
+  if (tx_ringbuf.availableForStore() == 0)
     return 0;
-  tx_buffer[tx_buffer_idx++] = data;
+  tx_ringbuf.store_char(data);
   return 1;
 }
+
+int RioteeI2C::available(void) {
+  return rx_ringbuf.available();
+}
+
+int RioteeI2C::peek(void) {
+  return rx_ringbuf.peek();
+}
+
+RioteeI2C Wire;
