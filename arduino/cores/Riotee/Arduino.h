@@ -3,6 +3,7 @@
 
 #include "riotee.h"
 #include "riotee_timing.h"
+#include "printf.h"
 
 #ifdef __cplusplus
 #include "Serial.h"
@@ -49,4 +50,4 @@ int analogRead(uint32_t pin);
 }
 #endif
 
-#endif // Arduino_h
+#endif  // Arduino_h
