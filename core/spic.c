@@ -8,28 +8,39 @@
 
 TEARDOWN_FUN(spic_teardown_ptr);
 
-riotee_rc_t spic_init(riotee_spic_cfg_t* cfg) {
+riotee_rc_t riotee_spic_init(riotee_spic_cfg_t* cfg) {
   NRF_SPIM3->PSEL.CSN = cfg->pin_cs;
   NRF_SPIM3->PSEL.MOSI = cfg->pin_copi;
   NRF_SPIM3->PSEL.MISO = cfg->pin_cipo;
   NRF_SPIM3->PSEL.SCK = cfg->pin_sck;
 
   NRF_SPIM3->FREQUENCY = cfg->frequency;
+  switch (cfg->order) {
+    case RIOTEE_SPIC_ORDER_MSBFIRST:
+      NRF_SPIM3->CONFIG = (SPIM_CONFIG_ORDER_MsbFirst << SPIM_CONFIG_ORDER_Pos);
+      break;
+    case RIOTEE_SPIC_ORDER_LSBFIRST:
+      NRF_SPIM3->CONFIG = (SPIM_CONFIG_ORDER_LsbFirst << SPIM_CONFIG_ORDER_Pos);
+      break;
+    default:
+      return RIOTEE_ERR_INVALIDARG;
+  }
+
   switch (cfg->mode) {
-    case SPIC_MODE0_CPOL0_CPHA0:
-      NRF_SPIM3->CONFIG =
+    case RIOTEE_SPIC_MODE0_CPOL0_CPHA0:
+      NRF_SPIM3->CONFIG |=
           (SPI_CONFIG_CPHA_Leading << SPI_CONFIG_CPHA_Pos) | (SPI_CONFIG_CPOL_ActiveHigh << SPI_CONFIG_CPOL_Pos);
       break;
-    case SPIC_MODE1_CPOL0_CPHA1:
-      NRF_SPIM3->CONFIG =
+    case RIOTEE_SPIC_MODE1_CPOL0_CPHA1:
+      NRF_SPIM3->CONFIG |=
           (SPI_CONFIG_CPHA_Trailing << SPI_CONFIG_CPHA_Pos) | (SPI_CONFIG_CPOL_ActiveHigh << SPI_CONFIG_CPOL_Pos);
       break;
-    case SPIC_MODE2_CPOL1_CPHA0:
-      NRF_SPIM3->CONFIG =
+    case RIOTEE_SPIC_MODE2_CPOL1_CPHA0:
+      NRF_SPIM3->CONFIG |=
           (SPI_CONFIG_CPHA_Leading << SPI_CONFIG_CPHA_Pos) | (SPI_CONFIG_CPOL_ActiveLow << SPI_CONFIG_CPOL_Pos);
       break;
-    case SPIC_MODE3_CPOL1_CPHA1:
-      NRF_SPIM3->CONFIG =
+    case RIOTEE_SPIC_MODE3_CPOL1_CPHA1:
+      NRF_SPIM3->CONFIG |=
           (SPI_CONFIG_CPHA_Leading << SPI_CONFIG_CPHA_Pos) | (SPI_CONFIG_CPOL_ActiveLow << SPI_CONFIG_CPOL_Pos);
       break;
     default:
@@ -64,7 +75,7 @@ void SPIM3_IRQHandler(void) {
   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
-riotee_rc_t spic_transfer(uint8_t* data_tx, size_t n_tx, uint8_t* data_rx, size_t n_rx) {
+riotee_rc_t riotee_spic_transfer(uint8_t* data_tx, size_t n_tx, uint8_t* data_rx, size_t n_rx) {
   unsigned long notification_value;
 
   taskENTER_CRITICAL();
@@ -99,4 +110,14 @@ riotee_rc_t spic_transfer(uint8_t* data_tx, size_t n_tx, uint8_t* data_rx, size_
     return RIOTEE_SUCCESS;
   }
   return RIOTEE_ERR_GENERIC;
+}
+
+void riotee_spic_def_cfg(riotee_spic_cfg_t* cfg) {
+  cfg->frequency = RIOTEE_SPIC_FREQUENCY_M8;
+  cfg->mode = RIOTEE_SPIC_MODE0_CPOL0_CPHA0;
+  cfg->order = RIOTEE_SPIC_ORDER_MSBFIRST;
+  cfg->pin_cs = PIN_D7;
+  cfg->pin_sck = PIN_D8;
+  cfg->pin_copi = PIN_D10;
+  cfg->pin_cipo = PIN_D9;
 }
