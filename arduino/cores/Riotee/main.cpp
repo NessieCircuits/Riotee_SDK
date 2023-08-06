@@ -1,10 +1,10 @@
 #include "riotee.h"
 #include "riotee_adc.h"
 
+#include "external/ArduinoCore-API/api/Common.h"
+
 void startup(void);
 void bootstrap(void);
-void setup(void);
-void loop(void);
 
 __attribute__((weak)) void startup(void){};
 __attribute__((weak)) void bootstrap(void){};

@@ -1,80 +1,44 @@
-#include "nrf.h"
-#include "nrf_gpio.h"
+#include "riotee.h"
+#include "riotee_gpio.h"
 
 #include "Arduino.h"
+#include "external/ArduinoCore-API/api/Common.h"
 
-#define PINS_COUNT 64
+void pinMode(pin_size_t pinNumber, PinMode pinMode) {
+  switch (pinMode) {
+    case INPUT:
+      riotee_gpio_cfg_input(pinNumber, RIOTEE_GPIO_IN_NOPULL);
+      break;
 
-void pinMode(uint32_t ulPin, uint32_t ulMode) {
-  if (ulPin >= PINS_COUNT) {
-    return;
-  }
+    case INPUT_PULLUP:
+      riotee_gpio_cfg_input(pinNumber, RIOTEE_GPIO_IN_PULLUP);
 
-  NRF_GPIO_Type *port = nrf_gpio_pin_port_decode(&ulPin);
+      break;
 
-  // Set pin mode according to chapter '22.6.3 I/O Pin Configuration'
-  switch (ulMode) {
-  case INPUT:
-    // Set pin to input mode
-    port->PIN_CNF[ulPin] =
-        ((uint32_t)GPIO_PIN_CNF_DIR_Input << GPIO_PIN_CNF_DIR_Pos) |
-        ((uint32_t)GPIO_PIN_CNF_INPUT_Connect << GPIO_PIN_CNF_INPUT_Pos) |
-        ((uint32_t)GPIO_PIN_CNF_PULL_Disabled << GPIO_PIN_CNF_PULL_Pos) |
-        ((uint32_t)GPIO_PIN_CNF_DRIVE_S0S1 << GPIO_PIN_CNF_DRIVE_Pos) |
-        ((uint32_t)GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos);
-    break;
+    case INPUT_PULLDOWN:
+      riotee_gpio_cfg_input(pinNumber, RIOTEE_GPIO_IN_PULLDOWN);
 
-  case INPUT_PULLUP:
-    // Set pin to input mode with pull-up resistor enabled
-    port->PIN_CNF[ulPin] =
-        ((uint32_t)GPIO_PIN_CNF_DIR_Input << GPIO_PIN_CNF_DIR_Pos) |
-        ((uint32_t)GPIO_PIN_CNF_INPUT_Connect << GPIO_PIN_CNF_INPUT_Pos) |
-        ((uint32_t)GPIO_PIN_CNF_PULL_Pullup << GPIO_PIN_CNF_PULL_Pos) |
-        ((uint32_t)GPIO_PIN_CNF_DRIVE_S0S1 << GPIO_PIN_CNF_DRIVE_Pos) |
-        ((uint32_t)GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos);
-    break;
+      break;
 
-  case INPUT_PULLDOWN:
-    // Set pin to input mode with pull-down resistor enabled
-    port->PIN_CNF[ulPin] =
-        ((uint32_t)GPIO_PIN_CNF_DIR_Input << GPIO_PIN_CNF_DIR_Pos) |
-        ((uint32_t)GPIO_PIN_CNF_INPUT_Connect << GPIO_PIN_CNF_INPUT_Pos) |
-        ((uint32_t)GPIO_PIN_CNF_PULL_Pulldown << GPIO_PIN_CNF_PULL_Pos) |
-        ((uint32_t)GPIO_PIN_CNF_DRIVE_S0S1 << GPIO_PIN_CNF_DRIVE_Pos) |
-        ((uint32_t)GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos);
-    break;
+    case OUTPUT:
+      riotee_gpio_cfg_output(pinNumber);
 
-  case OUTPUT:
-    // Set pin to output mode
-    port->PIN_CNF[ulPin] =
-        ((uint32_t)GPIO_PIN_CNF_DIR_Output << GPIO_PIN_CNF_DIR_Pos) |
-        ((uint32_t)GPIO_PIN_CNF_INPUT_Disconnect << GPIO_PIN_CNF_INPUT_Pos) |
-        ((uint32_t)GPIO_PIN_CNF_PULL_Disabled << GPIO_PIN_CNF_PULL_Pos) |
-        ((uint32_t)GPIO_PIN_CNF_DRIVE_S0S1 << GPIO_PIN_CNF_DRIVE_Pos) |
-        ((uint32_t)GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos);
-    break;
+      break;
 
-  default:
-    // do nothing
-    break;
+    default:
+      break;
   }
 }
 
-void digitalWrite(uint32_t ulPin, uint32_t ulVal) {
-  if (ulPin >= PINS_COUNT) {
-    return;
-  }
+void digitalWrite(pin_size_t pinNumber, PinStatus status) {
+  switch (status) {
+    case LOW:
+      riotee_gpio_clear(pinNumber);
+      break;
 
-  NRF_GPIO_Type *port = nrf_gpio_pin_port_decode(&ulPin);
-
-  switch (ulVal) {
-  case LOW:
-    port->OUTCLR = (1 << ulPin);
-    break;
-
-  default:
-    port->OUTSET = (1 << ulPin);
-    break;
+    default:
+      riotee_gpio_set(pinNumber);
+      break;
   }
 
   return;

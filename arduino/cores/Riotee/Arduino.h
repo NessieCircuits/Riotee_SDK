@@ -3,19 +3,17 @@
 
 #include "riotee.h"
 #include "riotee_timing.h"
+#include "riotee_spic.h"
+#include "riotee_i2c.h"
+#include "riotee_adc.h"
+#include "riotee_uart.h"
 #include "printf.h"
+
+#include "external/ArduinoCore-API/api/Common.h"
 
 #ifdef __cplusplus
 #include "Serial.h"
 #endif
-
-#define LOW (0x0)
-#define HIGH (0x1)
-
-#define INPUT (0x0)
-#define OUTPUT (0x1)
-#define INPUT_PULLUP (0x2)
-#define INPUT_PULLDOWN (0x3)
 
 #define LED_BUILTIN PIN_LED_CTRL
 
@@ -33,21 +31,5 @@
 
 #define A0 PIN_D2
 #define A1 PIN_D3
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-void pinMode(uint32_t pin, uint32_t mode);
-void digitalWrite(uint32_t ulPin, uint32_t ulVal);
-
-#define delay(x) riotee_sleep_ms(x)
-#define delayMicroseconds(x) riotee_delay_us(x)
-
-int analogRead(uint32_t pin);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif  // Arduino_h
