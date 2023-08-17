@@ -19,7 +19,7 @@
 # CAUTION: Arduino cashes the board definitions in ~/.config/arduino-ide (Linux).
 # You must delete this directory in order for changes in boards.txt to be applied.
 
-menu.stacksize=StackSize
+menu.stacksize=Stack Size
 menu.retainedsize=Retained Memory Size
 
 RioteeBoard.name=Riotee Board
