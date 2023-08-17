@@ -1,1 +1,0 @@
-../../../examples/stella/README.md

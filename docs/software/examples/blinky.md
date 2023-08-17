@@ -1,1 +1,0 @@
-../../../examples/blinky/README.md

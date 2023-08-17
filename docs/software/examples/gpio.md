@@ -1,1 +1,0 @@
-../../../examples/gpio/README.md
