@@ -1,3 +1,8 @@
+/**
+ * @defgroup timing Timing functionality
+ * @{
+ */
+
 #ifndef __RIOTEE_TIMING_H_
 #define __RIOTEE_TIMING_H_
 
@@ -64,4 +69,4 @@ void riotee_delay_ms(unsigned int ms);
 }
 #endif
 
-#endif /* __RIOTEE_TIMING_H_ */
+#endif /** @} __RIOTEE_TIMING_H_ */

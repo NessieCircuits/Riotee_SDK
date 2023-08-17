@@ -8,5 +8,6 @@
    adc
    spic
    uart
+   timing
 
 ```
