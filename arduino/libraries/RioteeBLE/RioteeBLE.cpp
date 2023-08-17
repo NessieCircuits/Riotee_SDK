@@ -3,11 +3,11 @@
 
 #include <cstring>
 
-riotee_ble_adv_addr_t adv_address = {.addr_bytes = {0xBE, 0xEF, 0xDE, 0xAD, 0x00, 0x01}};
+const uint8_t adv_address[] = {0x01, 0xEE, 0xC0, 0xFF, 0x03, 0x02};
 
 void RioteeBLE::begin(const char adv_name[], void *data, size_t data_len) {
   riotee_ble_init();
-  riotee_ble_adv_cfg_t cfg = {.addr = &adv_address,
+  riotee_ble_adv_cfg_t cfg = {.addr = adv_address,
                               .name = adv_name,
                               .name_len = strlen(adv_name) - 1,
                               .data = data,
