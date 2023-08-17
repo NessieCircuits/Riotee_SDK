@@ -1,5 +1,5 @@
+(adc_driver)=
 # ADC
-
 
 The Riotee Module has two analog pins that can be sampled with the 12-bit successive approximation ADC on-board the nRF52.
 Additionally, the ADC can be used to sample the supply voltage and the capacitor voltage.

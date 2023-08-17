@@ -1,6 +1,5 @@
 # Quickstart
 
-
 Just got yourself a Riotee board? Welcome to the battery-free Internet of Things!
 
 To follow this guide, you will need;
@@ -14,11 +13,13 @@ To follow this guide, you will need;
 
 If you haven't done it already, solder the pin headers to the Riotee Board and the Solar Shield.
 
-!!! note
-    Pay close attention to the orientation and the mounting angle when soldering the headers. It is difficult to de-solder the headers once they're soldered on to more than one pad.
+:::{caution}
+  Pay close attention to the orientation and the mounting angle when soldering the headers. It is difficult to de-solder the headers once they're soldered on to more than one pad.
+:::
 
 Stack the Solar Shield into the mating headers of the Riotee Board.
 
+(arduino_install)=
 ## Install the Riotee Arduino Core
 
 1. Open the Arduino IDE and navigate to `File->Preferences`.

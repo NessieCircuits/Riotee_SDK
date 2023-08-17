@@ -14,11 +14,11 @@ Riotee products are available for purchase on [CrowdSupply](https://www.crowdsup
  - The [Solar Shield](./hardware/solar_shield.md) plugs into the Riotee Board's headers. It has four small solar cells and a pair of sliding switches that allow you to select one, three, or all four solar cells so you can experiment to see which configuration works best under specific conditions.
  - The [Sensor Shield](./hardware/sensor_shield.md) adds an accelerometer, a temperature-and-humidity sensor, and a microphone. 
  - The [Capacitor Shield](./hardware/capacitor_shield.md) allows you to extend the on-board capacitance of the Riotee device.
-
+ - The [Riotee Probe](./hardware/probe.md) enables programming the microcontrollers on the Riotee Module after it has been soldered to a PCB.
 
 ## Software support
 
- - For a quickstart with Riotee, use the Arduino package.
+ - For a quickstart with Riotee, use the [Arduino package](arduino).
  - For more involved development, use the [SDK](https://github.com/NessieCircuits/Riotee_SDK) and the [template project](https://github.com/NessieCircuits/Riotee_AppTemplate).
 
 

@@ -1,3 +1,4 @@
+(ble_driver)=
 # Bluetooth Low Energy
 
 Riotee has limited support for BLE. You can use the API to send advertisement packets with a custom payload on the three advertising channels.

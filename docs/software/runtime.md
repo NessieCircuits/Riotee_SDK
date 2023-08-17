@@ -22,6 +22,7 @@ When the runtime detects a *low* capacitor voltage level, it suspends user code 
 If the capacitor voltage does not recover above the *low* threshold within a short time, the runtime copies the complete state of the user task (stack, heap and registers) to non-volatile RAM.
 There are two possible scenarios for what happens next: 1. The capacitor discharges further and the device loses power. This could be when, for example, someone covers the solar panel of a solar-harvesting device. Once power is restored, the device resets and the system task reloads the user application from non-volatile memory. The user task continues execution. 2. The capacitor voltage recovers above the *high* threshold. The runtime wakes up the user task and the application continues.
 
+(runtime_callbacks)=
 ## Callbacks
 
 There are a number of callbacks that your application can implement:
@@ -31,6 +32,7 @@ There are a number of callbacks that your application can implement:
  - `reset_callback()`: Called later after every reset. Initialize peripherals here.
  - `turnoff_callback()`: Called right before the application gets suspended. Abort any energy-intensive operation immediately.
 
+(retained_memory)=
 ## Retained memory
 
 The runtime automatically checkpoints application state to non-volatile memory before an imminent power failure.
@@ -60,8 +62,10 @@ You may increase the memory area where retained variables are stored by defining
 The SDK will reserve a memory area of the specified size for your variables and the runtime will automatically checkpoint all variables to non-volatile RAM.
 
 The drawback is that, depending on the specified size, the checkpointing may take significantly longer and consume significantly more energy.
-You must chose the capacitance of your device such that the checkpoint can still safely complete before the power supply gets interrupted.
 
+:::{important}
+   You must chose the capacitance of your device such that the checkpoint can still safely complete before the power supply gets interrupted.
+:::
 The runtime only checkpoints the part of the retained memory area that is actually occupied by the variables and the stack so don't worry about reducing RIOTEE_RAM_RETAINED_SIZE beyond the default value of 8192B.
 However you may find that you can fit more static/global variables into the retained memory when you reduce the (generous) default `RIOTEE_STACK_SIZE` in your application's Makefile.
 For an example, take a look at the [dsp example's Makefile](https://github.com/NessieCircuits/Riotee_SDK/blob/main/examples/dsp/Makefile).

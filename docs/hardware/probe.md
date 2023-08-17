@@ -22,6 +22,7 @@ The [Riotee Probe software](https://github.com/NessieCircuits/Riotee_ProbeSoftwa
 The *firmware* is running on the RP2040 on-board the Riotee Probe and exposes a USB interface for interfacing with the Riotee Module via UART, ARM SWD and TI SBW.
 The *Python package* runs on a computer and offers a CLI and API that talks to the Riotee Probe over USB.
 
+For installation and usage instructions, refer to the [repository's readme](https://github.com/NessieCircuits/Riotee_ProbeSoftware).
 
 ## Pinout
 
