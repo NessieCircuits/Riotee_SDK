@@ -6,6 +6,7 @@
 
    runtime
    drivers/index
-   examples/index
+   examples
    return_codes
+   arduino
 ```
