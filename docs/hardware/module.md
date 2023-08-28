@@ -31,17 +31,17 @@ The module has two microcontrollers: The Nordic Semiconductor nRF52833 has a 64-
 
 | Pad        | Description                                                                         |
 |------------|-------------------------------------------------------------------------------------|
-| D0         | Digital Input/Ouptut.                                                               |
-| D1         | Digital Input/Ouptut.                                                               |
-| D2/A0      | Digital Input/Ouptut or analog input.                                               |
-| D3/A1      | Digital Input/Ouptut or analog input.                                               |
-| D4         | Digital Input/Ouptut.                                                               |
-| D5         | Digital Input/Ouptut.                                                               |
-| D6         | Digital Input/Ouptut.                                                               |
-| D7         | Digital Input/Ouptut                                                                |
-| D8         | Digital Input/Ouptut.                                                               |
-| D9         | Digital Input/Ouptut.                                                               |
-| D10        | Digital Input/Ouptut.                                                               |
+| D0         | Digital input/output.                                                               |
+| D1         | Digital input/output.                                                               |
+| D2/A0      | Digital input/output or analog input.                                               |
+| D3/A1      | Digital input/output or analog input.                                               |
+| D4         | Digital input/output.                                                               |
+| D5         | Digital input/output.                                                               |
+| D6         | Digital input/output.                                                               |
+| D7         | Digital input/output                                                                |
+| D8         | Digital input/output.                                                               |
+| D9         | Digital input/output.                                                               |
+| D10        | Digital input/output.                                                               |
 | SCL        | I2C Clock. Connected to AM1805 RTC and MAX20361 boost. Connect I2C devices here.    |
 | SDA        | I2C Data. Connected to AM1805 RTC and MAX20361 boost. Connect I2C devices here.     |
 | VcapMon    | Buffered capacitor voltage. Use this to measure capacitor voltage with peripherals. |
@@ -58,6 +58,44 @@ The module has two microcontrollers: The Nordic Semiconductor nRF52833 has a 64-
 | SbwIO      | TI Spy-bi-wire (SBW) I/O for programming MSP430FR.                                  |
 
 The nRF52 allows flexbily mapping most of the peripherals to any of the pins.
+
+## Internal Pin Map
+
+Most signals on the Riotee Module are shared between the MSP430 and the nRF52 so either of the two controllers can access the peripherals like RTC, boost converter and threshold network.
+Additionally, the two controllers are connected with five signals, supporting 4-wire SPI plus an additional handshake line.
+The table below shows the complete signal mapping on the Riotee Module.
+
+
+| Signal     | Pin MSP430 | Pin nRF52 | Description                                            |
+|------------|------------|-----------|--------------------------------------------------------|
+| D0         | P2.6       | P0.21     | Digital input/output.                                  |
+| D1         | P2.5       | P0.08     | Digital input/output.                                  |
+| D2/A0      | P2.3       | P0.04     | Digital input/output or analog input.                  |
+| D3/A1      | P2.4       | P0.05     | Digital input/output or analog input.                  |
+| D4         | P4.6       | P1.09     | Digital input/output.                                  |
+| D5         | P3.6       | P0.26     | Digital input/output.                                  |
+| D6         | PJ.6       | P1.03     | Digital input/output.                                  |
+| D7         | P5.3       | P0.11     | Digital input/output.                                  |
+| D8         | P5.2       | P0.13     | Digital input/output.                                  |
+| D9         | P5.1       | P0.16     | Digital input/output.                                  |
+| D10        | P5.0       | P0.12     | Digital input/output.                                  |
+| C2C.GPIO   | PJ.2       | P0.15     | GPIO signal between MSP430 and nRF52.                  |
+| C2C.COPI   | P2.0       | P0.17     | SPI COPI between MSP430 and nRF52.                     |
+| C2C.CIPO   | P2.1       | P0.14     | SPI CIPO between MSP430 and nRF52.                     |
+| C2C.CLK    | P1.5       | P0.18     | SPI SCK between MSP430 and nRF52.                      |
+| C2C.CS     | P1.4       | P0.22     | SPI CS between MSP430 and nRF52.                       |
+| SYS.SDA    | P6.4       | P0.06     | I2C Clock. Connected to AM1805 RTC and MAX20361 boost. |
+| SYS.SCL    | P6.5       | P1.08     | I2C Data. Connected to AM1805 RTC and MAX20361 boost.  |
+| MAX_INT    | PJ.1       | P0.25     | MAX20361 boost converter interrupt signal.             |
+| LED_CTRL   | PJ.0       | P0.03     | Controls LED. Active high.                             |
+| VCAP_SENSE | P7.5       | P0.29     | Buffered capacitor voltage.                            |
+| RTC_INT    | P7.3       | P0.30     | AM1805 RTC interrupt signal.                           |
+| PWRGD_L    | P5.4       | P0.23     | Low threshold indicator.                               |
+| PWRGD_H    | P5.5       | P0.07     | High threshold indicator.                              |
+| THRCTRL.L0 | P6.2       | P1.07     | Controls low threshold resistor network.               |
+| THRCTRL.L1 | P7.0       | P1.04     | Controls low threshold resistor network.               |
+| THRCTRL.H0 | P1.3       | P0.09     | Controls high threshold resistor network.              |
+| THRCTRL.H1 | P3.3       | P1.02     | Controls high threshold resistor network.              |
 
 ## Soldering
 

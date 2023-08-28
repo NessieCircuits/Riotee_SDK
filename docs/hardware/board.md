@@ -21,17 +21,17 @@ Our Riotee Board combines a Riotee Module with a USB Type-C connector and circui
 
 | Pad        | Description                                                                         |
 |------------|-------------------------------------------------------------------------------------|
-| D0/RX      | Digital Input/Ouptut. Connected to USB-UART on the Board.                           |
-| D1/TX      | Digital Input/Ouptut. Connected to USB-UART on the Board.                           |
-| D2/A0      | Digital Input/Ouptut or analog input.                                               |
-| D3/A1      | Digital Input/Ouptut or analog input.                                               |
-| D4         | Digital Input/Ouptut.                                                               |
-| D5         | Digital Input/Ouptut. Connected to board LED. 1M pulldown.                          |
-| D6         | Digital Input/Ouptut. Connected to push button. 1M pullup.                          |
-| D7         | Digital Input/Ouptut                                                                |
-| D8         | Digital Input/Ouptut.                                                               |
-| D9         | Digital Input/Ouptut.                                                               |
-| D10        | Digital Input/Ouptut.                                                               |
+| D0/RX      | Digital input/output. Connected to USB-UART on the Board.                           |
+| D1/TX      | Digital input/output. Connected to USB-UART on the Board.                           |
+| D2/A0      | Digital input/output or analog input.                                               |
+| D3/A1      | Digital input/output or analog input.                                               |
+| D4         | Digital input/output.                                                               |
+| D5         | Digital input/output. Connected to board LED. 1M pulldown.                          |
+| D6         | Digital input/output. Connected to push button. 1M pullup.                          |
+| D7         | Digital input/output                                                                |
+| D8         | Digital input/output.                                                               |
+| D9         | Digital input/output.                                                               |
+| D10        | Digital input/output.                                                               |
 | SCL        | I2C Clock. Connected to AM1805 RTC and MAX20361 boost. Connect I2C devices here.    |
 | SDA        | I2C Data. Connected to AM1805 RTC and MAX20361 boost. Connect I2C devices here.     |
 | VcapMon    | Buffered capacitor voltage. Use this to measure capacitor voltage with peripherals. |
