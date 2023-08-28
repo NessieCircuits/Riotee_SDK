@@ -27,7 +27,7 @@ The module has two microcontrollers: The Nordic Semiconductor nRF52833 has a 64-
 
 ![Pinout](./img/riotee-module-pinout_comb.svg)
 
-## Pin description
+## Pin Description
 
 | Pad        | Description                                                                         |
 |------------|-------------------------------------------------------------------------------------|

@@ -16,7 +16,7 @@ Our Riotee Board combines a Riotee Module with a USB Type-C connector and circui
 
 ![Board Pinout](./img/riotee-board-pinout.svg)
 
-## Pin description
+## Pin Description
 
 
 | Pad        | Description                                                                         |
@@ -85,7 +85,7 @@ and
 riotee-probe program -d msp430 -f firmware_msp430.hex
 ```
 
-## Constant power supply
+## Constant Power Supply
 
 The Riotee Board automatically switches on a constant 2V power supply when programming/debugging one of the microcontrollers on the Riotee Module.
 You can also permanently enable this constant power supply with
