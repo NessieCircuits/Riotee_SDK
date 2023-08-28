@@ -45,6 +45,22 @@ For installation and usage instructions, refer to the [repository's readme](http
 | +3V3      | Auxiliary +3.3V power supply.                                                   |
 | VccTarget | Target power supply. Enabled during programming. Can be controlled via CLI/API. |
 
+
+## Constant power supply
+
+The Riotee Probe automatically switches on a constant 2V power supply on the *VccTarget* pin when programming/debugging one of the microcontrollers on the Riotee Module.
+You can also permanently enable this constant power supply with
+
+```bash
+riotee-probe target-power --on
+```
+
+The constant power supply remains enabled while the probe is powered or until it is disabled with
+
+```bash
+riotee-probe target-power --off
+```
+
 ## Resources
  - [Schematics](https://www.riotee.nessie-circuits.de/artifacts/probe_hardware/latest/schematics.pdf)
  - [Layout](https://www.riotee.nessie-circuits.de/artifacts/probe_hardware/latest/pcb.pdf)

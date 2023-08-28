@@ -71,6 +71,8 @@ Install the `riotee-probe` Python package with
 pipx install riotee-probe
 ```
 
+On Linux, install the provided [udev rules](https://github.com/NessieCircuits/Riotee_ProbeSoftware#udev-rules-(linux)) to access the Riotee Board without root privileges.
+
 Flash new firmware with
 
 ```bash
@@ -81,6 +83,21 @@ and
 
 ```bash
 riotee-probe program -d msp430 -f firmware_msp430.hex
+```
+
+## Constant power supply
+
+The Riotee Board automatically switches on a constant 2V power supply when programming/debugging one of the microcontrollers on the Riotee Module.
+You can also permanently enable this constant power supply with
+
+```bash
+riotee-probe target-power --on
+```
+
+The constant power supply remains enabled while the board is powered from USB or until it is disabled with
+
+```bash
+riotee-probe target-power --off
 ```
 
 ## Updating Firmware
