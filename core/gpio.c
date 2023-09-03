@@ -74,7 +74,7 @@ void riotee_gpio_init(void) {
 
 static void wait_callback(unsigned int pin_no) {
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-  xTaskNotifyIndexedFromISR(usr_task_handle, 1, EVT_GPIO, eSetValueWithOverwrite, &xHigherPriorityTaskWoken);
+  xTaskNotifyIndexedFromISR(usr_task_handle, 1, EVT_GPIO_BASE, eSetBits, &xHigherPriorityTaskWoken);
   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
@@ -82,15 +82,14 @@ riotee_rc_t riotee_gpio_wait_level(unsigned int pin, riotee_gpio_level_t level, 
   unsigned long notification_value;
   taskENTER_CRITICAL();
   xTaskNotifyStateClearIndexed(usr_task_handle, 1);
+  ulTaskNotifyValueClearIndexed(usr_task_handle, 1, 0xFFFFFFFF);
+
   gpint_register(pin, level, pull, wait_callback);
   taskEXIT_CRITICAL();
-  xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
-  switch (notification_value) {
-    case EVT_GPIO:
-      return RIOTEE_SUCCESS;
-    case EVT_RESET:
-      return RIOTEE_ERR_RESET;
-    default:
-      return RIOTEE_ERR_GENERIC;
-  }
+  xTaskNotifyWaitIndexed(1, 0x0, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
+  if (notification_value & EVT_RESET)
+    return RIOTEE_ERR_RESET;
+  if (notification_value == EVT_GPIO_BASE)
+    return RIOTEE_SUCCESS;
+  return RIOTEE_ERR_GENERIC;
 }

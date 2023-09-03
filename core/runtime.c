@@ -21,6 +21,13 @@
 
 #define UNUSED(X) ((void)(X))
 
+enum {
+  /* Capacitor voltage high threshold. */
+  EVT_RUNTIME_PWRGD_L = EVT_RUNTIME_BASE + 0,
+  /* Capacitor voltage low threshold. */
+  EVT_RUNTIME_PWRGD_H = EVT_RUNTIME_BASE + 1,
+};
+
 extern unsigned long __etext;
 extern unsigned long __bss_retained_start__;
 extern unsigned long __bss_retained_end__;
@@ -207,9 +214,11 @@ static void threshold_callback(unsigned int pin_no) {
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
   if (pin_no == PIN_PWRGD_L) {
-    xTaskNotifyIndexedFromISR(sys_task_handle, 1, EVT_PWRGD_L, eSetValueWithOverwrite, &xHigherPriorityTaskWoken);
+    xTaskNotifyIndexedFromISR(sys_task_handle, 1, EVT_RUNTIME_PWRGD_L, eSetValueWithOverwrite,
+                              &xHigherPriorityTaskWoken);
   } else if (pin_no == PIN_PWRGD_H) {
-    xTaskNotifyIndexedFromISR(sys_task_handle, 1, EVT_PWRGD_H, eSetValueWithOverwrite, &xHigherPriorityTaskWoken);
+    xTaskNotifyIndexedFromISR(sys_task_handle, 1, EVT_RUNTIME_PWRGD_H, eSetValueWithOverwrite,
+                              &xHigherPriorityTaskWoken);
   }
   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
   return;
@@ -270,7 +279,7 @@ static void sys_task(void *pvParameter) {
   } else {
     if (checkpoint_load() == 0) {
       /* Unblock the user task */
-      xTaskNotifyIndexed(usr_task_handle, 1, EVT_RESET, eSetValueWithOverwrite);
+      xTaskNotifyIndexed(usr_task_handle, 1, EVT_RESET, eSetBits);
       runtime_stats.n_reset++;
     } else {
       initialize_retained();
@@ -295,7 +304,7 @@ static void sys_task(void *pvParameter) {
     /* Set a high threshold - upon reaching this threshold, execution continues */
     /* If the user task was already waiting on high threshold, we have to notify it here */
     if (gpint_unregister(PIN_PWRGD_H) == RIOTEE_GPIO_ERR_OK)
-      xTaskNotifyIndexed(usr_task_handle, 1, EVT_GPIO, eSetValueWithOverwrite);
+      xTaskNotifyIndexed(usr_task_handle, 1, EVT_GPIO_BASE, eSetBits);
     gpint_register(PIN_PWRGD_H, RIOTEE_GPIO_LEVEL_HIGH, RIOTEE_GPIO_IN_NOPULL, threshold_callback);
 
     /* Set a 10ms timer*/
@@ -303,7 +312,7 @@ static void sys_task(void *pvParameter) {
     /* Wait until capacitor is recharged or timer expires */
     xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
     /* Recharged? */
-    if (notification_value == EVT_PWRGD_H) {
+    if (notification_value == EVT_RUNTIME_PWRGD_H) {
       sys_cancel_timer();
       xTaskNotifyStateClearIndexed(xTaskGetCurrentTaskHandle(), 1);
       continue;
@@ -323,7 +332,7 @@ static void sys_task(void *pvParameter) {
     /* Wait until capacitor is recharged or discharged below the critical threshold again */
     xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
     /* Recharged? */
-    if (notification_value == EVT_PWRGD_H) {
+    if (notification_value == EVT_RUNTIME_PWRGD_H) {
       gpint_unregister(PIN_PWRGD_L);
       continue;
     }

@@ -45,7 +45,7 @@ void SAADC_IRQHandler(void) {
 
   if (--samples_remaining == 0) {
     stop_sampling();
-    xTaskNotifyIndexedFromISR(usr_task_handle, 1, EVT_ADC, eSetBits, &xHigherPriorityTaskWoken);
+    xTaskNotifyIndexedFromISR(usr_task_handle, 1, EVT_ADC_BASE, eSetBits, &xHigherPriorityTaskWoken);
     portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
   } else {
     NRF_SAADC->RESULT.PTR += 2;
@@ -55,7 +55,7 @@ void SAADC_IRQHandler(void) {
 
 static void teardown(void) {
   stop_sampling();
-  xTaskNotifyIndexed(usr_task_handle, 1, EVT_TEARDOWN, eSetValueWithOverwrite);
+  xTaskNotifyIndexed(usr_task_handle, 1, EVT_TEARDOWN, eSetBits);
 }
 
 void riotee_adc_init(void) {
@@ -132,6 +132,7 @@ riotee_rc_t riotee_adc_sample(int16_t *dst, riotee_adc_cfg_t *cfg) {
   samples_remaining = cfg->n_samples;
 
   xTaskNotifyStateClearIndexed(usr_task_handle, 1);
+  ulTaskNotifyValueClearIndexed(usr_task_handle, 1, 0xFFFFFFFF);
 
   NRF_SAADC->INTENSET = SAADC_INTENSET_END_Msk;
 
@@ -147,14 +148,14 @@ riotee_rc_t riotee_adc_sample(int16_t *dst, riotee_adc_cfg_t *cfg) {
 
   taskEXIT_CRITICAL();
 
-  xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
+  xTaskNotifyWaitIndexed(1, 0x0, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
 
-  if (notification_value == EVT_ADC)
-    return RIOTEE_SUCCESS;
-  if (notification_value == EVT_TEARDOWN)
-    return RIOTEE_ERR_TEARDOWN;
-  if (notification_value == EVT_RESET)
+  if (notification_value & EVT_RESET)
     return RIOTEE_ERR_RESET;
+  if (notification_value & EVT_TEARDOWN)
+    return RIOTEE_ERR_TEARDOWN;
+  if (notification_value == EVT_ADC_BASE)
+    return RIOTEE_SUCCESS;
 
   return RIOTEE_ERR_GENERIC;
 }
