@@ -16,6 +16,12 @@ static riotee_stella_pkt_t *rx_buf_ptr;
 static uint16_t pkt_counter __attribute__((section(".retained_bss")));
 
 enum {
+  EVT_STELLA_TIMEOUT = EVT_STELLA_BASE + 0,
+  EVT_STELLA_RCVD = EVT_STELLA_BASE + 1,
+  EVT_STELLA_CRCERR = EVT_STELLA_BASE + 2,
+};
+
+enum {
   /* Uplink logical address index */
   LA_UPLINK_IDX = 1,
   /* Downlink logical address index */
@@ -39,7 +45,7 @@ static void radio_crc_ok(void) {
 
   radio_stop();
   stella_teardown_ptr = NULL;
-  xTaskNotifyIndexedFromISR(usr_task_handle, 1, EVT_STELLA_RCVD, eSetValueWithOverwrite, &xHigherPriorityTaskWoken);
+  xTaskNotifyIndexedFromISR(usr_task_handle, 1, EVT_STELLA_RCVD, eSetBits, &xHigherPriorityTaskWoken);
 
   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
@@ -49,7 +55,7 @@ static void radio_crc_err(void) {
 
   radio_stop();
   stella_teardown_ptr = NULL;
-  xTaskNotifyIndexedFromISR(usr_task_handle, 1, EVT_STELLA_CRCERR, eSetValueWithOverwrite, &xHigherPriorityTaskWoken);
+  xTaskNotifyIndexedFromISR(usr_task_handle, 1, EVT_STELLA_CRCERR, eSetBits, &xHigherPriorityTaskWoken);
 
   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
@@ -158,7 +164,7 @@ static void teardown(void) {
   radio_stop();
   radio_cb_unregister(RADIO_EVT_ADDRESS);
   NRF_TIMER2->TASKS_STOP = 1;
-  xTaskNotifyIndexed(usr_task_handle, 1, EVT_TEARDOWN, eSetValueWithOverwrite);
+  xTaskNotifyIndexed(usr_task_handle, 1, EVT_TEARDOWN, eSetBits);
   stella_teardown_ptr = NULL;
 }
 
@@ -166,16 +172,16 @@ static inline int wait_for_completion(riotee_stella_pkt_t *rx_pkt, riotee_stella
   unsigned long notification_value;
 
   /* Wait until acknowledgment is received/expired */
-  xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
+  xTaskNotifyWaitIndexed(1, 0x0, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
 
   /* Make sure HFXO has stopped so the next packet can be sent right after returning. */
   while ((NRF_CLOCK->HFCLKSTAT & CLOCK_HFCLKSTAT_SRC_Msk) == CLOCK_HFCLKSTAT_SRC_Xtal) {
   }
 
-  if (notification_value == EVT_RESET)
+  if (notification_value & EVT_RESET)
     return RIOTEE_ERR_RESET;
 
-  if (notification_value == EVT_TEARDOWN)
+  if (notification_value & EVT_TEARDOWN)
     return RIOTEE_ERR_TEARDOWN;
 
   if (notification_value == EVT_STELLA_CRCERR)
@@ -183,6 +189,9 @@ static inline int wait_for_completion(riotee_stella_pkt_t *rx_pkt, riotee_stella
 
   if (notification_value == EVT_STELLA_TIMEOUT)
     return RIOTEE_ERR_STELLA_NOACK;
+
+  if (notification_value != EVT_STELLA_RCVD)
+    return RIOTEE_ERR_GENERIC;
 
   /* acknowledgment ID must match packet ID */
   if (rx_pkt->hdr.ack_id != tx_pkt->hdr.pkt_id)
@@ -205,6 +214,8 @@ riotee_rc_t riotee_stella_transceive(riotee_stella_pkt_t *rx_pkt, riotee_stella_
   NRF_RADIO->PACKETPTR = (uint32_t)tx_pkt;
 
   xTaskNotifyStateClearIndexed(usr_task_handle, 1);
+  ulTaskNotifyValueClearIndexed(usr_task_handle, 1, 0xFFFFFFFF);
+
   stella_teardown_ptr = teardown;
   taskEXIT_CRITICAL();
 

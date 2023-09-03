@@ -120,18 +120,19 @@ riotee_rc_t riotee_ble_advertise(riotee_adv_ch_t ch) {
 
   radio_start();
   xTaskNotifyStateClearIndexed(usr_task_handle, 1);
+  ulTaskNotifyValueClearIndexed(usr_task_handle, 1, 0xFFFFFFFF);
 
   /* Register the teardown function */
   ble_teardown_ptr = teardown;
   taskEXIT_CRITICAL();
-  xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
+  xTaskNotifyWaitIndexed(1, 0x0, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
 
-  if (notification_value == EVT_BLE)
-    return RIOTEE_SUCCESS;
-  if (notification_value == EVT_TEARDOWN)
-    return RIOTEE_ERR_TEARDOWN;
-  if (notification_value == EVT_RESET)
+  if (notification_value & EVT_RESET)
     return RIOTEE_ERR_RESET;
+  if (notification_value & EVT_TEARDOWN)
+    return RIOTEE_ERR_TEARDOWN;
+  if (notification_value == EVT_BLE_BASE)
+    return RIOTEE_SUCCESS;
 
   return RIOTEE_ERR_GENERIC;
 }
@@ -148,7 +149,7 @@ void radio_disabled_callback() {
     NRF_CLOCK->TASKS_HFCLKSTOP = 1;
     /* Unregister teardown function */
     ble_teardown_ptr = NULL;
-    xTaskNotifyIndexedFromISR(usr_task_handle, 1, EVT_BLE, eSetBits, &xHigherPriorityTaskWoken);
+    xTaskNotifyIndexedFromISR(usr_task_handle, 1, EVT_BLE_BASE, eSetBits, &xHigherPriorityTaskWoken);
   }
   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
