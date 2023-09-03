@@ -236,7 +236,9 @@ void c_startup(void) {
   riotee_max20361_init();
   startup_callback();
 
+#ifndef DISABLE_CAP_MONITOR
   wait_for_high();
+#endif
 
   /* Copy static/global system variables from flash to RAM */
   src = &__etext;
@@ -256,8 +258,7 @@ void c_startup(void) {
   __ISB();
 #endif
 
-  /* First call to static constructors via newlibc. There will be a second when nonretained memory gets set up.
-   */
+  /* First call to static constructors via newlibc. There is a second when nonretained memory gets set up. */
   __libc_init_array();
   runtime_start();
 }
