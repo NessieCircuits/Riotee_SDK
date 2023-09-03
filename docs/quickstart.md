@@ -22,10 +22,20 @@ Stack the Solar Shield into the mating headers of the Riotee Board.
 (arduino_install)=
 ## Install the Riotee Arduino Core
 
-1. Open the Arduino IDE and navigate to `File->Preferences`.
-2. Open the list of board managers by clicking on the icon next to the input field for *Additional boards manager URLs*.
-3. Add `https://riotee.nessie-circuits.de/arduino/package_index.json` as one new row to the list of board manager URLs.
-4. Confirm the changes by clicking OK.
+ - Open the Arduino IDE and navigate to `File->Preferences`.
+ - Open the list of board managers by clicking on the icon next to the input field for *Additional boards manager URLs*.
+ - Add `https://riotee.nessie-circuits.de/arduino/package_index.json` as one new row to the list of board manager URLs.
+ - Confirm the changes by clicking OK.
+
+## Linux only: Install the udev rules
+
+ - Download the [Riotee udev rules](https://github.com/NessieCircuits/Riotee_ProbeSoftware/blob/main/52-riotee.rules) and copy them to the `/etc/udev/rules.d/` directory on your machine.
+ - Make sure your user belongs to the *plugdev* group and reload the udev rules with:
+
+```bash
+sudo udevadm control --reload-rules
+sudo udevadm trigger
+```
 
 ## Write your Arduino sketch
 

@@ -20,11 +20,19 @@ git clone --recursive git@github.com:NessieCircuits/Riotee_SDK.git
 ### Linux
 
  - Install `make` from your distribution's repository (`apt install build-essential` on Ubuntu).
- - Install the `GNU Arm Embedded Toolchain` from your distribution's repository (`apt install gcc-arm-none-eabi` on Ubuntu) or from [the official website](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads).
+ - Install the *GNU Arm Embedded Toolchain* from your distribution's repository (`apt install gcc-arm-none-eabi` on Ubuntu) or from [the official website](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads).
  - For uploading firmware to your Riotee device install the [riotee-probe](https://github.com/NessieCircuits/Riotee_ProbeSoftware) Python package with
 
 ```bash
 pipx install riotee-probe
+```
+
+ - Download the [Riotee udev rules](https://github.com/NessieCircuits/Riotee_ProbeSoftware/blob/main/52-riotee.rules) and copy them to the `/etc/udev/rules.d/` directory on your machine.
+ - Make sure your user belongs to the *plugdev* group and reload the udev rules with:
+
+```bash
+sudo udevadm control --reload-rules
+sudo udevadm trigger
 ```
 
 ### Windows
