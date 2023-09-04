@@ -24,7 +24,7 @@ Stack the Solar Shield into the mating headers of the Riotee Board.
 
  - Open the Arduino IDE and navigate to `File->Preferences`.
  - Open the list of board managers by clicking on the icon next to the input field for *Additional boards manager URLs*.
- - Add `https://riotee.nessie-circuits.de/arduino/package_index.json` as one new row to the list of board manager URLs.
+ - Add `https://riotee.nessie-circuits.de/arduino/package_riotee_index.json` as one new row to the list of board manager URLs.
  - Confirm the changes by clicking OK.
 
 ## Linux only: Install the udev rules

@@ -36,17 +36,17 @@ jobs:
         
       - run: mkdir output
       
-      - name: Download current package_index.json
-        run: wget -P output https://riotee.nessie-circuits.de/arduino/package_index.json
+      - name: Download current package_riotee_index.json
+        run: wget -P output https://riotee.nessie-circuits.de/arduino/package_riotee_index.json
 
-      - name: Insert snippet into package_index.json
-        run: sed -i '/"platforms":/r package_index_snippet.json' output/package_index.json
+      - name: Insert snippet into package_riotee_index.json
+        run: sed -i '/"platforms":/r package_index_snippet.json' output/package_riotee_index.json
     
       - name: Upload package index snippet as artifact
         uses: actions/upload-artifact@v3
         with:
           name: package_index
-          path: output/package_index.json
+          path: output/package_riotee_index.json
 
       - name: Upload package index to FTP server
         uses: SamKirkland/FTP-Deploy-Action@4.3.3
