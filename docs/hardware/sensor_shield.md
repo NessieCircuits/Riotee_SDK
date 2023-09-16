@@ -11,7 +11,7 @@ Sensors:
 
 To minimize the power consumption of the shield, disable the microphone by setting high pin D5 and put the SHTC3 into sleep mode with `shtc3_init()` in the `startup_callback()` and whenever not needed.
 
-For an example, take a look at the [VM1010 example](https://github.com/NessieCircuits/Riotee_SDK/examples/vm1010).
+For an example, take a look at the [VM1010 example](https://github.com/NessieCircuits/Riotee_SDK/tree/main/examples/vm1010).
 
 ## Microphone bias voltage
 
