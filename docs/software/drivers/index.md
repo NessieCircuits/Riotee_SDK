@@ -7,6 +7,7 @@
    gpio
    adc
    spic
+   i2c
    uart
    timing
 

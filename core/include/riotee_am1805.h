@@ -200,6 +200,7 @@ typedef struct {
 
 /* Establishes connection to device. Can block for multiple seconds! */
 int am1805_init(void);
+
 int am1805_get_hundredths(unsigned int* hundredths);
 int am1805_set_datetime(struct tm* t);
 int am1805_get_datetime(struct tm* t);
