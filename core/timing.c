@@ -5,6 +5,9 @@
 #include "riotee_timing.h"
 #include <soc/nrfx_coredep.h>
 
+uint32_t overflow_counter __NONRETAINED_ZEROED__;
+unsigned int n_reset __NONRETAINED_ZEROED__;
+
 void riotee_delay_us(unsigned int us) {
   nrfx_coredep_delay_us(us);
 }
@@ -35,6 +38,10 @@ void RTC0_IRQHandler(void) {
     NRF_RTC0->INTENCLR = RTC_INTENCLR_COMPARE1_Msk;
 
     xTaskNotifyIndexedFromISR(sys_task_handle, 1, EVT_RTC_BASE, eSetBits, &xHigherPriorityTaskWoken);
+  }
+  if ((NRF_RTC0->EVENTS_OVRFLW == 1)) {
+    NRF_RTC0->EVENTS_OVRFLW = 0;
+    overflow_counter++;
   }
 
   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
@@ -85,9 +92,27 @@ void riotee_timing_init(void) {
 
   NRF_CLOCK->TASKS_LFCLKSTART = 1;
 
+  NRF_RTC0->EVTENSET = RTC_EVTENSET_OVRFLW_Msk;
+  NRF_RTC0->INTENSET = RTC_INTENSET_OVRFLW_Msk;
+
   NVIC_EnableIRQ(RTC0_IRQn);
 
   NRF_RTC0->PRESCALER = 0;
   NRF_RTC0->TASKS_CLEAR = 1;
   NRF_RTC0->TASKS_START = 1;
+
+  n_reset = runtime_stats.n_reset;
+}
+
+riotee_rc_t riotee_timing_now(uint64_t *dst) {
+  riotee_rc_t rc;
+
+  *dst = (((uint64_t)overflow_counter) << 24) + NRF_RTC0->COUNTER;
+  if (runtime_stats.n_reset == n_reset)
+    rc = RIOTEE_SUCCESS;
+  else
+    rc = RIOTEE_ERR_RESET;
+
+  n_reset = runtime_stats.n_reset;
+  return rc;
 }

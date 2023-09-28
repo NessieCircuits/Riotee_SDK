@@ -65,6 +65,20 @@ void riotee_delay_us(unsigned int us);
  */
 void riotee_delay_ms(unsigned int ms);
 
+/**
+ * @brief Reads the current value of the internal RTC-driven timer.
+ *
+ * Reads a 56-bit wide counter driven by a 32kHz clock. Return code indicates whether a reset has occured since the last
+ * call to the function.
+ *
+ * @param dst Pointer to destination buffer.
+ *
+ * @retval RIOTEE_SUCCESS   No reset since the last call to the function.
+ * @retval RIOTEE_ERR_RESET Reset since the last call to the function.
+ *
+ */
+riotee_rc_t riotee_timing_now(uint64_t *dst);
+
 #ifdef __cplusplus
 }
 #endif
