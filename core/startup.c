@@ -232,7 +232,7 @@ void c_startup(void) {
   *(volatile uint32_t *)0x4007AC84ul = 0x00000002ul;
 
   /* This must happen soon to avoid max20361 cutting power */
-  riotee_i2c_init(PIN_SYS_SDA, PIN_SYS_SCL);
+  riotee_i2c_init();
   riotee_max20361_init();
   startup_callback();
 
