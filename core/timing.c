@@ -107,6 +107,7 @@ void riotee_timing_init(void) {
 riotee_rc_t riotee_timing_now(uint64_t *dst) {
   riotee_rc_t rc;
 
+  taskENTER_CRITICAL();
   *dst = (((uint64_t)overflow_counter) << 24) + NRF_RTC0->COUNTER;
   if (runtime_stats.n_reset == n_reset)
     rc = RIOTEE_SUCCESS;
@@ -114,5 +115,7 @@ riotee_rc_t riotee_timing_now(uint64_t *dst) {
     rc = RIOTEE_ERR_RESET;
 
   n_reset = runtime_stats.n_reset;
+  taskEXIT_CRITICAL();
+
   return rc;
 }
