@@ -69,7 +69,7 @@ SECTIONS {
                 /* Exclude all system variables from retained data */
                 . = ALIGN(4);
                 __data_start__ = .;
-                *(.volatile.data)
+                *(.volatile_data)
                 *runtime.c.o(.data .data.*)
                 *tasks.c.o(.data .data.*)
                 *port.c.o(.data .data.*)

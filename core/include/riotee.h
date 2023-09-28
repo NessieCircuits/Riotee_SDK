@@ -135,9 +135,9 @@ void turnoff_callback(void);
 riotee_rc_t riotee_wait_cap_charged(void);
 
 /** Data is set to initial value after every reset. */
-#define __NONRETAINED_INITIALIZED__ __attribute__((section(".volatile.data")))
+#define __NONRETAINED_INITIALIZED__ __attribute__((section(".volatile_data")))
 /** Data is set to zero after every reset. */
-#define __NONRETAINED_ZEROED__ __attribute__((section(".volatile.bss")))
+#define __NONRETAINED_ZEROED__ __attribute__((section(".volatile_bss")))
 
 #if defined __cplusplus
 }
