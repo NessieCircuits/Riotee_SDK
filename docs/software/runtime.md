@@ -30,7 +30,8 @@ There are a number of callbacks that your application can implement:
  - `bootstrap_callback()`: Called once after programming the device.
  - `startup_callback()`: Called right after every reset. Perform early stage initizialization required for low-power operation here.
  - `reset_callback()`: Called later after every reset. Initialize peripherals here.
- - `turnoff_callback()`: Called right before the application gets suspended. Abort any energy-intensive operation immediately.
+ - `suspend_callback()`: Called right before the application gets suspended. Abort any energy-intensive operation immediately.
+ - `resume_callback()`: Called right after the application gets resumed.
 
 (retained_memory)=
 ## Retained memory

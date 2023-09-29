@@ -34,7 +34,7 @@ enum {
 
 typedef struct {
   unsigned int n_reset;
-  unsigned int n_turnoff;
+  unsigned int n_suspend;
 } runtime_stats_t;
 
 extern TaskHandle_t usr_task_handle;

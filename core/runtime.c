@@ -64,7 +64,9 @@ void sys_setup_timer(unsigned int ticks);
 void sys_cancel_timer(void);
 
 /* Dummy callback to be called when low capacitor voltage is detected. Can be overwritten by the user. */
-__attribute__((weak)) void turnoff_callback(void){};
+__attribute__((weak)) void suspend_callback(void){};
+/* Dummy callback to be called when capacitor voltage has recovered. Can be overwritten by the user. */
+__attribute__((weak)) void resume_callback(void){};
 /* Dummy callback during first boot-up of the device */
 __attribute__((weak)) void bootstrap_callback(void){};
 /* Dummy callback after every reset */
@@ -255,9 +257,6 @@ static void teardown(void) {
     if (fn_teardown != NULL)
       fn_teardown();
   }
-
-  /* Give the application an opportunity to switch off power-hungry devices */
-  turnoff_callback();
 }
 
 /* High priority system task initializes runtime, and handles intermittent execution and checkpointing. */
@@ -291,6 +290,7 @@ static void sys_task(void *pvParameter) {
   reset_callback();
 
   for (;;) {
+    resume_callback();
     vTaskResume(usr_task_handle);
 
     /* Wait until capacitor voltage falls below the 'low' threshold */
@@ -299,7 +299,10 @@ static void sys_task(void *pvParameter) {
 
     vTaskSuspend(usr_task_handle);
     teardown();
-    runtime_stats.n_turnoff++;
+    /* Give the application an opportunity to switch off power-hungry devices */
+    suspend_callback();
+
+    runtime_stats.n_suspend++;
 
     /* Set a high threshold - upon reaching this threshold, execution continues */
     /* If the user task was already waiting on high threshold, we have to notify it here */

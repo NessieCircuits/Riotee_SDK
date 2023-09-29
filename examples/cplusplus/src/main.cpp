@@ -7,7 +7,7 @@
 static LED led = LED(PIN_LED_CTRL);
 
 /* This gets called when capacitor voltage gets low */
-void turnoff_callback(void) {
+void suspend_callback(void) {
   led.off();
 }
 

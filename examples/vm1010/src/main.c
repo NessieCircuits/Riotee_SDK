@@ -28,7 +28,7 @@ void reset_callback(void) {
   vm1010_init(&cfg);
 }
 
-void turnoff_callback(void) {
+void suspend_callback(void) {
   /* Disable the microphone */
   riotee_gpio_set(PIN_MICROPHONE_DISABLE);
   vm1010_exit();

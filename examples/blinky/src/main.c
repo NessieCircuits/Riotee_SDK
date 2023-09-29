@@ -9,7 +9,7 @@ void reset_callback(void) {
 }
 
 /* This gets called when capacitor voltage gets low */
-void turnoff_callback(void) {
+void suspend_callback(void) {
   riotee_gpio_clear(PIN_LED_CTRL);
 }
 

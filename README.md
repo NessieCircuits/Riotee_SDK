@@ -64,7 +64,8 @@ In a nutshell: Your application must provide a Makefile that includes the [SDK's
 There are a number of callbacks that your application can implement:
  - `startup_callback()`: Called right after every reset. Perform early stage initizialization required for low-power operation here
  - `reset_callback()`: Called later after every reset. Initialize peripherals here.
- - `turnoff_callback()`: Called right before the application gets suspended. Abort any energy-intensive operation immediately.
+ - `suspend_callback()`: Called right before the application gets suspended. Abort any energy-intensive operation immediately.
+ - `resume_callback()`: Called right after the application gets resumed.
 
 
 Your application may change the default size of the memory that is retained across power failures as well as the stack size by defining `RIOTEE_RAM_RETAINED_SIZE` and `RIOTEE_STACK_SIZE` in the Makefile.

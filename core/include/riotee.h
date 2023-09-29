@@ -112,14 +112,23 @@ void bootstrap_callback(void);
 void reset_callback(void);
 
 /**
- * @brief User-provided turnoff callback.
+ * @brief User-provided suspend callback.
  *
  * \ingroup riotee
  *
  * This callback is called when the capacitor voltage drops below a threshold. If your application uses power-hungry
  * peripherals, power them off immediately in this callback. Keep the callback as short as possible.
  */
-void turnoff_callback(void);
+void suspend_callback(void);
+
+/**
+ * @brief User-provided resume callback.
+ *
+ * \ingroup riotee
+ *
+ * This callback is called when the capacitor voltage has recovered and the application resumes.
+ */
+void resume_callback(void);
 
 /**
  * @brief Waits until the capacitor is charged.
