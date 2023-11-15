@@ -9,7 +9,8 @@
 
 void riotee_uart_init(uint32_t pseltxd, riotee_uart_baudrate_t baudrate) {
   NRF_UART0->PSEL.TXD = pseltxd;
-  riotee_gpio_cfg_input(pseltxd, RIOTEE_GPIO_IN_PULLUP);
+  riotee_gpio_cfg_output(pseltxd);
+  riotee_gpio_set(pseltxd);
   NRF_UART0->BAUDRATE = baudrate;
 }
 
