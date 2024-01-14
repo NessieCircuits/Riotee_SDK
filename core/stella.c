@@ -251,3 +251,7 @@ riotee_rc_t riotee_stella_send(void *data, size_t n) {
 void riotee_stella_set_id(uint32_t dev_id) {
   _dev_id = dev_id;
 }
+
+uint32_t riotee_stella_get_id(void) {
+  return _dev_id;
+}

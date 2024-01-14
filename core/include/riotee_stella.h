@@ -75,6 +75,14 @@ riotee_rc_t riotee_stella_send(void *data, size_t n);
  */
 void riotee_stella_set_id(uint32_t dev_id);
 
+/**
+ * @brief Reads the ID that is used when sending packets with riotee_stella_send()
+ *
+ * @return uint32_t Device ID
+ *
+ */
+uint32_t riotee_stella_get_id(void);
+
 /** Stella-specific return codes. */
 enum {
   /** No acknowledgement received. */
