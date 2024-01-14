@@ -83,6 +83,14 @@ void riotee_stella_set_id(uint32_t dev_id);
  */
 uint32_t riotee_stella_get_id(void);
 
+/**
+ * @brief Reads internal counter counting number of sent packets.
+ *
+ * @return unsigned int Number of sent packets.
+ *
+ */
+unsigned int riotee_stella_get_packet_counter(void);
+
 /** Stella-specific return codes. */
 enum {
   /** No acknowledgement received. */

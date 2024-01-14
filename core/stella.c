@@ -13,7 +13,7 @@ static riotee_stella_pkt_t tx_buf;
 static riotee_stella_pkt_t *rx_buf_ptr;
 
 /* Counts number of transmitted packets */
-static uint16_t pkt_counter __attribute__((section(".retained_bss")));
+static unsigned int pkt_counter __attribute__((section(".retained_bss")));
 
 enum {
   EVT_STELLA_TIMEOUT = EVT_STELLA_BASE + 0,
@@ -174,6 +174,9 @@ static inline int wait_for_completion(riotee_stella_pkt_t *rx_pkt, riotee_stella
   /* Wait until acknowledgment is received/expired */
   xTaskNotifyWaitIndexed(1, 0x0, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
 
+  /* Count the packet whether successful or not. */
+  pkt_counter++;
+
   /* Make sure HFXO has stopped so the next packet can be sent right after returning. */
   while ((NRF_CLOCK->HFCLKSTAT & CLOCK_HFCLKSTAT_SRC_Msk) == CLOCK_HFCLKSTAT_SRC_Xtal) {
   }
@@ -233,7 +236,8 @@ riotee_rc_t riotee_stella_send(void *data, size_t n) {
   memcpy(tx_buf.data, data, n);
 
   tx_buf.len = sizeof(riotee_stella_pkt_header_t) + n;
-  tx_buf.hdr.pkt_id = pkt_counter++;
+  /* Packet ID is truncated packet counter. */
+  tx_buf.hdr.pkt_id = (uint16_t)pkt_counter;
 
   /* Set correct device ID */
   tx_buf.hdr.dev_id = _dev_id;
@@ -254,4 +258,8 @@ void riotee_stella_set_id(uint32_t dev_id) {
 
 uint32_t riotee_stella_get_id(void) {
   return _dev_id;
+}
+
+unsigned int riotee_stella_get_packet_counter(void) {
+  return pkt_counter;
 }
