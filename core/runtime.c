@@ -310,8 +310,8 @@ static void sys_task(void *pvParameter) {
       xTaskNotifyIndexed(usr_task_handle, 1, EVT_GPIO_BASE, eSetBits);
     gpint_register(PIN_PWRGD_H, RIOTEE_GPIO_LEVEL_HIGH, RIOTEE_GPIO_IN_NOPULL, threshold_callback);
 
-    /* Set a 10ms timer*/
-    sys_setup_timer(8333);
+    /* Set a 100ms timer*/
+    sys_setup_timer(3277);
     /* Wait until capacitor is recharged or timer expires */
     xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
     /* Recharged? */
