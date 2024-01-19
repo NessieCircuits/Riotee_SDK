@@ -41,32 +41,62 @@ typedef struct __attribute__((packed)) {
 void riotee_stella_init(void);
 
 /**
- * @brief Transmits uplink tx_pkt and receives downlink packet into rx_pkt.
+ * @brief Sends data to the basestation in a Stella packet.
  *
- * @param rx_pkt Pointer to buffer where received packet is stored.
- * @param tx_pkt Pointer to packet that is sent.
+ * Sends a packet with the specified data as payload to the basestation. IMPORTANT: If the basestation sends data in the
+ * acknowledgement packet, this data is discarded and the function returns RIOTEE_ERR_OVERFLOW.
  *
- * @retval RIOTEE_SUCCESS                 Packet successfully sent and acknowledged.
+ * @param tx_data Pointer to data.
+ * @param tx_size Size of data.
+ *
+ * @retval RIOTEE_SUCCESS                Packet successfully sent and acknowledged.
+ * @retval RIOTEE_ERR_OVERFLOW           tx_size exceeds maximum packet size or basestation sent a payload.
  * @retval RIOTEE_ERR_RESET              Reset occured while sending/receiving acknowledgement.
  * @retval RIOTEE_ERR_TEARDOWN           Teardown occured while sending/receiving acknowledgement.
  * @retval RIOTEE_ERR_STELLA_NOACK       Packet sent, but no acknowledgement received.
  * @retval RIOTEE_ERR_STELLA_INVALIDACK  Invalid acknowledgement received.
  */
-riotee_rc_t riotee_stella_transceive(riotee_stella_pkt_t *rx_pkt, riotee_stella_pkt_t *tx_pkt);
+riotee_rc_t riotee_stella_send(void *tx_data, size_t tx_size);
 
 /**
- * @brief Sends data in a Stella packet.
+ * @brief Receives a packet from the basestation.
  *
- * @param data Pointer to data.
- * @param n Size of data.
+ * Sends an empty packet to the basestation and receives the response packet in the provided destination buffer. The
+ * destination buffer should have the size of the payload if known or RIOTEE_STELLA_MAX_DATA otherwise. Returns the
+ * number of bytes copied into the destination buffer or an error code.
+ *
+ * @param rx_buf Pointer to destination buffer.
+ * @param rx_size Size of destination buffer.
+ *
+ * @returns Size of received payload in bytes or error code.
  *
  * @retval RIOTEE_SUCCESS                 Packet successfully sent and acknowledged.
+ * @retval RIOTEE_ERR_OVERFLOW            Received payload is bigger than rx_size.
+ * @retval RIOTEE_ERR_RESET               Reset occured while sending/receiving response.
+ * @retval RIOTEE_ERR_TEARDOWN            Teardown occured while sending/receiving response.
+ * @retval RIOTEE_ERR_STELLA_NOACK        Packet sent, but no response received.
+ * @retval RIOTEE_ERR_STELLA_INVALIDACK   Invalid response received.
+ */
+riotee_rc_t riotee_stella_receive(uint8_t *rx_buf, size_t rx_size);
+
+/**
+ * @brief Sends data in a Stella packet and receives response from basestation.
+ *
+ * @param rx_buf  Pointer to destination buffer.
+ * @param rx_size Size of destination buffer.
+ * @param tx_data Pointer to TX data.
+ * @param tx_size Size of TX data.
+ *
+ * @returns Size of received payload in bytes or error code.
+ *
+ * @retval RIOTEE_SUCCESS                Packet successfully sent and acknowledged.
+ * @retval RIOTEE_ERR_OVERFLOW           tx_size exceeds maximum payload or received payload is bigger than rx_size
  * @retval RIOTEE_ERR_RESET              Reset occured while sending/receiving acknowledgement.
  * @retval RIOTEE_ERR_TEARDOWN           Teardown occured while sending/receiving acknowledgement.
  * @retval RIOTEE_ERR_STELLA_NOACK       Packet sent, but no acknowledgement received.
  * @retval RIOTEE_ERR_STELLA_INVALIDACK  Invalid acknowledgement received.
  */
-riotee_rc_t riotee_stella_send(void *data, size_t n);
+riotee_rc_t riotee_stella_transceive(uint8_t *rx_buf, size_t rx_size, void *tx_data, size_t tx_size);
 
 /**
  * @brief Sets the ID that is used when sending packets with riotee_stella_send()

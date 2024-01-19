@@ -10,9 +10,10 @@ The basestation continuously listens for incoming packets.
 Upon reception of a packet from a device, the basestation responds with an acknowledgment packet containing the device's ID, the packet ID of the received packet that is being acknowledged, the packet ID of the current packet and a payload with a maximum size of 247 Byte.
 
 :::{important}
-   Always check the return code of `riotee_stella_send(...)` and `riotee_stella_transceive(...)` to distinguish between a power failure (RIOTEE_ERR_RESET)and  successful communication (RIOTEE_SUCCESS).
+   Always check the return code of `riotee_stella_send(...)`, `riotee_stella_receive(...)` and `riotee_stella_transceive(...)` to distinguish between a power failure (RIOTEE_ERR_RESET) and successful communication (RIOTEE_SUCCESS or number of bytes received).
 :::
 
+Each device is identified by a device ID that is sent as part of the packet. By default, this device ID corresponds to the lower 32 bits of the unique device identifier stored in the FICR->DEVICEID[0] of the nRF52833. The device ID can be set to a custom value by the user with `riotee_stella_set_id(...)`.
 
 ## Riotee Gateway
 
