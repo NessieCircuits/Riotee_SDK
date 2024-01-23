@@ -62,6 +62,19 @@ int printf_(const char* format, ...);
 
 
 /**
+ * Tiny vprintf implementation
+ * You have to implement _putchar if you use vprintf()
+ * To avoid conflicts with the regular vprintf() API it is overridden by macro defines
+ * and internal underscore-appended functions like vprintf_() are used
+ * \param format A string that specifies the format of the output
+ * \param va A value identifying a variable arguments list initialized with va_start
+ * \return The number of characters that are written into the array, not counting the terminating null character
+ */
+#define vprintf vprintf_
+int vprintf_(const char* format, va_list va);
+
+
+/**
  * Tiny sprintf implementation
  * Due to security reasons (buffer overflow) YOU SHOULD CONSIDER USING (V)SNPRINTF INSTEAD!
  * \param buffer A pointer to the buffer where to store the formatted string. MUST be big enough to store the output!
