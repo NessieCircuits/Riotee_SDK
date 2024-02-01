@@ -61,6 +61,8 @@ OPT = -O3 -g3
 
 CFLAGS = ${INCLUDES}
 CFLAGS += $(OPT)
+# used to pass in defines from command line
+CFLAGS += $(USER_DEFINES)
 CFLAGS += -DNRF${NRF_DEV_NUM}_XXAA
 CFLAGS += -DRIOTEE_STACK_SIZE=${RIOTEE_STACK_SIZE}
 CFLAGS += -DARM_MATH_CM4
