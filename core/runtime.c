@@ -245,7 +245,11 @@ static void initialize_retained(void) {
 
 /* Waits until capacitor is fully charged as indicated by PWRGD_H pin */
 riotee_rc_t riotee_wait_cap_charged(void) {
+#ifdef DISABLE_CAP_MON
+  return RIOTEE_SUCCESS;
+#else
   return riotee_gpio_wait_level(PIN_PWRGD_H, RIOTEE_GPIO_LEVEL_HIGH, RIOTEE_GPIO_IN_NOPULL);
+#endif
 }
 
 static void teardown(void) {
@@ -268,8 +272,10 @@ static void sys_task(void *pvParameter) {
   /* Make sure that the user task does not yet start */
   vTaskSuspend(usr_task_handle);
 
+#ifndef DISABLE_CAP_MONITOR
   gpint_register(PIN_PWRGD_H, RIOTEE_GPIO_LEVEL_HIGH, RIOTEE_GPIO_IN_NOPULL, threshold_callback);
   xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
+#endif
 
   if (check_fresh_start()) {
     initialize_retained();
@@ -292,6 +298,10 @@ static void sys_task(void *pvParameter) {
   for (;;) {
     resume_callback();
     vTaskResume(usr_task_handle);
+
+#ifdef DISABLE_CAP_MONITOR
+    vTaskSuspend(sys_task_handle);
+#endif
 
     /* Wait until capacitor voltage falls below the 'low' threshold */
     gpint_register(PIN_PWRGD_L, RIOTEE_GPIO_LEVEL_LOW, RIOTEE_GPIO_IN_NOPULL, threshold_callback);
