@@ -727,6 +727,10 @@ int printf_(const char* format, ...)
   return ret;
 }
 
+int vprintf_(const char* format, va_list va) {
+  char buffer[1];
+  return _vsnprintf(_out_char, buffer, (size_t)-1, format, va);
+}
 
 int sprintf_(char* buffer, const char* format, ...)
 {
