@@ -36,9 +36,9 @@ sudo udevadm trigger
 ```
 
 ### Windows
- - Install `make` via Cygwin or Chocolatey following the instructions [here](https://earthly.dev/blog/makefiles-on-windows/).
- - Add the path to `make`  (e.g. `C:/cygwin64/bin` for Cygwin) to your `Path` variable ([Instructions](https://www.architectryan.com/2018/03/17/add-to-the-path-on-windows-10/)).
- - Install the `GNU Arm Embedded Toolchain` from the [official website](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads).
+ - Install `make` via Cygwin following the instructions [here](https://earthly.dev/blog/makefiles-on-windows/).
+ - Add the path to `make`  (e.g. `C:\cygwin64\bin` for Cygwin) to your `Path` variable ([Instructions](https://www.architectryan.com/2018/03/17/add-to-the-path-on-windows-10/)).
+ - Install the `GNU Arm Embedded Toolchain` from the [official website](https://developer.arm.com/-/media/Files/downloads/gnu/13.2.rel1/binrel/arm-gnu-toolchain-13.2.rel1-mingw-w64-i686-arm-none-eabi.exe?rev=07af46c1f7574a77969b0f764a1255f0&hash=E5598DC9AB1C892D26C25B6158FFA65C).
  - For uploading firmware to your Riotee device install the [riotee-probe](https://github.com/NessieCircuits/Riotee_ProbeSoftware) Python package globally with
 
 ```bash
