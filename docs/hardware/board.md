@@ -68,6 +68,8 @@ The default baudrate of the UART driver is 1000000bps, but this can be changed v
 
 ## Programming
 
+The Riotee Board embeds a {doc}`/hardware/probe` that allows programming and debugging software running on the Riotee Module.
+
 Install the `riotee-probe` Python package with
 
 ```bash
@@ -108,6 +110,10 @@ riotee-probe target-power --off
 Connect a jumper wire from one of the ground pins to the pad labelled 'USB_BOOT' on the bottom of the board, while plugging in the USB cable.
 A removable storage drive should appear on your PC.
 Download the latest firmware (*probe_riotee_board_[version].uf2*) from the [release page](https://github.com/NessieCircuits/Riotee_ProbeSoftware/releases/latest) and drop it into the drive.
+
+## Debugging
+
+Refer to the Refer to the {doc}`/debugging` section.
 
 ## Resources
  - [Schematics](https://www.riotee.nessie-circuits.de/artifacts/board/latest/schematics.pdf)

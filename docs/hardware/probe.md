@@ -45,7 +45,7 @@ For installation and usage instructions, refer to the [repository's readme](http
 | +3V3      | Auxiliary +3.3V power supply.                                                   |
 | VccTarget | Target power supply. Enabled during programming. Can be controlled via CLI/API. |
 
-
+(constant_power_supply)=
 ## Constant Power Supply
 
 The Riotee Probe automatically switches on a constant 2V power supply on the *VccTarget* pin when programming/debugging one of the microcontrollers on the Riotee Module.

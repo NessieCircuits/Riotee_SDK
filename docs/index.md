@@ -32,7 +32,7 @@ Riotee products are available for purchase on [CrowdSupply](https://www.crowdsup
    hardware/index
    software/index
    networking/index
-   development_setup
+   debugging
    current_consumption
    support
    legal_notice

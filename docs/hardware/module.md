@@ -149,6 +149,10 @@ and
 riotee-probe program -d msp430 -f firmware_msp430.hex
 ```
 
+## Debugging
+
+Refer to the {doc}`/debugging` section.
+
 ## LED
 
 The Riotee Module has a red LED connected to *P0.03* of the nRF52 and *PJ.0* of the MSP430FR.
