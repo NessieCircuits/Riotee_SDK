@@ -45,6 +45,9 @@ Our Riotee Board combines a Riotee Module with a USB Type-C connector and circui
 | SbwClk     | TI Spy-bi-wire (SBW) Clock for programming MSP430FR.                                |
 | SbwIO      | TI Spy-bi-wire (SBW) I/O for programming MSP430FR.                                  |
 
+## Voltage and current ratings
+
+For voltage and current ratings of individual pins please refer to [the module documentation](module_pad_ratings).
 ## Button
 
 The Board has a push button connected to pin D6 that is pulled high with a 1M resistor.

@@ -59,6 +59,25 @@ The module has two microcontrollers: The Nordic Semiconductor nRF52833 has a 64-
 
 The nRF52 allows flexbily mapping most of the peripherals to any of the pins.
 
+(module_pad_ratings)=
+## Voltage and current ratings
+
+| Pad        | Rating                                                 |
+|------------|--------------------------------------------------------| 
+| D0-D10     | Max voltage 2.0V, Max output current 4mA.*             |
+| A0-A1      | Max voltage 2.0V, Max output current 4mA.*             |
+| +2V        | Max output current 500mA.                              |
+| +2V (Aon)  | Max output current 500mA.                              |
+| Vin        | Max voltage 3.5V, Harvesting voltage range 225mV-2.5V. |
+| EnableBuck | Connect to ground or leave floating.                   |
+| Bypass     | Max voltage 5.0V.                                      |
+| VcapMon    | Max output current 10mA.                               |
+| Vcap       | Max voltage 4.7V.                                      |
+
+*The GPIO pins of the nRF52 are specified to drop by less than 0.4V below the supply voltage at a maximum current output of 4mA. Configuring the GPIOs for *high drive* mode increases the current rating to 14mA at a 0.4V voltage drop. Refer to the product specificiation for more details.
+
+The total current out of or into all GPIO pins at any time should not exceed 15mA.
+
 ## Internal Pin Map
 
 Most signals on the Riotee Module are shared between the MSP430 and the nRF52 so either of the two controllers can access the peripherals like RTC, boost converter and threshold network.
