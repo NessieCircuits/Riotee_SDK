@@ -28,7 +28,7 @@ For this purpose, the Riotee Probe, which is also present on the Riotee Board, a
 
 At multiple instances, the Riotee runtime waits for the capacitor voltage to reach a threshold before continuing execution. Similarly, many applications use the `riotee_wait_cap_charged()` call to wait for this threshold. As a result, even when you have the constant power supply enabled, your application will not run when you don't have a harvester attached. To allow your application to execute regardless, you can compile it with the flag `DISABLE_CAP_MONITOR` defined. This flag disables all waiting for the capacitor voltage threshold and allows code to execute while the constant power supply is enabled and no harvester is attached.
 
-To compile your application with the `DISABLE_CAP_MONITOR` flag, call `make USER_DEFINES=-DDISABLE_CAP_MONITOR`.
+To compile your application with the `DISABLE_CAP_MONITOR` flag, call `make USER_DEFINES=-DDISABLE_CAP_MONITOR` or add `USER_DEFINES=-DDISABLE_CAP_MONITOR` to the application's Makefile.
 :::
 
 
@@ -38,6 +38,10 @@ The RP2040 microcontroller on the Riotee Board and Riotee Probe exposes a CMSIS-
 
 :::{important}
 When entering a debugging session, the Riotee Probe automatically enables the [constant power supply](constant_power_supply). However, as long as you don't have a harvester attached, you still need to compile your application with the `DISABLE_CAP_MONITOR` flag defined. See [the hint above](#disable_cap_monitor).
+:::
+
+:::{tip}
+Stepping through highly optimized code can be cumbersome. To change the default optimization level you can add, for example, `OPT = -O0 -g3` to the application's Makefile.
 :::
 
 ### Command-line
@@ -59,7 +63,13 @@ For Visual Studio Code, install the *Cortex-Debug* extension from the marketplac
             "type": "cortex-debug",
             "runToEntryPoint": "main",
             "showDevDebugOutput": "none",
-            "servertype": "pyocd"
+            "servertype": "pyocd",
+            "serverArgs": [
+                "--target",
+                "nrf52833",
+                "--elf",
+                "${workspaceRoot}/_build/build.elf",
+            ]
         },
     ]
 }
