@@ -4,6 +4,7 @@ DRIVER_DIR := $(RIOTEE_SDK_ROOT)/drivers
 RTOS_DIR := $(RIOTEE_SDK_ROOT)/external/freertos
 NRFX_DIR := $(RIOTEE_SDK_ROOT)/external/nrfx
 CMSIS_DIR := $(RIOTEE_SDK_ROOT)/external/CMSIS_5
+TFLIGHT_DIR := $(RIOTEE_SDK_ROOT)/external/tflm-cmsis
 LINKER_SCRIPT:= $(RIOTEE_SDK_ROOT)/linker.ld
 NRF_DEV_NUM := 52833
 
@@ -12,6 +13,7 @@ RIOTEE_RAM_RETAINED_SIZE ?= 8192
 
 SDK_SRC_FILES += \
   $(CORE_DIR)/startup.c \
+  $(CORE_DIR)/syscalls.c \
   $(CORE_DIR)/thresholds.c \
   $(CORE_DIR)/printf.c \
   $(CORE_DIR)/radio.c \
@@ -73,6 +75,7 @@ CFLAGS += -DNRF${NRF_DEV_NUM}_XXAA
 CFLAGS += -DRIOTEE_STACK_SIZE=${RIOTEE_STACK_SIZE}
 CFLAGS += -DARM_MATH_CM4
 CFLAGS += -DFLOAT_ABI_HARD
+CFLAGS += -DTF_LITE_STATIC_MEMORY
 CFLAGS += -Wall
 CFLAGS += -fno-builtin
 CFLAGS += -mthumb
