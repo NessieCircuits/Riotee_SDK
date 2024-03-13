@@ -46,7 +46,7 @@ Stepping through highly optimized code can be cumbersome. To change the default 
 
 ### Command-line
 
-After installing *pyOCD* with `pip install pyocd`, you can start a gdb server with `pyocd gdbserver --elf _build/build.elf --target nrf52832` and connect to the session with your favorite debugging tool.
+After installing *pyOCD* with `pip install pyocd`, you can start a gdb server with `pyocd gdbserver --elf _build/build.elf --target nrf52833` and connect to the session with your favorite debugging tool.
 
 
 ### Visual Studio Code
