@@ -51,15 +51,21 @@ INC_DIRS += \
   $(NRFX_DIR)/hal \
   $(NRFX_DIR)/mdk \
   $(NRFX_DIR)/templates \
-  $(CMSIS_DIR)/CMSIS/Core/Include
+  $(CMSIS_DIR)/CMSIS/Core/Include \
+  $(TFLIGHT_DIR) \
+  $(TFLIGHT_DIR)/third_party/flatbuffers/include \
+  $(TFLIGHT_DIR)/third_party/gemmlowp \
+  $(TFLIGHT_DIR)/third_party/kissfft \
+  $(TFLIGHT_DIR)/third_party/ruy \
+
 
 INCLUDES = $(INC_DIRS:%=-I%)
 
 LIBS = $(LIB_DIRS:%=-L%)
 
-OPT = -O3 -g3
+OPT ?= -O3 -g3
 
-CFLAGS = ${INCLUDES}
+CFLAGS += ${INCLUDES}
 CFLAGS += $(OPT)
 # used to pass in defines from command line
 CFLAGS += $(USER_DEFINES)
