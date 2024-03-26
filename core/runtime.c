@@ -15,11 +15,14 @@
 #include "runtime.h"
 #include "riotee_thresholds.h"
 
+#define UNUSED(X) ((void)(X))
+
 /* RIOTEE_STACK_SIZE is defined and passed in via the Makefile */
 #define USR_STACK_SIZE_WORDS (RIOTEE_STACK_SIZE / sizeof(uint32_t))
 #define SYS_STACK_SIZE (configMINIMAL_STACK_SIZE + 128)
 
-#define UNUSED(X) ((void)(X))
+/* Start address of the high section of the MSP430 FRAM */
+#define FRAM_HIGH_START 0xA000
 
 enum {
   /* Capacitor voltage high threshold. */
@@ -127,7 +130,7 @@ static int checkpoint_store() {
    * loaded. */
   hdr.signature = NVM_SIG_INVALID;
 
-  if ((rc = nvm_begin_write(0x0)) != 0)
+  if ((rc = nvm_begin_write(FRAM_HIGH_START)) != 0)
     return rc;
   if ((rc = nvm_write((uint8_t *)&hdr, sizeof(checkpoint_header))) != 0)
     return rc;
@@ -141,7 +144,7 @@ static int checkpoint_store() {
   nvm_end();
 
   /* Now that the snapshot was written successfully, we can update the signature */
-  if ((rc = nvm_begin_write(0x0)) != 0)
+  if ((rc = nvm_begin_write(FRAM_HIGH_START)) != 0)
     return rc;
   uint32_t signature = NVM_SIG_VALID;
   if ((rc = nvm_write((uint8_t *)&signature, sizeof(signature))) != 0)
@@ -161,7 +164,7 @@ static int checkpoint_load() {
   int rc;
   checkpoint_header hdr;
 
-  if ((rc = nvm_begin_read(0x0)) != 0)
+  if ((rc = nvm_begin_read(FRAM_HIGH_START)) != 0)
     return rc;
   if ((rc = nvm_read((uint8_t *)&hdr, sizeof(checkpoint_header))) != 0)
     return rc;
