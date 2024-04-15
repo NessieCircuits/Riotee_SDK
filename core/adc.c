@@ -49,7 +49,7 @@ void SAADC_IRQHandler(void) {
     portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
   } else {
     NRF_SAADC->RESULT.PTR += 2;
-    NRF_RTC0->CC[2] = (NRF_RTC0->COUNTER + sample_interval_ticks32) % (1 << 24);
+    NRF_RTC0->CC[2] = (NRF_RTC0->CC[2] + sample_interval_ticks32) % (1 << 24);
   }
 }
 
