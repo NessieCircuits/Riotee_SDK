@@ -15,8 +15,8 @@
 static unsigned int pin_mode;
 static unsigned int pin_dout;
 
-riotee_adc_cfg_t adc_cfg = {.acq_time = RIOTEE_ADC_ACQTIME_5US,
-                            .gain = RIOTEE_ADC_GAIN4,
+riotee_adc_cfg_t adc_cfg = {.acq_time = RIOTEE_ADC_ACQTIME_3US,
+                            .gain = RIOTEE_ADC_GAIN2,
                             .oversampling = RIOTEE_ADC_OVERSAMPLE_4X,
                             .reference = RIOTEE_ADC_REFERENCE_INTERNAL};
 
