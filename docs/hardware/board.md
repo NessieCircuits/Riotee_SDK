@@ -113,7 +113,7 @@ Download the latest firmware (*probe_riotee_board_[version].uf2*) from the [rele
 
 ## Debugging
 
-Refer to the Refer to the {doc}`/debugging` section.
+Refer to the {doc}`/debugging` section.
 
 ## Resources
  - [Schematics](https://www.riotee.nessie-circuits.de/artifacts/board/latest/schematics.pdf)

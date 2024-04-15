@@ -168,6 +168,7 @@ VcapMon=\frac{5.62}{15.62}Vcap
 
 *VcapMon* is connected to ADC channel AIN5 on the nRF52 and ADC channel A17 on the MSP430.
 
+(power_switches)=
 ## Power Switches
 
 ```{image} img/power_switches.svg
