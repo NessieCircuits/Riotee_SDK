@@ -144,7 +144,6 @@ riotee_rc_t riotee_adc_sample(int16_t *dst, riotee_adc_cfg_t *cfg) {
     NRF_RTC0->CC[2] = (NRF_RTC0->COUNTER + cfg->sample_interval_ticks32) % (1 << 24);
     NRF_RTC0->EVTENSET = RTC_EVTEN_COMPARE2_Msk;
   }
-  NRF_SAADC->TASKS_START = 1;
 
   taskEXIT_CRITICAL();
 
