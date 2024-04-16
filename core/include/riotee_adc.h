@@ -97,6 +97,17 @@ typedef enum {
   RIOTEE_ADC_ACQTIME_40US = 5UL
 } riotee_adc_acqtime_t;
 
+typedef enum {
+  /** No pullup on ADC input. */
+  RIOTEE_ADC_RES_NOPULL = 0UL,
+  /** Pulldown on ADC input. */
+  RIOTEE_ADC_RES_PULLDOWN = 1UL,
+  /** Pullup on ADC input. */
+  RIOTEE_ADC_RES_PULLUP = 2UL,
+  /** Pullup and pulldown (VDD/2) on ADC input. */
+  RIOTEE_ADC_RES_VDD1_2 = 3UL,
+} riotee_adc_res_t;
+
 typedef struct {
   /** Gain of ADC pre-amplifier. */
   riotee_adc_gain_t gain;
@@ -108,6 +119,10 @@ typedef struct {
   riotee_adc_input_t input_pos;
   /** ADC negative input. */
   riotee_adc_input_t input_neg;
+  /** Positive input resistor config. */
+  riotee_adc_res_t res_pos;
+  /** Negative input resistor config. */
+  riotee_adc_res_t res_neg;
   /** Oversampling factor. */
   riotee_adc_oversample_t oversampling;
   /** Number of samples to be taken. */
