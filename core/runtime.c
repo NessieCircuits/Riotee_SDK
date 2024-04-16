@@ -200,10 +200,10 @@ void vApplicationIdleHook(void) {
 
 /* Assigns statically allocated memory for FreeRTOS idle task */
 void vApplicationGetIdleTaskMemory(StaticTask_t **ppxIdleTaskTCBBuffer, StackType_t **ppxIdleTaskStackBuffer,
-                                   uint32_t *pulIdleTaskStackSize) {
+                                   configSTACK_DEPTH_TYPE *puxIdleTaskStackSize) {
   *ppxIdleTaskTCBBuffer = &xIdleTaskTCB;
   *ppxIdleTaskStackBuffer = uxIdleTaskStack;
-  *pulIdleTaskStackSize = configMINIMAL_STACK_SIZE;
+  *puxIdleTaskStackSize = configMINIMAL_STACK_SIZE;
 }
 
 void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName) {
