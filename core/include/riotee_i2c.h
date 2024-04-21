@@ -79,7 +79,7 @@ riotee_rc_t riotee_i2c_write_atomic(uint8_t dev_addr, uint8_t* data, size_t n_da
  * @brief Reads the specified number of bytes from an I2C peripheral.
  *
  * Reads the specified number of bytes from an I2C peripheral within a critical section. Should only be used for short
- * transfers as it will drain the capacitor and sink the system without checkpointing if ernergy becomes low.
+ * transfers as it will drain the capacitor and sink the system without checkpointing if energy becomes low.
  *
  * @param buffer Pointer to a destination buffer where data gets stored.
  * @param n_data Number of bytes to read.
