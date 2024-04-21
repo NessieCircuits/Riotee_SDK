@@ -48,7 +48,7 @@ static int set_configuration_key(uint8_t key) {
   return write_register(AM1805_CONFIG_KEY_REG, key);
 }
 
-static int get_id(uint16_t* id) {
+int am1805_get_id(uint16_t* id) {
   int rc;
   if ((rc = read_registers((uint8_t*)id, 2, AM1805_ID0_REG)) != 0)
     return rc;
@@ -75,7 +75,7 @@ int am1805_init(void) {
   int retries = N_RETRIES;
   do {
     retries--;
-    if (get_id(&id) == 0)
+    if (am1805_get_id(&id) == 0)
       if (id == 0x0518) {
         return 0;
       }
@@ -85,16 +85,18 @@ int am1805_init(void) {
 }
 
 int am1805_enable_trickle(void) {
+  int rc;
   /* Sets lowest thresholds for VBAT */
-  set_configuration_key(AM1805_CONFIG_KEY_OTHERS);
-  write_register(AM1805_BREF_CONTROL_REG, 0xF0);
+  if ((rc = set_configuration_key(AM1805_CONFIG_KEY_OTHERS)) != 0)
+    return rc;
+  if ((rc = write_register(AM1805_BREF_CONTROL_REG, 0xF0)) != 0)
+    return rc;
 
   /* Enable trickle charging of capacitors on VBAT */
-  set_configuration_key(AM1805_CONFIG_KEY_OTHERS);
-  write_register(AM1805_TRICKLE_REG,
-                 AM1805_TRICKLE_REG_TCS_MSK | AM1805_TRICKLE_REG_DIODE_SCHOTTKY_MSK | AM1805_TRICKLE_REG_ROUT_6K_MSK);
-
-  return 0;
+  if ((rc = set_configuration_key(AM1805_CONFIG_KEY_OTHERS)) != 0)
+    return rc;
+  return write_register(AM1805_TRICKLE_REG, AM1805_TRICKLE_REG_TCS_MSK | AM1805_TRICKLE_REG_DIODE_SCHOTTKY_MSK |
+                                                AM1805_TRICKLE_REG_ROUT_6K_MSK);
 }
 
 int am1805_get_datetime(struct tm* t) {

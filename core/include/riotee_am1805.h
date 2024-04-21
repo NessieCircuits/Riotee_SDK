@@ -216,4 +216,7 @@ int am1805_disable_power(void);
 /* Enables trickle charging of VBAT from VCC */
 int am1805_enable_trickle(void);
 
+/* Reads device ID. Should always return 0x0518. */
+int am1805_get_id(uint16_t* id);
+
 #endif /* __RIOTEE_AM1805_H_ */
