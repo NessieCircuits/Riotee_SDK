@@ -4,8 +4,8 @@
 #include <string.h>
 
 #define TX_BUF_SIZE 64
-#define N_RETRIES 20
-#define RETRY_DELAY_MS 20
+#define N_RETRIES 40
+#define RETRY_DELAY_MS 50
 
 uint8_t tx_buf[TX_BUF_SIZE];
 
