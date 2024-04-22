@@ -9,6 +9,8 @@
 
 static GPINT_CALLBACK registry[42] = {0};
 
+static TaskHandle_t blocking_task;
+
 void GPIOTE_IRQHandler(void) {
   if (NRF_GPIOTE->EVENTS_PORT == 1) {
     for (uint32_t i = 0; i < 42; i++) {
@@ -74,15 +76,16 @@ void riotee_gpio_init(void) {
 
 static void wait_callback(unsigned int pin_no) {
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-  xTaskNotifyIndexedFromISR(usr_task_handle, 1, EVT_GPIO_BASE, eSetBits, &xHigherPriorityTaskWoken);
+  xTaskNotifyIndexedFromISR(blocking_task, 1, EVT_GPIO_BASE, eSetBits, &xHigherPriorityTaskWoken);
   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
 riotee_rc_t riotee_gpio_wait_level(unsigned int pin, riotee_gpio_level_t level, riotee_gpio_in_pull_t pull) {
   unsigned long notification_value;
   taskENTER_CRITICAL();
-  xTaskNotifyStateClearIndexed(usr_task_handle, 1);
-  ulTaskNotifyValueClearIndexed(usr_task_handle, 1, 0xFFFFFFFF);
+  blocking_task = xTaskGetCurrentTaskHandle();
+  xTaskNotifyStateClearIndexed(blocking_task, 1);
+  ulTaskNotifyValueClearIndexed(blocking_task, 1, 0xFFFFFFFF);
 
   gpint_register(pin, level, pull, wait_callback);
   taskEXIT_CRITICAL();

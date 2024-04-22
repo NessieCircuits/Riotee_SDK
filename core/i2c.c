@@ -14,6 +14,8 @@
 
 TEARDOWN_FUN(i2c_teardown_ptr);
 
+static TaskHandle_t blocking_task;
+
 enum {
   EVT_I2C_STOPPED = EVT_I2C_BASE + 0,
   EVT_I2C_ERROR = EVT_I2C_BASE + 1,
@@ -23,7 +25,7 @@ static void teardown(void) {
   NRF_TWIM1->TASKS_STOP = 1;
   NRF_TWIM1->ENABLE = TWIM_ENABLE_ENABLE_Disabled << TWIM_ENABLE_ENABLE_Pos;
 
-  xTaskNotifyIndexed(usr_task_handle, 1, EVT_TEARDOWN, eSetBits);
+  xTaskNotifyIndexed(blocking_task, 1, EVT_TEARDOWN, eSetBits);
   i2c_teardown_ptr = NULL;
 }
 
@@ -37,11 +39,11 @@ void SPIM1_SPIS1_TWIM1_TWIS1_SPI1_TWI1_IRQHandler(void) {
   if (NRF_TWIM1->EVENTS_ERROR == 1) {
     NRF_TWIM1->EVENTS_ERROR = 0;
     NRF_TWIM1->TASKS_STOP = 1;
-    xTaskNotifyIndexedFromISR(usr_task_handle, 1, EVT_I2C_ERROR, eSetBits, &xHigherPriorityTaskWoken);
+    xTaskNotifyIndexedFromISR(blocking_task, 1, EVT_I2C_ERROR, eSetBits, &xHigherPriorityTaskWoken);
 
   } else if (NRF_TWIM1->EVENTS_STOPPED == 1) {
     NRF_TWIM1->EVENTS_STOPPED = 0;
-    xTaskNotifyIndexedFromISR(usr_task_handle, 1, EVT_I2C_STOPPED, eSetBits, &xHigherPriorityTaskWoken);
+    xTaskNotifyIndexedFromISR(blocking_task, 1, EVT_I2C_STOPPED, eSetBits, &xHigherPriorityTaskWoken);
   }
   NRF_TWIM1->ENABLE = TWIM_ENABLE_ENABLE_Disabled << TWIM_ENABLE_ENABLE_Pos;
   i2c_teardown_ptr = NULL;
@@ -85,8 +87,9 @@ riotee_rc_t riotee_i2c_write(uint8_t dev_addr, uint8_t *data, size_t n_data) {
 
   NRF_TWIM1->INTENSET = TWIM_INTENSET_ERROR_Msk | TWIM_INTENSET_STOPPED_Msk;
 
-  xTaskNotifyStateClearIndexed(usr_task_handle, 1);
-  ulTaskNotifyValueClearIndexed(usr_task_handle, 1, 0xFFFFFFFF);
+  blocking_task = xTaskGetCurrentTaskHandle();
+  xTaskNotifyStateClearIndexed(blocking_task, 1);
+  ulTaskNotifyValueClearIndexed(blocking_task, 1, 0xFFFFFFFF);
   i2c_teardown_ptr = teardown;
   NRF_TWIM1->TASKS_STARTTX = 1;
 
@@ -125,8 +128,9 @@ riotee_rc_t riotee_i2c_read(uint8_t *buffer, size_t n_data, uint8_t dev_addr) {
 
   NRF_TWIM1->INTENSET = TWIM_INTENSET_ERROR_Msk | TWIM_INTENSET_STOPPED_Msk;
 
-  xTaskNotifyStateClearIndexed(usr_task_handle, 1);
-  ulTaskNotifyValueClearIndexed(usr_task_handle, 1, 0xFFFFFFFF);
+  blocking_task = xTaskGetCurrentTaskHandle();
+  xTaskNotifyStateClearIndexed(blocking_task, 1);
+  ulTaskNotifyValueClearIndexed(blocking_task, 1, 0xFFFFFFFF);
   i2c_teardown_ptr = teardown;
 
   NRF_TWIM1->TASKS_STARTRX = 1;
