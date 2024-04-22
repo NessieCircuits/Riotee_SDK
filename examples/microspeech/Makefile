@@ -26,7 +26,6 @@ LIB_DIRS = $(RIOTEE_SDK_ROOT)/external/tflm-cmsis
 
 LIB_FILES = -ltensorflow-microlite
 
-CFLAGS += -DDISABLE_CAP_MONITOR
 CFLAGS += -DTF_LITE_STATIC_MEMORY
 
 include $(RIOTEE_SDK_ROOT)/Makefile
