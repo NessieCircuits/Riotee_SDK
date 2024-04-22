@@ -6,27 +6,25 @@
 #include "printf.h"
 
 void reset_callback(void) {
+  int rc;
   riotee_gpio_cfg_output(PIN_LED_CTRL);
+
+  /* This may take a few seconds.. see datasheet. */
+  if ((rc = riotee_am1805_init()) != 0) {
+    printf("Error initializing RTC: %d\r\n", rc);
+  }
+
+  if ((rc = riotee_am1805_enable_trickle()) != 0) {
+    printf("Error enabling trickle charging: %d\r\n", rc);
+  }
 }
 
 int main(void) {
-  int rc;
-  uint8_t reg_buf;
   struct tm now;
 
-  printf("Waiting 3s..\r\n");
-  riotee_sleep_ms(3000);
-
-  if ((rc = am1805_enable_trickle()) != 0) {
-    printf("Error enabling trickle charging: %d\r\n", rc);
-  }
-
   for (;;) {
-    riotee_wait_cap_charged();
-
-    am1805_get_datetime(&now);
+    riotee_am1805_get_datetime(&now);
     printf("Now: %02d:%02d:%02d\r\n", now.tm_hour, now.tm_min, now.tm_sec);
-
     riotee_sleep_ms(1000);
   }
 }

@@ -199,24 +199,24 @@ typedef struct {
 } am1805_alarm_t;
 
 /* Establishes connection to device. Can block for multiple seconds! */
-int am1805_init(void);
+int riotee_am1805_init(void);
 
-int am1805_get_hundredths(unsigned int* hundredths);
-int am1805_set_datetime(struct tm* t);
-int am1805_get_datetime(struct tm* t);
+int riotee_am1805_get_hundredths(unsigned int* hundredths);
+int riotee_am1805_set_datetime(struct tm* t);
+int riotee_am1805_get_datetime(struct tm* t);
 
-int am1805_set_alarm(struct tm* t_alarm);
-int am1805_get_alarm(struct tm* t);
-int am1805_get_status(uint8_t* dst);
-int am1805_reset(void);
+int riotee_am1805_set_alarm(struct tm* t_alarm);
+int riotee_am1805_get_alarm(struct tm* t);
+int riotee_am1805_get_status(uint8_t* dst);
+int riotee_am1805_reset(void);
 
 /* Cuts power supply to all devices except AM1805 */
-int am1805_disable_power(void);
+int riotee_am1805_disable_power(void);
 
 /* Enables trickle charging of VBAT from VCC */
-int am1805_enable_trickle(void);
+int riotee_am1805_enable_trickle(void);
 
 /* Reads device ID. Should always return 0x0518. */
-int am1805_get_id(uint16_t* id);
+int riotee_am1805_get_id(uint16_t* id);
 
 #endif /* __RIOTEE_AM1805_H_ */
