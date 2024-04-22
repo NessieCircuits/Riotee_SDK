@@ -8,6 +8,8 @@
 
 TEARDOWN_FUN(spic_teardown_ptr);
 
+static TaskHandle_t blocking_task;
+
 riotee_rc_t riotee_spic_init(riotee_spic_cfg_t* cfg) {
   NRF_SPIM3->PSEL.CSN = cfg->pin_cs;
   NRF_SPIM3->PSEL.MOSI = cfg->pin_copi;
@@ -59,7 +61,7 @@ static void teardown() {
   while (NRF_SPIM3->EVENTS_STOPPED == 0) {
   }
   NRF_SPIM3->ENABLE = (SPIM_ENABLE_ENABLE_Disabled << SPIM_ENABLE_ENABLE_Pos);
-  xTaskNotifyIndexed(usr_task_handle, 1, EVT_TEARDOWN, eSetBits);
+  xTaskNotifyIndexed(blocking_task, 1, EVT_TEARDOWN, eSetBits);
   spic_teardown_ptr = NULL;
 }
 
@@ -69,7 +71,7 @@ void SPIM3_IRQHandler(void) {
   if (NRF_SPIM3->EVENTS_END == 1) {
     NRF_SPIM3->EVENTS_END = 0;
     NRF_SPIM3->TASKS_STOP = 1;
-    xTaskNotifyIndexedFromISR(usr_task_handle, 1, EVT_SPIC_BASE, eSetBits, &xHigherPriorityTaskWoken);
+    xTaskNotifyIndexedFromISR(blocking_task, 1, EVT_SPIC_BASE, eSetBits, &xHigherPriorityTaskWoken);
     spic_teardown_ptr = NULL;
   }
   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
@@ -86,8 +88,9 @@ riotee_rc_t riotee_spic_transfer(uint8_t* data_tx, size_t n_tx, uint8_t* data_rx
   NRF_SPIM3->RXD.PTR = (uint32_t)data_rx;
   NRF_SPIM3->RXD.MAXCNT = n_rx;
 
-  xTaskNotifyStateClearIndexed(usr_task_handle, 1);
-  ulTaskNotifyValueClearIndexed(usr_task_handle, 1, 0xFFFFFFFF);
+  blocking_task = xTaskGetCurrentTaskHandle();
+  xTaskNotifyStateClearIndexed(blocking_task, 1);
+  ulTaskNotifyValueClearIndexed(blocking_task, 1, 0xFFFFFFFF);
 
   NRF_SPIM3->EVENTS_END = 0;
   NRF_SPIM3->EVENTS_STOPPED = 0;
