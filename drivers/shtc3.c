@@ -86,7 +86,7 @@ static int shtc3_sleep(void) {
   cmd2bytes(cmd_buf, CMD_SLEEP);
 
   /* Put device to sleep */
-  if ((ret = riotee_i2c_write(DEVICE_ADDRESS, cmd_buf, sizeof(shtc3_cmd_t))) != 0)
+  if ((ret = riotee_i2c_write_atomic(DEVICE_ADDRESS, cmd_buf, sizeof(shtc3_cmd_t))) != 0)
     return ret;
   return 0;
 }
