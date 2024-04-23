@@ -118,6 +118,11 @@ static int checkpoint_store() {
   int rc;
   checkpoint_header hdr;
 
+  /* TODO: This is somehow necessary to avoid errors with long store/load */
+  nvm_begin_write(FRAM_HIGH_START);
+  riotee_delay_us(5);
+  nvm_end();
+
   hdr.top_of_stack = *(uint32_t *)&usr_task_tcb;
 
   hdr.stack_size = ((unsigned int)&usr_task_stack[USR_STACK_SIZE_WORDS - 1] - hdr.top_of_stack) / sizeof(StackType_t);
@@ -163,6 +168,11 @@ static int checkpoint_store() {
 static int checkpoint_load() {
   int rc;
   checkpoint_header hdr;
+
+  /* TODO: This is somehow necessary to avoid errors with long store/load */
+  nvm_begin_read(FRAM_HIGH_START);
+  riotee_delay_us(5);
+  nvm_end();
 
   if ((rc = nvm_begin_read(FRAM_HIGH_START)) != 0)
     return rc;
