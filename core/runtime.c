@@ -280,6 +280,7 @@ static void sys_task(void *pvParameter) {
   xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
 #endif
 
+#ifndef DISABLE_CHECKPOINTING
   if (check_fresh_start()) {
     initialize_retained();
     bootstrap_callback();
@@ -290,11 +291,16 @@ static void sys_task(void *pvParameter) {
       xTaskNotifyIndexed(usr_task_handle, 1, EVT_RESET, eSetBits);
       runtime_stats.n_reset++;
     } else {
+      printf("Loading checkpoint failed!");
       initialize_retained();
       /* Call user bootstrap code */
       bootstrap_callback();
     }
   }
+#else
+  initialize_retained();
+  bootstrap_callback();
+#endif
 
   reset_callback();
 
@@ -323,6 +329,7 @@ static void sys_task(void *pvParameter) {
       xTaskNotifyIndexed(usr_task_handle, 1, EVT_GPIO_BASE, eSetBits);
     gpint_register(PIN_PWRGD_H, RIOTEE_GPIO_LEVEL_HIGH, RIOTEE_GPIO_IN_NOPULL, threshold_callback);
 
+#ifndef DISABLE_CHECKPOINTING
     /* Set a 100ms timer*/
     sys_setup_timer(3277);
     /* Wait until capacitor is recharged or timer expires */
@@ -352,8 +359,10 @@ static void sys_task(void *pvParameter) {
       gpint_unregister(PIN_PWRGD_L);
       continue;
     }
+
     /* Dropped below the threshold again -> take a snapshot */
     checkpoint_store();
+#endif
     /* Wait until capacitor is recharged */
     xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
   }
