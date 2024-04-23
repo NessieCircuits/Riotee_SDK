@@ -6,7 +6,7 @@
 #include "riotee_thresholds.h"
 #include "runtime.h"
 
-#define STACK_TOP 0x20018000
+#define STACK_TOP 0x20020000
 
 extern unsigned long _stext;
 extern unsigned long __bss_start__;
