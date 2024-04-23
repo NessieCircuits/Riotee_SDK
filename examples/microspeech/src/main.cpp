@@ -28,7 +28,7 @@ void startup_callback(void) {
 }
 
 void reset_callback(void) {
-  riotee_thresholds_low_set(THR_LOW_3V1);
+  riotee_thresholds_low_set(THR_LOW_2V5);
 
   vm1010_cfg_t cfg = {.pin_mode = PIN_D10, .pin_dout = PIN_D4, .pin_vout = PIN_D2, .pin_vbias = PIN_D3};
   vm1010_init(&cfg);
