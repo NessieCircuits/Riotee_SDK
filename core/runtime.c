@@ -269,7 +269,7 @@ static void teardown(void) {
 /* High priority system task initializes runtime, and handles intermittent execution and checkpointing. */
 static void sys_task(void *pvParameter) {
   UNUSED(pvParameter);
-
+  int rc;
   unsigned long notification_value;
 
   /* Make sure that the user task does not yet start */
@@ -344,9 +344,8 @@ static void sys_task(void *pvParameter) {
     /* Timer has expired. Is capacitor voltage still below threshold? */
     if ((NRF_P0->IN & (1 << PIN_PWRGD_L)) == 0) {
       /* Take the snapshot */
-      if (checkpoint_store() != 0)
-        printf("Checkpointing failed!");
-
+      if ((rc = checkpoint_store()) != 0)
+        printf("Checkpointing failed: %d\r\n", rc);
     } else {
       /* Monitor for capacitor voltage to drop below threshold again */
       gpint_register(PIN_PWRGD_L, RIOTEE_GPIO_LEVEL_LOW, RIOTEE_GPIO_IN_NOPULL, threshold_callback);
@@ -361,7 +360,8 @@ static void sys_task(void *pvParameter) {
     }
 
     /* Dropped below the threshold again -> take a snapshot */
-    checkpoint_store();
+    if ((rc = checkpoint_store()) != 0)
+      printf("Checkpointing failed: %d\r\n", rc);
 #endif
     /* Wait until capacitor is recharged */
     xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
