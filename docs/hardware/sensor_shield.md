@@ -7,12 +7,6 @@ Sensors:
 - Sensirion SHTC3 digital temperature and humidity sensor
 - Vesper VM1010 analog microphone with power switch
 
-## Low power operation
-
-To minimize the power consumption of the shield, disable the microphone by setting high pin D5 and put the SHTC3 into sleep mode with `shtc3_init()` in the `startup_callback()` and whenever not needed.
-
-For an example, take a look at the [VM1010 example](https://github.com/NessieCircuits/Riotee_SDK/tree/main/examples/vm1010).
-
 ## Microphone bias voltage
 
 The analog output of the microphone is developed with respect to a 800mV offset voltage and swings often just a few millivolts for low sound levels.
@@ -20,6 +14,16 @@ To enable measuring these small voltage swings, the sensor shield has an 810mV b
 Configuring the ADC in differential mode and measuring the output voltage with respect to this bias voltage significantly increases the resolution and may also reduce noise that gets coupled in on the way from the shield to the ADC.
 
 Due to the design of the bias voltage circuit, it takes around 4ms for the bias voltage to reach 99% of its value after the microphone is enabled via pin D5.
+
+## Low power operation
+
+To minimize the power consumption of the shield, disable the microphone by setting high pin D5 and put the SHTC3 into sleep mode with `shtc3_init()` in the `startup_callback()` and whenever not needed.
+
+For an example, take a look at the [VM1010 example](https://github.com/NessieCircuits/Riotee_SDK/tree/main/examples/vm1010).
+
+## Code examples
+
+There exist examples for the [VM1010 microphone](https://github.com/NessieCircuits/Riotee_SDK/tree/main/examples/vm1010) and the [SHTC3 temperature and humidity sensor](https://github.com/NessieCircuits/Riotee_SDK/tree/main/examples/shtc3). There is currently no driver or code examples for the BMA400 accelerometer. Please open an issue in the SDK repo to request software support.
 
 ## Pinout
 
