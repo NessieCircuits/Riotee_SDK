@@ -16,6 +16,8 @@ limitations under the License.
 #ifndef TENSORFLOW_LITE_MICRO_EXAMPLES_MICRO_SPEECH_MICRO_MODEL_SETTINGS_H_
 #define TENSORFLOW_LITE_MICRO_EXAMPLES_MICRO_SPEECH_MICRO_MODEL_SETTINGS_H_
 
+#include <stdint.h>
+
 // The following values are derived from values used during model training.
 // If you change the way you preprocess the input, update all these constants.
 constexpr int kAudioSampleFrequency = 16000;
@@ -36,7 +38,7 @@ constexpr const char *kCategoryLabels[kCategoryCount] = {
 
 struct ClassificationResult {
   float probability;
-  int category_idx;
+  uint8_t category_idx;
 };
 
 TfLiteStatus Classify(struct ClassificationResult &result, const int16_t *audio_data, const size_t audio_data_size);
