@@ -8,7 +8,7 @@
 #include "riotee_adc.h"
 #include "riotee_gpio.h"
 #include "riotee_timing.h"
-#include "riotee_stella.h"
+#include "riotee_ble.h"
 #include "riotee_thresholds.h"
 
 #include "vm1010.h"
@@ -18,6 +18,9 @@
  */
 #define PIN_MICROPHONE_DISABLE PIN_D5
 #define N_SAMPLES 16000
+
+const uint8_t adv_address[] = {0x01, 0xEE, 0xC0, 0xFF, 0x03, 0x02};
+const char adv_name[] = "RIOTEE";
 
 void startup_callback(void) {
   /* Call this early to put SHTC3 into low power mode */
@@ -32,6 +35,8 @@ void reset_callback(void) {
 
   vm1010_cfg_t cfg = {.pin_mode = PIN_D10, .pin_dout = PIN_D4, .pin_vout = PIN_D2, .pin_vbias = PIN_D3};
   vm1010_init(&cfg);
+
+  riotee_ble_init();
 }
 
 void suspend_callback(void) {
@@ -73,7 +78,14 @@ void prescale_audio(int16_t *dst, const size_t n_samples) {
 int main(void) {
   int rc;
   struct ClassificationResult result;
-  printf("main..\r\n");
+
+  riotee_ble_adv_cfg_t adv_cfg = {.addr = adv_address,
+                                  .name = adv_name,
+                                  .name_len = 6,
+                                  .data = &result.category_idx,
+                                  .data_len = 1,
+                                  .manufacturer_id = RIOTEE_BLE_ADV_MNF_NORDIC};
+  riotee_ble_adv_cfg(&adv_cfg);
 
   for (;;) {
     riotee_wait_cap_charged();
@@ -104,9 +116,11 @@ int main(void) {
     printf("Sampling done. Start processing..\r\n");
     prescale_audio(samples, N_SAMPLES);
 
-    if ((rc = Classify(result, samples, N_SAMPLES)) == kTfLiteOk)
+    if ((rc = Classify(result, samples, N_SAMPLES)) == kTfLiteOk) {
       printf("Heard %s with %.2f probability\r\n", kCategoryLabels[result.category_idx], result.probability);
-    else
+      riotee_wait_cap_charged();
+      riotee_ble_advertise(ADV_CH_ALL);
+    } else
       printf("Classification failed with error %d\r\n", rc);
   }
 }
