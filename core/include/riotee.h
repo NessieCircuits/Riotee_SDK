@@ -143,6 +143,17 @@ void resume_callback(void);
  */
 riotee_rc_t riotee_wait_cap_charged(void);
 
+/**
+ * @brief Stores a snapshot of the application state to non-volatile memory
+ *
+ * \ingroup riotee
+ *
+ * Requests the runtime to checkpoint application state to non-volatile memory. User should only call this when
+ * capacitor is sufficiently charged.
+ *
+ */
+void riotee_checkpoint();
+
 /** Data is set to initial value after every reset. */
 #define __NONRETAINED_INITIALIZED__ __attribute__((section(".volatile_data")))
 /** Data is set to zero after every reset. */

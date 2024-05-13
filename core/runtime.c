@@ -29,6 +29,8 @@ enum {
   EVT_RUNTIME_PWRGD_L = EVT_RUNTIME_BASE + 0,
   /* Capacitor voltage low threshold. */
   EVT_RUNTIME_PWRGD_H = EVT_RUNTIME_BASE + 1,
+  /* User task requests checkpoint. */
+  EVT_RUNTIME_CHK_REQ = EVT_RUNTIME_BASE + 2,
 };
 
 extern unsigned long __etext;
@@ -324,7 +326,20 @@ static void sys_task(void *pvParameter) {
 
     /* Wait until capacitor voltage falls below the 'low' threshold */
     gpint_register(PIN_PWRGD_L, RIOTEE_GPIO_LEVEL_LOW, RIOTEE_GPIO_IN_NOPULL, threshold_callback);
-    xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
+
+    while (1) {
+      xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
+      /* Low threshold detected */
+      if (notification_value == EVT_RUNTIME_PWRGD_L)
+        break;
+      /* Checkpoint requested by application */
+      else if (notification_value == EVT_RUNTIME_CHK_REQ) {
+        vTaskSuspend(usr_task_handle);
+        checkpoint_store();
+        vTaskResume(usr_task_handle);
+      } else
+        printf("Wrong notification value received\r\n");
+    }
 
     vTaskSuspend(usr_task_handle);
     teardown();
@@ -378,6 +393,10 @@ static void sys_task(void *pvParameter) {
   }
 }
 
+void riotee_checkpoint() {
+  /* Notify system task to take a snapshot */
+  xTaskNotifyIndexed(sys_task_handle, 1, EVT_RUNTIME_CHK_REQ, eSetValueWithOverwrite);
+}
 int main(void);
 
 void user_task(void *pvParameter) {
