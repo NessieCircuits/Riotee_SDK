@@ -182,6 +182,15 @@ int riotee_am1805_set_alarm(struct tm* t_alarm) {
   return 0;
 }
 
+int riotee_am1805_clear_alarm() {
+  int rc;
+  uint8_t status;
+  if ((rc = riotee_am1805_get_status(&status)) != 0)
+    return rc;
+  status &= ~AM1805_STATUS_ALM_MSK;
+  return write_register(AM1805_STATUS_REG, status);
+}
+
 int riotee_am1805_get_status(uint8_t* dst) {
   return read_register(dst, AM1805_STATUS_REG);
 }
