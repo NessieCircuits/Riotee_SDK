@@ -219,4 +219,7 @@ int riotee_am1805_enable_trickle(void);
 /* Reads device ID. Should always return 0x0518. */
 int riotee_am1805_get_id(uint16_t* id);
 
+/* Clear flag for alarm interrupt in status register. */
+int riotee_am1805_clear_alarm();
+
 #endif /* __RIOTEE_AM1805_H_ */
