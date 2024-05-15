@@ -11,7 +11,6 @@
 /* This gets called after every reset */
 void reset_callback(void) {
   int rc;
-  uint8_t reg;
   if ((rc = riotee_am1805_init()) != 0)
     printf("Error initializing RTC: %d\r\n", rc);
 }
@@ -46,7 +45,6 @@ void am1805_poweroff(unsigned int seconds) {
 }
 
 int main(void) {
-  int rc;
   struct tm now;
 
   riotee_am1805_get_datetime(&now);
