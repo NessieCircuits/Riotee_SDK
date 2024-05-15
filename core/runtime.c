@@ -78,6 +78,7 @@ __attribute__((weak)) void bootstrap_callback(void){};
 __attribute__((weak)) void reset_callback(void){};
 
 void __libc_init_array(void);
+int main(void);
 
 /* Checks if a certain value is found in flash memory to determine if this is the first boot after programming. */
 static bool check_fresh_start() {
@@ -157,11 +158,6 @@ static int checkpoint_store() {
   if ((rc = nvm_write((uint8_t *)&signature, sizeof(signature))) != 0)
     return rc;
   nvm_end();
-
-  /* If this was a first boot, overwrite the marker now */
-  if (check_fresh_start()) {
-    overwrite_marker();
-  }
 
   return 0;
 }
@@ -278,13 +274,67 @@ static void teardown(void) {
   }
 }
 
+static void sys_handle_suspend(void) {
+  unsigned long notification_value;
+  int rc;
+
+  /* Switch off power-hungry devices registered in drivers */
+  teardown();
+  /* Give the application an opportunity to switch off power-hungry devices */
+  suspend_callback();
+
+  runtime_stats.n_suspend++;
+
+  /* Set a high threshold - upon reaching this threshold, execution continues */
+  /* If the user task was already waiting on high threshold, we have to notify it here */
+  if (gpint_unregister(PIN_PWRGD_H) == RIOTEE_GPIO_ERR_OK)
+    xTaskNotifyIndexed(usr_task_handle, 1, EVT_GPIO_BASE, eSetBits);
+  gpint_register(PIN_PWRGD_H, RIOTEE_GPIO_LEVEL_HIGH, RIOTEE_GPIO_IN_NOPULL, threshold_callback);
+
+#ifndef DISABLE_CHECKPOINTING
+  /* Set a 100ms timer*/
+  sys_setup_timer(3277);
+  /* Wait until capacitor is recharged or timer expires */
+  xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
+  /* Recharged? */
+  if (notification_value == EVT_RUNTIME_PWRGD_H) {
+    sys_cancel_timer();
+    xTaskNotifyStateClearIndexed(xTaskGetCurrentTaskHandle(), 1);
+    return;
+  }
+
+  /* Timer has expired. Is capacitor voltage still below threshold? */
+  if ((NRF_P0->IN & (1 << PIN_PWRGD_L)) == 0) {
+    /* Take the snapshot */
+    if ((rc = checkpoint_store()) != 0)
+      printf("Checkpointing failed: %d\r\n", rc);
+  } else {
+    /* Monitor for capacitor voltage to drop below threshold again */
+    gpint_register(PIN_PWRGD_L, RIOTEE_GPIO_LEVEL_LOW, RIOTEE_GPIO_IN_NOPULL, threshold_callback);
+  }
+
+  /* Wait until capacitor is recharged or discharged below the critical threshold again */
+  xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
+  /* Recharged? */
+  if (notification_value == EVT_RUNTIME_PWRGD_H) {
+    gpint_unregister(PIN_PWRGD_L);
+    return;
+  }
+
+  /* Dropped below the threshold again -> take a snapshot */
+  if ((rc = checkpoint_store()) != 0)
+    printf("Checkpointing failed: %d\r\n", rc);
+#endif
+
+  /* Wait until capacitor is recharged */
+  xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
+}
+
 /* High priority system task initializes runtime, and handles intermittent execution and checkpointing. */
 static void sys_task(void *pvParameter) {
   UNUSED(pvParameter);
-  int rc;
   unsigned long notification_value;
 
-  /* Make sure that the user task does not yet start */
   vTaskSuspend(usr_task_handle);
 
 #ifndef DISABLE_CAP_MONITOR
@@ -292,10 +342,17 @@ static void sys_task(void *pvParameter) {
   xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
 #endif
 
-#ifndef DISABLE_CHECKPOINTING
+#ifdef DISABLE_CHECKPOINTING
+  initialize_retained();
+  if (check_fresh_start()) {
+    bootstrap_callback();
+    overwrite_marker();
+  }
+#else
   if (check_fresh_start()) {
     initialize_retained();
     bootstrap_callback();
+    overwrite_marker();
 
   } else {
     if (checkpoint_load() == 0) {
@@ -307,89 +364,35 @@ static void sys_task(void *pvParameter) {
       initialize_retained();
       /* Call user bootstrap code */
       bootstrap_callback();
+      overwrite_marker();
     }
   }
-#else
-  initialize_retained();
-  bootstrap_callback();
+
 #endif
 
   reset_callback();
 
   for (;;) {
-    resume_callback();
     vTaskResume(usr_task_handle);
 
-#ifdef DISABLE_CAP_MONITOR
-    vTaskSuspend(sys_task_handle);
-#endif
-
-    /* Wait until capacitor voltage falls below the 'low' threshold */
+#ifndef DISABLE_CAP_MONITOR
+    /* Monitor capacitor voltage for 'low' threshold */
     gpint_register(PIN_PWRGD_L, RIOTEE_GPIO_LEVEL_LOW, RIOTEE_GPIO_IN_NOPULL, threshold_callback);
-
-    while (1) {
-      xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
-      /* Low threshold detected */
-      if (notification_value == EVT_RUNTIME_PWRGD_L)
-        break;
-      /* Checkpoint requested by application */
-      else if (notification_value == EVT_RUNTIME_CHK_REQ) {
-        vTaskSuspend(usr_task_handle);
-        checkpoint_store();
-        vTaskResume(usr_task_handle);
-      } else
-        printf("Wrong notification value received\r\n");
-    }
-
-    vTaskSuspend(usr_task_handle);
-    teardown();
-    /* Give the application an opportunity to switch off power-hungry devices */
-    suspend_callback();
-
-    runtime_stats.n_suspend++;
-
-    /* Set a high threshold - upon reaching this threshold, execution continues */
-    /* If the user task was already waiting on high threshold, we have to notify it here */
-    if (gpint_unregister(PIN_PWRGD_H) == RIOTEE_GPIO_ERR_OK)
-      xTaskNotifyIndexed(usr_task_handle, 1, EVT_GPIO_BASE, eSetBits);
-    gpint_register(PIN_PWRGD_H, RIOTEE_GPIO_LEVEL_HIGH, RIOTEE_GPIO_IN_NOPULL, threshold_callback);
-
-#ifndef DISABLE_CHECKPOINTING
-    /* Set a 100ms timer*/
-    sys_setup_timer(3277);
-    /* Wait until capacitor is recharged or timer expires */
-    xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
-    /* Recharged? */
-    if (notification_value == EVT_RUNTIME_PWRGD_H) {
-      sys_cancel_timer();
-      xTaskNotifyStateClearIndexed(xTaskGetCurrentTaskHandle(), 1);
-      continue;
-    }
-
-    /* Timer has expired. Is capacitor voltage still below threshold? */
-    if ((NRF_P0->IN & (1 << PIN_PWRGD_L)) == 0) {
-      /* Take the snapshot */
-      if ((rc = checkpoint_store()) != 0)
-        printf("Checkpointing failed: %d\r\n", rc);
-    } else {
-      /* Monitor for capacitor voltage to drop below threshold again */
-      gpint_register(PIN_PWRGD_L, RIOTEE_GPIO_LEVEL_LOW, RIOTEE_GPIO_IN_NOPULL, threshold_callback);
-    }
-
-    /* Wait until capacitor is recharged or discharged below the critical threshold again */
-    xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
-    /* Recharged? */
-    if (notification_value == EVT_RUNTIME_PWRGD_H) {
-      gpint_unregister(PIN_PWRGD_L);
-      continue;
-    }
-
-    /* Dropped below the threshold again -> take a snapshot */
-    if ((rc = checkpoint_store()) != 0)
-      printf("Checkpointing failed: %d\r\n", rc);
 #endif
-    /* Wait until capacitor is recharged */
+
+    /* Wait for event -> User task starts executing */
     xTaskNotifyWaitIndexed(1, 0xFFFFFFFF, 0xFFFFFFFF, &notification_value, portMAX_DELAY);
+    vTaskSuspend(usr_task_handle);
+    /* Low threshold detected */
+    if (notification_value == EVT_RUNTIME_PWRGD_L) {
+      sys_handle_suspend();
+      resume_callback();
+    }
+    /* Checkpoint requested by application */
+    else if (notification_value == EVT_RUNTIME_CHK_REQ) {
+      checkpoint_store();
+    } else
+      printf("Wrong notification value received\r\n");
   }
 }
 
@@ -397,7 +400,6 @@ void riotee_checkpoint() {
   /* Notify system task to take a snapshot */
   xTaskNotifyIndexed(sys_task_handle, 1, EVT_RUNTIME_CHK_REQ, eSetValueWithOverwrite);
 }
-int main(void);
 
 void user_task(void *pvParameter) {
   UNUSED(pvParameter);
