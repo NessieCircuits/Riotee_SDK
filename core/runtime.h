@@ -8,12 +8,6 @@
 int runtime_init(void);
 void runtime_start(void);
 
-__attribute__((always_inline)) static inline void enter_low_power(void) {
-  __WFE();
-  __SEV();
-  __WFE();
-}
-
 /* Lower 4 bits are reserved for individual events in each module. */
 enum {
   /* Teardown may happen in addition to the module event. */
