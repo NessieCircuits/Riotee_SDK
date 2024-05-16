@@ -352,7 +352,6 @@ static void sys_task(void *pvParameter) {
   if (check_fresh_start()) {
     initialize_retained();
     bootstrap_callback();
-    overwrite_marker();
 
   } else {
     if (checkpoint_load() == 0) {
@@ -364,13 +363,17 @@ static void sys_task(void *pvParameter) {
       initialize_retained();
       /* Call user bootstrap code */
       bootstrap_callback();
-      overwrite_marker();
     }
   }
 
 #endif
 
   reset_callback();
+
+  if (check_fresh_start())
+    overwrite_marker();
+  else
+    resume_callback();
 
   for (;;) {
     vTaskResume(usr_task_handle);
