@@ -1,6 +1,8 @@
 #ifndef __RIOTEE_H_
 #define __RIOTEE_H_
 
+#include "nrf.h"
+
 #define PIN_SYS_SCL 40
 #define PIN_SYS_SDA 6
 
@@ -153,6 +155,18 @@ riotee_rc_t riotee_wait_cap_charged(void);
  *
  */
 void riotee_checkpoint();
+
+/**
+ * @brief Enter low power mode
+ *
+ * Puts the CPU to low power mode, Execution stops until CPU is woken up by an event.
+ *
+ */
+__attribute__((always_inline)) static inline void enter_low_power(void) {
+  __WFE();
+  __SEV();
+  __WFE();
+}
 
 /** Data is set to initial value after every reset. */
 #define __NONRETAINED_INITIALIZED__ __attribute__((section(".volatile_data")))
