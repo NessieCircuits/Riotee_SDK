@@ -299,7 +299,7 @@ static void sys_handle_suspend(void) {
   /* Recharged? */
   if (notification_value == EVT_RUNTIME_PWRGD_H) {
     sys_cancel_timer();
-    xTaskNotifyStateClearIndexed(xTaskGetCurrentTaskHandle(), 1);
+    xTaskNotifyStateClearIndexed(sys_task_handle, 1);
     return;
   }
 
@@ -348,32 +348,28 @@ static void sys_task(void *pvParameter) {
     bootstrap_callback();
     overwrite_marker();
   }
+  reset_callback();
 #else
   if (check_fresh_start()) {
     initialize_retained();
     bootstrap_callback();
-
+    overwrite_marker();
+    reset_callback();
   } else {
     if (checkpoint_load() == 0) {
       /* Unblock the user task */
       xTaskNotifyIndexed(usr_task_handle, 1, EVT_RESET, eSetBits);
       runtime_stats.n_reset++;
+      reset_callback();
+      resume_callback();
+
     } else {
-      printf("Loading checkpoint failed!");
+      printf("Loading checkpoint failed!\r\n");
       initialize_retained();
-      /* Call user bootstrap code */
-      bootstrap_callback();
+      reset_callback();
     }
   }
-
 #endif
-
-  reset_callback();
-
-  if (check_fresh_start())
-    overwrite_marker();
-  else
-    resume_callback();
 
   for (;;) {
     vTaskResume(usr_task_handle);
