@@ -8,7 +8,7 @@ The package supports most of the standard Arduino API like *digitalWrite(..)*, *
 It also partially supports the *SPI* and *Wire* libraries.
 Additionally, all drivers and the runtime API of the SDK are available.
 
-The Arduino *setup(..)* function is called from the runtime's *reset_callback(..)*.
+The Arduino *setup(..)* function is called from the runtime's *lateinit(..)*.
 The Arduino *loop(..)* function is continously run within the user task's *main(..)* function.
 The runtime's additional callback functions are also available.
 For more details, refer to the [runtime documentation](runtime_callbacks).

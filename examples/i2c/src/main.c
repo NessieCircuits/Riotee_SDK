@@ -11,7 +11,7 @@
 /* Address of ID register. */
 #define REG_ADDR 0x0
 
-void reset_callback(void) {
+void lateinit(void) {
   riotee_i2c_init();
 }
 

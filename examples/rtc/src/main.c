@@ -5,7 +5,7 @@
 #include "riotee_am1805.h"
 #include "printf.h"
 
-void reset_callback(void) {
+void lateinit(void) {
   int rc;
   riotee_gpio_cfg_output(PIN_LED_CTRL);
 

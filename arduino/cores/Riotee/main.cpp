@@ -10,17 +10,17 @@ __attribute__((weak)) void startup(void){};
 __attribute__((weak)) void bootstrap(void){};
 
 /* This gets called very early, before setting up memory */
-void startup_callback(void) {
+void earlyinit(void) {
   startup();
 }
 
 /* This gets called one time after flashing new firmware */
-void bootstrap_callback(void) {
+void bootstrap(void) {
   bootstrap();
 }
 
 /* This gets called after every reset */
-void reset_callback(void) {
+void lateinit(void) {
   riotee_adc_init();
   setup();
 }

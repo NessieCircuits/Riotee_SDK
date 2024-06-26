@@ -27,11 +27,11 @@ There are two possible scenarios for what happens next: 1. The capacitor dischar
 
 There are a number of callbacks that your application can implement:
 
- - `bootstrap_callback()`: Called once after programming the device.
- - `startup_callback()`: Called right after every reset. Perform early stage initizialization required for low-power operation here.
- - `reset_callback()`: Called later after every reset. Initialize peripherals here.
- - `suspend_callback()`: Called right before the application gets suspended. Abort any energy-intensive operation immediately.
- - `resume_callback()`: Called right after the application gets resumed.
+ - `bootstrap()`: Called once after programming the device.
+ - `earlyinit()`: Called right after every reset. Perform early stage initizialization required for low-power operation here.
+ - `lateinit()`: Called later after every reset. Initialize peripherals here.
+ - `suspend()`: Called right before the application gets suspended. Abort any energy-intensive operation immediately.
+ - `resume()`: Called right after the application gets resumed.
 
 (retained_memory)=
 ## Retained memory
@@ -79,11 +79,11 @@ The runtime thus first waits until the capacitor voltage has recovered before in
 If you have power-hungry peripherals that must be explicitly disabled or put into a low power mode, this can become a problem:
 While the runtime waits until the capacitor voltage has recovered, your peripheral may consume more power than what is being harvested and the system never really starts up.
 
-To prevent such situations, the runtime provides the `startup_callback()`.
+To prevent such situations, the runtime provides the `earlyinit()`.
 This callback is executed almost immediately after reset and allows you to put any power-hungry peripherals into a low power mode such that the system can charge up.
 
-Note that during the `startup_callback()`, the system is not yet setup and you cannot use static or global variables.
-Really only do what's necessary to reduce the power consumption and do the remaining initialization later in the `reset_callback` when the capacitor has charged up sufficiently.
+Note that during the `earlyinit()`, the system is not yet setup and you cannot use static or global variables.
+Really only do what's necessary to reduce the power consumption and do the remaining initialization later in the `lateinit` when the capacitor has charged up sufficiently.
 
 
 ## Resources used by the runtime 
@@ -129,12 +129,12 @@ The driver informs the application that the operation was interrupted by returni
 
 ## Walk-through
 
-The runtime uses custom start-up code located in `src/startup.c`. The function `c_startup` is installed as the reset handler in the `vectors` interrupt vector table. First, it initializes the GPIOs to reduce leakage current on the pins shared with the MSP430. By default, the boost converter (MAX20361) shuts off the power supply when it detects below 3.7V on the capacitor. To prevent this, the startup code initializes I2C and disables this functionality. Next, the optional `startup_callback` is executed where a user may perform any early-stage initialization that must be done as soon after the reset as possible, for example to put an attached device to a low power mode.
+The runtime uses custom start-up code located in `src/startup.c`. The function `c_startup` is installed as the reset handler in the `vectors` interrupt vector table. First, it initializes the GPIOs to reduce leakage current on the pins shared with the MSP430. By default, the boost converter (MAX20361) shuts off the power supply when it detects below 3.7V on the capacitor. To prevent this, the startup code initializes I2C and disables this functionality. Next, the optional `earlyinit` is executed where a user may perform any early-stage initialization that must be done as soon after the reset as possible, for example to put an attached device to a low power mode.
 Then the code waits until the *high* threshold is reached before initializing static/global variables (.data and .bss). Note that at this stage, only the system variables are initialized. User variables are stored in a separate section (`data_retained` and `bss_retained` in the linker script `linker.ld`) and initialized later in the process. After enabling the FPU, any static C++ constructors are initialized with a call to newlib's `__libc_init_array()`.
 
-Next, the runtime is initialized and started in `runtime_start()` in `src/runtime.c`. After initializing UART, timing and gpio interrupt functionality, two FreeRTOS tasks are created and the FreeRTOS scheduler is started. The `sys_task` has higher priority so it executes first and immediately disables the `usr_task`. Just like the startup code it also waits for the capacitor voltage to be above the *high* threshold to make sure the system has enough energy for the next step. Next, the system task checks if this is a first boot-up after flashing the code. This is done by comparing a variable that was just copied over from flash against the known value (0x8BADF00D). Two possible outcomes: 1) If the value is correct, this is fresh boot and the code overwrites the corresponding value in flash with zeroes to guarantee that the condition is false after the next reset. Next, static/global user variables are initialized, just like we did for system variables in `c_startup`. The system calls the `bootstrap_callback` where a user may perform one-time initialization. 2) This is not a fresh boot. The system task loads the previous application state from non-volatile memory into the stack structure and into the `data_retained` and `bss_retained` memory sections (see `checkpoint_load(..)`).
+Next, the runtime is initialized and started in `runtime_start()` in `src/runtime.c`. After initializing UART, timing and gpio interrupt functionality, two FreeRTOS tasks are created and the FreeRTOS scheduler is started. The `sys_task` has higher priority so it executes first and immediately disables the `usr_task`. Just like the startup code it also waits for the capacitor voltage to be above the *high* threshold to make sure the system has enough energy for the next step. Next, the system task checks if this is a first boot-up after flashing the code. This is done by comparing a variable that was just copied over from flash against the known value (0x8BADF00D). Two possible outcomes: 1) If the value is correct, this is fresh boot and the code overwrites the corresponding value in flash with zeroes to guarantee that the condition is false after the next reset. Next, static/global user variables are initialized, just like we did for system variables in `c_startup`. The system calls the `bootstrap` where a user may perform one-time initialization. 2) This is not a fresh boot. The system task loads the previous application state from non-volatile memory into the stack structure and into the `data_retained` and `bss_retained` memory sections (see `checkpoint_load(..)`).
 
-Next, the system task calls `reset_callback` where a user may perform hardware initialization necessary after every reset. The system task resumes the user task (does not run, yet because of lower priority) installs a handler to react to a *low* threshold and blocks for the corresponding notification. At this point, the user task becomes the highest priority task that is able to run and gets swapped in. It executes until the *low* threshold handler is called. The handler wakes up the system task which suspends the user task and executes the `teardown` function.
+Next, the system task calls `lateinit` where a user may perform hardware initialization necessary after every reset. The system task resumes the user task (does not run, yet because of lower priority) installs a handler to react to a *low* threshold and blocks for the corresponding notification. At this point, the user task becomes the highest priority task that is able to run and gets swapped in. It executes until the *low* threshold handler is called. The handler wakes up the system task which suspends the user task and executes the `teardown` function.
 This function iterates a table of function pointers where device drivers can register functions that abort any power-intensive process like transmitting a packet and inform the application that the operation has failed.
 
 Next, the system task registers a callback for detection of a *high* threshold. If the application was already waiting on a high threshold, it is overridden as it will anyways only continue execution after the *high* threshold is reached again.

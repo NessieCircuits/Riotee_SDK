@@ -9,7 +9,7 @@ static unsigned int counter = 0;
 /* Buffer for receiving incoming packet. */
 uint8_t rx_buf[RIOTEE_STELLA_MAX_DATA];
 
-void reset_callback(void) {
+void lateinit(void) {
   riotee_stella_init();
 }
 

@@ -6,7 +6,7 @@
 uint8_t tx_data[] = {0xCA, 0xFE, 0xD0, 0x0D};
 uint8_t rx_data[sizeof(tx_data)];
 
-void reset_callback(void) {
+void lateinit(void) {
   riotee_spic_cfg_t cfg = {.frequency = RIOTEE_SPIC_FREQUENCY_M8,
                            .mode = RIOTEE_SPIC_MODE0_CPOL0_CPHA0,
                            .order = RIOTEE_SPIC_ORDER_LSBFIRST,

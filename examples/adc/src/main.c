@@ -4,7 +4,7 @@
 #include "riotee_adc.h"
 #include "printf.h"
 
-void reset_callback(void) {
+void lateinit(void) {
   riotee_adc_init();
 }
 

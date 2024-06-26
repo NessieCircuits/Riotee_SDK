@@ -23,7 +23,7 @@ TfLiteStatus RegisterOps(HelloWorldOpResolver &op_resolver) {
 }
 }  // namespace
 
-void reset_callback(void) {
+void lateinit(void) {
   riotee_gpio_cfg_output(PIN_LED_CTRL);
 }
 

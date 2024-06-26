@@ -4,7 +4,7 @@
 
 #define PIN_BUTTON PIN_D6
 
-void reset_callback(void) {
+void lateinit(void) {
   riotee_gpio_cfg_output(PIN_LED_CTRL);
 }
 

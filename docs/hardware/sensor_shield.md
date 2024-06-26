@@ -17,7 +17,7 @@ Due to the design of the bias voltage circuit, it takes around 4ms for the bias 
 
 ## Low power operation
 
-To minimize the power consumption of the shield, disable the microphone by setting high pin D5 and put the SHTC3 into sleep mode with `shtc3_init()` in the `startup_callback()` and whenever not needed.
+To minimize the power consumption of the shield, disable the microphone by setting high pin D5 and put the SHTC3 into sleep mode with `shtc3_init()` in the `earlyinit()` and whenever not needed.
 
 For an example, take a look at the [VM1010 example](https://github.com/NessieCircuits/Riotee_SDK/tree/main/examples/vm1010).
 

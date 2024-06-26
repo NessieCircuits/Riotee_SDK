@@ -9,13 +9,13 @@
 #include "printf.h"
 
 /* This gets called after every reset */
-void reset_callback(void) {
+void lateinit(void) {
   int rc;
   if ((rc = riotee_am1805_init()) != 0)
     printf("Error initializing RTC: %d\r\n", rc);
 }
 
-void bootstrap_callback(void) {
+void bootstrap(void) {
   /* Reset RTC once after programming. */
   riotee_am1805_reset();
 }

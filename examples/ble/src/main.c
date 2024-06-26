@@ -10,7 +10,7 @@ static struct {
   unsigned int counter;
 } ble_data;
 
-void reset_callback(void) {
+void lateinit(void) {
   riotee_ble_init();
 }
 

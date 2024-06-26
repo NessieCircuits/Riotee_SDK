@@ -89,7 +89,7 @@ extern "C" {
  * possible.
  *
  */
-void startup_callback(void);
+void earlyinit(void);
 
 /**
  * @brief User-provided bootstrap callback.
@@ -97,11 +97,11 @@ void startup_callback(void);
  * \ingroup riotee
  *
  * This callback is called once at the first reset after programming the device. It is called right before the first
- * reset_callback. Use this callback to do any one-time initilization like setting an RTC or writing configuration to
+ * lateinit. Use this callback to do any one-time initilization like setting an RTC or writing configuration to
  * the NVM.
  *
  */
-void bootstrap_callback(void);
+void bootstrap(void);
 
 /**
  * @brief User-provided reset callback.
@@ -111,7 +111,7 @@ void bootstrap_callback(void);
  * This callback is called after every reset of the device. Use this callback to initializer peripherals and drivers.
  *
  */
-void reset_callback(void);
+void lateinit(void);
 
 /**
  * @brief User-provided suspend callback.
@@ -121,7 +121,7 @@ void reset_callback(void);
  * This callback is called when the capacitor voltage drops below a threshold. If your application uses power-hungry
  * peripherals, power them off immediately in this callback. Keep the callback as short as possible.
  */
-void suspend_callback(void);
+void suspend(void);
 
 /**
  * @brief User-provided resume callback.
@@ -130,7 +130,7 @@ void suspend_callback(void);
  *
  * This callback is called when the capacitor voltage has recovered and the application resumes.
  */
-void resume_callback(void);
+void resume(void);
 
 /**
  * @brief Waits until the capacitor is charged.

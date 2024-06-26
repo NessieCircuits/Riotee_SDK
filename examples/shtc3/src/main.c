@@ -12,12 +12,12 @@ const char adv_name[] = "RIOTEE";
 
 static shtc3_res_t th_result;
 
-void startup_callback(void) {
+void earlyinit(void) {
   /* Call this early to put SHTC3 into low power mode */
   shtc3_init();
 }
 
-void reset_callback(void) {
+void lateinit(void) {
   riotee_ble_init();
 }
 

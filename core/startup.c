@@ -187,7 +187,7 @@ static void wait_for_high(void) {
 
 void __libc_init_array(void);
 
-__attribute__((weak)) void startup_callback(void){
+__attribute__((weak)) void earlyinit(void){
 
 };
 
@@ -234,7 +234,7 @@ void c_startup(void) {
   /* This must happen soon to avoid max20361 cutting power */
   riotee_i2c_init();
   riotee_max20361_init();
-  startup_callback();
+  earlyinit();
 
 #ifndef DISABLE_CAP_MONITOR
   wait_for_high();

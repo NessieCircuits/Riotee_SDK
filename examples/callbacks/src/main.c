@@ -7,25 +7,25 @@
 static unsigned int counter = 0;
 
 /* Executes after every reset */
-void reset_callback(void) {
+void lateinit(void) {
   riotee_gpio_cfg_output(PIN_LED_CTRL);
   printf("reset\r\n");
 }
 
 /* Executes when capacitor voltage gets low */
-void suspend_callback(void) {
+void suspend(void) {
   riotee_gpio_clear(PIN_LED_CTRL);
   printf("suspend\r\n");
 }
 
 /* Executes when capacitor voltage has recovered and after reset */
-void resume_callback(void) {
+void resume(void) {
   riotee_gpio_set(PIN_LED_CTRL);
   printf("resume\r\n");
 }
 
 /* Executes once after programming the device */
-void bootstrap_callback(void) {
+void bootstrap(void) {
   printf("bootstrap\r\n");
 }
 

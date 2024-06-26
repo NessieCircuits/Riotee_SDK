@@ -22,7 +22,7 @@
 const uint8_t adv_address[] = {0x01, 0xEE, 0xC0, 0xFF, 0x03, 0x02};
 const char adv_name[] = "RIOTEE";
 
-void startup_callback(void) {
+void earlyinit(void) {
   /* Call this early to put SHTC3 into low power mode */
   shtc3_init();
   /* Disable microphone to reduce current consumption. */
@@ -30,7 +30,7 @@ void startup_callback(void) {
   riotee_gpio_set(PIN_MICROPHONE_DISABLE);
 }
 
-void reset_callback(void) {
+void lateinit(void) {
   riotee_thresholds_low_set(THR_LOW_2V5);
 
   vm1010_cfg_t cfg = {.pin_mode = PIN_D10, .pin_dout = PIN_D4, .pin_vout = PIN_D2, .pin_vbias = PIN_D3};
@@ -39,7 +39,7 @@ void reset_callback(void) {
   riotee_ble_init();
 }
 
-void suspend_callback(void) {
+void suspend(void) {
   /* Disable the microphone */
   riotee_gpio_set(PIN_MICROPHONE_DISABLE);
   vm1010_exit();

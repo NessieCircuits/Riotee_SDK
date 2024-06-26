@@ -12,7 +12,7 @@
 /* Pin D10 enables/disables microphone on the Riotee Sensor Shield (low active) */
 #define PIN_MICROPHONE_DISABLE PIN_D5
 
-void startup_callback(void) {
+void earlyinit(void) {
   /* Call this early to put SHTC3 into low power mode */
   shtc3_init();
   /* Disable microphone to reduce current consumption. */
@@ -21,14 +21,14 @@ void startup_callback(void) {
 }
 
 /* This gets called after every reset */
-void reset_callback(void) {
+void lateinit(void) {
   riotee_stella_init();
 
   vm1010_cfg_t cfg = {.pin_vout = PIN_D2, .pin_vbias = PIN_D3, .pin_mode = PIN_D10, .pin_dout = PIN_D4};
   vm1010_init(&cfg);
 }
 
-void suspend_callback(void) {
+void suspend(void) {
   /* Disable the microphone */
   riotee_gpio_set(PIN_MICROPHONE_DISABLE);
   vm1010_exit();

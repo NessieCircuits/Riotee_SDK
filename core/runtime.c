@@ -69,13 +69,13 @@ void sys_setup_timer(unsigned int ticks);
 void sys_cancel_timer(void);
 
 /* Dummy callback to be called when low capacitor voltage is detected. Can be overwritten by the user. */
-__attribute__((weak)) void suspend_callback(void){};
+__attribute__((weak)) void suspend(void){};
 /* Dummy callback to be called when capacitor voltage has recovered. Can be overwritten by the user. */
-__attribute__((weak)) void resume_callback(void){};
+__attribute__((weak)) void resume(void){};
 /* Dummy callback during first boot-up of the device */
-__attribute__((weak)) void bootstrap_callback(void){};
+__attribute__((weak)) void bootstrap(void){};
 /* Dummy callback after every reset */
-__attribute__((weak)) void reset_callback(void){};
+__attribute__((weak)) void lateinit(void){};
 
 void __libc_init_array(void);
 int main(void);
@@ -281,7 +281,7 @@ static void sys_handle_suspend(void) {
   /* Switch off power-hungry devices registered in drivers */
   teardown();
   /* Give the application an opportunity to switch off power-hungry devices */
-  suspend_callback();
+  suspend();
 
   runtime_stats.n_suspend++;
 
@@ -345,28 +345,28 @@ static void sys_task(void *pvParameter) {
 #ifdef DISABLE_CHECKPOINTING
   initialize_retained();
   if (check_fresh_start()) {
-    bootstrap_callback();
+    bootstrap();
     overwrite_marker();
   }
-  reset_callback();
+  lateinit();
 #else
   if (check_fresh_start()) {
     initialize_retained();
-    bootstrap_callback();
+    bootstrap();
     overwrite_marker();
-    reset_callback();
+    lateinit();
   } else {
     if (checkpoint_load() == 0) {
       /* Unblock the user task */
       xTaskNotifyIndexed(usr_task_handle, 1, EVT_RESET, eSetBits);
       runtime_stats.n_reset++;
-      reset_callback();
-      resume_callback();
+      lateinit();
+      resume();
 
     } else {
       printf("Loading checkpoint failed!\r\n");
       initialize_retained();
-      reset_callback();
+      lateinit();
     }
   }
 #endif
@@ -385,7 +385,7 @@ static void sys_task(void *pvParameter) {
     /* Low threshold detected */
     if (notification_value == EVT_RUNTIME_PWRGD_L) {
       sys_handle_suspend();
-      resume_callback();
+      resume();
     }
     /* Checkpoint requested by application */
     else if (notification_value == EVT_RUNTIME_CHK_REQ) {

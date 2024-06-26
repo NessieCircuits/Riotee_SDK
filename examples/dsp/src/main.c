@@ -9,7 +9,7 @@
 #include "arm_const_structs.h"
 
 /* This gets called after every reset */
-void reset_callback(void) {
+void lateinit(void) {
   riotee_uart_init(PIN_D1, 1000000);
   riotee_adc_init();
 }
@@ -20,7 +20,6 @@ static float32_t samples_f32[FFT_SIZE];
 static float32_t fft_result[FFT_SIZE];
 
 static arm_rfft_fast_instance_f32 fft_inst;
-
 
 static void adc2float(float32_t *dst, int16_t *src, size_t n) {
   /* outputs normed float [-1;+1] */
@@ -35,7 +34,7 @@ static void adc2float(float32_t *dst, int16_t *src, size_t n) {
   float mean = sum / n;
 
   for (unsigned int i = 0; i < n; i++) {
-    dst[i] = (src[i] -  mean) / max;
+    dst[i] = (src[i] - mean) / max;
   }
 }
 

@@ -62,10 +62,10 @@ In a nutshell: Your application must provide a Makefile that includes the [SDK's
  Your code defines a `main()` function. This function is executed while the device has energy and suspended when energy becomes critically low. If the power supply is interrupted, the stack and all static and global variables are stored in non-volatile memory and restored as soon as the supply comes back.
 
 There are a number of callbacks that your application can implement:
- - `startup_callback()`: Called right after every reset. Perform early stage initizialization required for low-power operation here
- - `reset_callback()`: Called later after every reset. Initialize peripherals here.
- - `suspend_callback()`: Called right before the application gets suspended. Abort any energy-intensive operation immediately.
- - `resume_callback()`: Called right after the application gets resumed.
+ - `earlyinit()`: Called right after every reset. Perform early stage initizialization required for low-power operation here
+ - `lateinit()`: Called later after every reset. Initialize peripherals here.
+ - `suspend()`: Called right before the application gets suspended. Abort any energy-intensive operation immediately.
+ - `resume()`: Called right after the application gets resumed.
 
 
 Your application may change the default size of the memory that is retained across power failures as well as the stack size by defining `RIOTEE_RAM_RETAINED_SIZE` and `RIOTEE_STACK_SIZE` in the Makefile.
