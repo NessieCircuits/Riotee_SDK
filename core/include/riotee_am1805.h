@@ -198,6 +198,10 @@ typedef struct {
   uint8_t second;
 } am1805_alarm_t;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Establishes connection to device. Can block for multiple seconds! */
 int riotee_am1805_init(void);
 
@@ -221,5 +225,9 @@ int riotee_am1805_get_id(uint16_t* id);
 
 /* Clear flag for alarm interrupt in status register. */
 int riotee_am1805_clear_alarm();
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __RIOTEE_AM1805_H_ */
