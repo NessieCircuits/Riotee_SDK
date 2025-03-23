@@ -69,13 +69,13 @@ void sys_setup_timer(unsigned int ticks);
 void sys_cancel_timer(void);
 
 /* Dummy callback to be called when low capacitor voltage is detected. Can be overwritten by the user. */
-__attribute__((weak)) void suspend(void){};
+__attribute__((weak)) void suspend(void) {};
 /* Dummy callback to be called when capacitor voltage has recovered. Can be overwritten by the user. */
-__attribute__((weak)) void resume(void){};
+__attribute__((weak)) void resume(void) {};
 /* Dummy callback during first boot-up of the device */
-__attribute__((weak)) void bootstrap(void){};
+__attribute__((weak)) void bootstrap(void) {};
 /* Dummy callback after every reset */
-__attribute__((weak)) void lateinit(void){};
+__attribute__((weak)) void lateinit(void) {};
 
 void __libc_init_array(void);
 int main(void);
@@ -268,7 +268,7 @@ static void teardown(void) {
   void (*fn_teardown)(void);
   uint32_t *fn_addr;
   for (fn_addr = &__teardown_start__; fn_addr < &__teardown_end__; fn_addr++) {
-    fn_teardown = (void (*)(void)) * fn_addr;
+    fn_teardown = (void (*)(void))*fn_addr;
     if (fn_teardown != NULL)
       fn_teardown();
   }

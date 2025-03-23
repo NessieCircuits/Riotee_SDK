@@ -187,7 +187,7 @@ static void wait_for_high(void) {
 
 void __libc_init_array(void);
 
-__attribute__((weak)) void earlyinit(void){
+__attribute__((weak)) void earlyinit(void) {
 
 };
 
@@ -251,7 +251,7 @@ void c_startup(void) {
   while (src < &__bss_end__)
     *(src++) = 0;
 
-    /* Activate FPU if compiler says that it's used */
+  /* Activate FPU if compiler says that it's used */
 #if (__FPU_USED == 1)
   SCB->CPACR |= (3UL << 20) | (3UL << 22);
   __DSB();
