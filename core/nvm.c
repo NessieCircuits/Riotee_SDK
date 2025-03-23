@@ -15,6 +15,8 @@
 typedef enum { NVM_WRITE = 0x800000, NVM_READ = 0x000000 } nvm_transfer_type_t;
 
 static volatile bool nvm_event = false;
+/* Grace period between two transfers has passed. */
+static volatile bool nvm_grace_passed = false;
 static unsigned int _pin_cs;
 
 int nvm_init(void) {
@@ -53,8 +55,11 @@ int nvm_init(void) {
 
   /* Minimum between the initialization or the end of one transaction and start of the next transaction */
   NRF_TIMER4->CC[2] = NVM_TEARDOWN_US;
-  NRF_TIMER4->SHORTS = TIMER_SHORTS_COMPARE2_STOP_Msk;
+  /* Can't use shorts to stop timer because of nRF52833 errata [78] */
+  NRF_TIMER4->INTENSET = TIMER_INTENSET_COMPARE2_Msk;
+
   NRF_TIMER4->TASKS_CLEAR = 1;
+  nvm_grace_passed = false;
   NRF_TIMER4->TASKS_START = 1;
 
   __NVIC_EnableIRQ(TIMER4_IRQn);
@@ -62,10 +67,22 @@ int nvm_init(void) {
 }
 
 void TIMER4_IRQHandler(void) {
-  if (NRF_TIMER4->EVENTS_COMPARE[1] == 1) {
+  if ((NRF_TIMER4->EVENTS_COMPARE[1] == 1) && (NRF_TIMER4->INTENSET & TIMER_INTENSET_COMPARE1_Msk)) {
     NRF_TIMER4->EVENTS_COMPARE[1] = 0;
     NRF_SPIM0->TASKS_STOP = 1;
+    /* nRF52833 errata [78] */
+    NRF_TIMER4->TASKS_SHUTDOWN = 1;
+    NRF_TIMER4->INTENCLR = TIMER_INTENCLR_COMPARE1_Msk;
     nvm_event = true;
+  }
+  if ((NRF_TIMER4->EVENTS_COMPARE[2] == 1) && (NRF_TIMER4->INTENSET & TIMER_INTENSET_COMPARE2_Msk)) {
+    NRF_TIMER4->EVENTS_COMPARE[2] = 0;
+    /* nRF52833 errata [78] */
+
+    NRF_TIMER4->TASKS_SHUTDOWN = 1;
+
+    NRF_TIMER4->INTENCLR = TIMER_INTENCLR_COMPARE2_Msk;
+    nvm_grace_passed = true;
   }
 }
 
@@ -102,10 +119,8 @@ static int begin(nvm_transfer_type_t transfer_type, uint32_t address) {
   int rc;
 
   /* If less than 10us have passed since the last transaction, wait for the remaining time */
-  do {
-    /* Capture current timer value into CC[3]. */
-    NRF_TIMER4->TASKS_CAPTURE[3] = 1;
-  } while (NRF_TIMER4->CC[3] < NVM_TEARDOWN_US);
+  while (!nvm_grace_passed) {
+  };
 
   if ((rc = is_ready()) != 0)
     return rc;
@@ -122,7 +137,6 @@ static int begin(nvm_transfer_type_t transfer_type, uint32_t address) {
   NRF_TIMER4->EVENTS_COMPARE[1] = 0;
 
   NRF_TIMER4->INTENSET = TIMER_INTENSET_COMPARE1_Msk;
-  NRF_TIMER4->SHORTS = TIMER_SHORTS_COMPARE1_STOP_Msk;
 
   NRF_TIMER4->TASKS_CLEAR = 1;
   NRF_TIMER4->TASKS_START = 1;
@@ -132,7 +146,6 @@ static int begin(nvm_transfer_type_t transfer_type, uint32_t address) {
     enter_low_power();
   }
   NRF_PPI->CHENCLR = PPI_CHENSET_CH0_Msk;
-  NRF_TIMER4->INTENCLR = TIMER_INTENCLR_COMPARE1_Msk;
 
   /* Should be stopped already, but better be safe */
   while (NRF_SPIM0->EVENTS_STOPPED == 0) {
@@ -140,8 +153,6 @@ static int begin(nvm_transfer_type_t transfer_type, uint32_t address) {
 
   NRF_SPIM0->ENABLE = (SPIM_ENABLE_ENABLE_Disabled << SPIM_ENABLE_ENABLE_Pos);
   NRF_SPIM0->INTENSET = SPIM_INTENSET_END_Msk;
-  /* See nRF52833 errata [78] */
-  NRF_TIMER4->TASKS_SHUTDOWN = 1;
 
   return 0;
 }
@@ -156,11 +167,13 @@ int nvm_begin_write(uint32_t address) {
 
 int nvm_end(void) {
   riotee_gpio_set(_pin_cs);
-
   /* Start a timer that allows us to check if the required time has passed before starting again. */
+  NRF_TIMER4->INTENSET = TIMER_INTENSET_COMPARE2_Msk;
+  NRF_TIMER4->EVENTS_COMPARE[2] = 0;
+
   NRF_TIMER4->TASKS_CLEAR = 1;
+  nvm_grace_passed = false;
   NRF_TIMER4->TASKS_START = 1;
-  NRF_TIMER4->SHORTS = TIMER_SHORTS_COMPARE2_STOP_Msk;
 
   NRF_SPIM0->INTENCLR = SPIM_INTENSET_END_Msk;
 
