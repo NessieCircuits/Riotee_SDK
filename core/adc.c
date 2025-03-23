@@ -10,6 +10,7 @@ TEARDOWN_FUN(adc_teardown_ptr);
 /* Number of samples that still need to be taken before buffer is filled. */
 static unsigned int samples_remaining;
 static unsigned int sample_interval_ticks32;
+static int16_t adc_result;
 
 /* Inverse gain lookup table, indexed by riotee_adc_gain_t */
 static const float gain_lut[] = {6.0f, 5.0f, 4.0f, 3.0f, 2.0f, 1.0f, 1.0f / 2, 1.0f / 4};
@@ -77,7 +78,6 @@ void riotee_adc_init(void) {
 }
 
 int16_t riotee_adc_read(riotee_adc_input_t in) {
-  int16_t result = 0;
   taskENTER_CRITICAL();
 
   NRF_SAADC->CH[0].CONFIG = (SAADC_CH_CONFIG_RESP_Bypass << SAADC_CH_CONFIG_RESP_Pos) |
@@ -88,7 +88,7 @@ int16_t riotee_adc_read(riotee_adc_input_t in) {
 
   NRF_SAADC->CH[0].PSELP = in;
   NRF_SAADC->CH[0].PSELN = RIOTEE_ADC_INPUT_NC;
-  NRF_SAADC->RESULT.PTR = (uint32_t)&result;
+  NRF_SAADC->RESULT.PTR = (uint32_t)&adc_result;
   NRF_SAADC->RESULT.MAXCNT = 1;
   NRF_SAADC->OVERSAMPLE = RIOTEE_ADC_OVERSAMPLE_DISABLED;
 
@@ -102,7 +102,7 @@ int16_t riotee_adc_read(riotee_adc_input_t in) {
   NRF_SAADC->ENABLE = (SAADC_ENABLE_ENABLE_Disabled << SAADC_ENABLE_ENABLE_Pos);
 
   taskEXIT_CRITICAL();
-  return result;
+  return adc_result;
 }
 riotee_rc_t riotee_adc_sample(int16_t *dst, riotee_adc_cfg_t *cfg) {
   unsigned long notification_value;
