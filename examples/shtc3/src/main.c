@@ -13,8 +13,11 @@ const char adv_name[] = "RIOTEE";
 static shtc3_res_t th_result;
 
 void earlyinit(void) {
-  /* Call this early to put SHTC3 into low power mode */
+  /* Call this early to put SHTC3 and microphone into low power mode */
   shtc3_init();
+  /* D5 disables the microphone */
+  riotee_gpio_cfg_output(PIN_D5);
+  riotee_gpio_set(PIN_D5);
 }
 
 void lateinit(void) {
