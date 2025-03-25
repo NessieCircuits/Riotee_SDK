@@ -62,6 +62,8 @@ static void radio_crc_err(void) {
 static void radio_address(void) {
   /* Stop the timeout timer */
   NRF_TIMER2->TASKS_STOP = 1;
+  /* nRF52833 errata [78] */
+  NRF_TIMER2->TASKS_SHUTDOWN = 1;
   radio_cb_unregister(RADIO_EVT_ADDRESS);
 }
 
@@ -88,7 +90,6 @@ static int timer_init(void) {
   /* 100us timeout for receiving the address of the acknowledgment */
   NRF_TIMER2->CC[0] = 100;
   NRF_TIMER2->INTENSET |= TIMER_INTENSET_COMPARE0_Msk;
-  NRF_TIMER2->SHORTS |= TIMER_SHORTS_COMPARE0_STOP_Msk;
   NVIC_EnableIRQ(TIMER2_IRQn);
   return 0;
 }
@@ -153,6 +154,9 @@ void TIMER2_IRQHandler(void) {
     radio_cb_unregister(RADIO_EVT_ADDRESS);
     radio_stop();
     stella_teardown_ptr = NULL;
+    NRF_TIMER2->TASKS_STOP = 1;
+    /* nRF52833 errata [78] */
+    NRF_TIMER2->TASKS_SHUTDOWN = 1;
 
     xTaskNotifyIndexedFromISR(usr_task_handle, 1, EVT_STELLA_TIMEOUT, eSetBits, &xHigherPriorityTaskWoken);
   }
