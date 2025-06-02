@@ -70,7 +70,6 @@ void RioteeSPI::beginTransaction(arduino::SPISettings settings, unsigned int pin
   spic_cfg.pin_copi = pin_copi;
 
   riotee_spic_init(&spic_cfg);
-  printf("INIT OK");
 }
 
 void RioteeSPI::beginTransaction(arduino::SPISettings settings, unsigned int pin_sck, unsigned int pin_copi,
