@@ -4,7 +4,7 @@ DRIVER_DIR := $(RIOTEE_SDK_ROOT)/drivers
 RTOS_DIR := $(RIOTEE_SDK_ROOT)/external/freertos
 NRFX_DIR := $(RIOTEE_SDK_ROOT)/external/nrfx
 CMSIS_DIR := $(RIOTEE_SDK_ROOT)/external/CMSIS_5
-TFLIGHT_DIR := $(RIOTEE_SDK_ROOT)/external/tflm-cmsis
+TFLITE_DIR := $(RIOTEE_SDK_ROOT)/external/tflm-cmsis
 LINKER_SCRIPT:= $(RIOTEE_SDK_ROOT)/linker.ld
 NRF_DEV_NUM := 52833
 
@@ -54,11 +54,11 @@ INC_DIRS += \
   $(NRFX_DIR)/mdk \
   $(NRFX_DIR)/templates \
   $(CMSIS_DIR)/CMSIS/Core/Include \
-  $(TFLIGHT_DIR) \
-  $(TFLIGHT_DIR)/third_party/flatbuffers/include \
-  $(TFLIGHT_DIR)/third_party/gemmlowp \
-  $(TFLIGHT_DIR)/third_party/kissfft \
-  $(TFLIGHT_DIR)/third_party/ruy \
+  $(TFLITE_DIR) \
+  $(TFLITE_DIR)/third_party/flatbuffers/include \
+  $(TFLITE_DIR)/third_party/gemmlowp \
+  $(TFLITE_DIR)/third_party/kissfft \
+  $(TFLITE_DIR)/third_party/ruy \
 
 
 INCLUDES = $(INC_DIRS:%=-I%)
