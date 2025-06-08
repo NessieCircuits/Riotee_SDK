@@ -1,5 +1,6 @@
 #include "riotee.h"
 #include "riotee_spic.h"
+#include "riotee_gpio.h"
 #include "printf.h"
 
 #include "SPI.h"
@@ -95,33 +96,28 @@ void RioteeSPI::beginTransaction(arduino::SPISettings settings) {
       return;
   }
 
-  spic_cfg.pin_cs = pin_cs;
-  spic_cfg.pin_sck = pin_sck;
-  spic_cfg.pin_cipo = pin_cipo;
-  spic_cfg.pin_copi = pin_copi;
+  spic_cfg.pin_cs = _pin_cs;
+  spic_cfg.pin_sck = _pin_sck;
+  spic_cfg.pin_cipo = _pin_cipo;
+  spic_cfg.pin_copi = _pin_copi;
 
   riotee_spic_init(&spic_cfg);
 }
 
-void RioteeSPI::beginTransaction(arduino::SPISettings settings, unsigned int pin_sck, unsigned int pin_copi,
-                                 unsigned int pin_cipo) {
-  beginTransaction(settings, RIOTEE_SPIC_PIN_UNUSED, pin_sck, pin_copi, pin_cipo);
-}
-
-void RioteeSPI::beginTransaction(arduino::SPISettings settings) {
-  beginTransaction(settings, RIOTEE_SPIC_PIN_UNUSED, PIN_D8, PIN_D10, PIN_D9);
+void RioteeSPI::beginTransaction(void) {
+  beginTransaction(arduino::DEFAULT_SPI_SETTINGS);
 }
 
 uint8_t RioteeSPI::transfer(uint8_t data) {
-  uint8_t rx_buf;
-  riotee_spic_transfer(&data, 1, &rx_buf, 1);
-  return rx_buf;
+  uint8_t _rx_buf;
+  riotee_spic_transfer(&data, 1, &_rx_buf, 1);
+  return _rx_buf;
 }
 
 uint16_t RioteeSPI::transfer16(uint16_t data) {
-  uint16_t rx_buf;
-  riotee_spic_transfer((uint8_t *)&data, 2, (uint8_t *)&rx_buf, 2);
-  return rx_buf;
+  uint16_t _rx_buf;
+  riotee_spic_transfer((uint8_t *)&data, 2, (uint8_t *)&_rx_buf, 2);
+  return _rx_buf;
 }
 
 void RioteeSPI::transfer(void *buf, size_t count) {
