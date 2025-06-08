@@ -7,29 +7,60 @@
 #define RX_BUF_SIZE 256
 static uint8_t rx_buf[RX_BUF_SIZE];
 
-void RioteeSPI::beginTransaction(void) {
-  beginTransaction(arduino::DEFAULT_SPI_SETTINGS);
+RioteeSPI::RioteeSPI() : _pin_copi(PIN_D10), _pin_cipo(PIN_D9), _pin_sck(PIN_D8), _pin_cs(RIOTEE_SPIC_PIN_UNUSED) {}
+
+void RioteeSPI::begin() {
+  riotee_gpio_cfg_output(_pin_copi);
+  riotee_gpio_cfg_output(_pin_sck);
+  riotee_gpio_cfg_input(_pin_cipo, RIOTEE_GPIO_IN_NOPULL);
+  if (_pin_cs != RIOTEE_SPIC_PIN_UNUSED) {
+    riotee_gpio_cfg_output(_pin_cs);
+    riotee_gpio_set(_pin_cs);
+  }
 }
 
-void RioteeSPI::beginTransaction(arduino::SPISettings settings, unsigned int pin_cs, unsigned int pin_sck,
-                                 unsigned int pin_copi, unsigned int pin_cipo) {
+void RioteeSPI::begin(unsigned int pin_cipo, unsigned int pin_sck, unsigned int pin_copi, unsigned int pin_cs) {
+  _pin_cipo = pin_cipo;
+  _pin_copi = pin_copi;
+  _pin_sck = pin_sck;
+  _pin_cs = pin_cs;
+  begin();
+}
+
+void RioteeSPI::begin(unsigned int pin_cipo, unsigned int pin_sck, unsigned int pin_copi) {
+  _pin_cipo = pin_cipo;
+  _pin_copi = pin_copi;
+  _pin_sck = pin_sck;
+  begin();
+}
+
+void RioteeSPI::end() {
+  riotee_gpio_cfg_disable(_pin_copi);
+  riotee_gpio_cfg_disable(_pin_sck);
+  riotee_gpio_cfg_disable(_pin_cipo);
+  if (_pin_cs != RIOTEE_SPIC_PIN_UNUSED) {
+    riotee_gpio_cfg_disable(_pin_cs);
+  }
+}
+
+void RioteeSPI::beginTransaction(arduino::SPISettings settings) {
   riotee_spic_cfg_t spic_cfg;
   unsigned int f_clk = settings.getClockFreq();
-  if (f_clk > 32000000)
+  if (f_clk >= 32000000)
     spic_cfg.frequency = RIOTEE_SPIC_FREQUENCY_M32;
-  else if (f_clk > 16000000)
+  else if (f_clk >= 16000000)
     spic_cfg.frequency = RIOTEE_SPIC_FREQUENCY_M16;
-  else if (f_clk > 8000000)
+  else if (f_clk >= 8000000)
     spic_cfg.frequency = RIOTEE_SPIC_FREQUENCY_M8;
-  else if (f_clk > 4000000)
+  else if (f_clk >= 4000000)
     spic_cfg.frequency = RIOTEE_SPIC_FREQUENCY_M4;
-  else if (f_clk > 2000000)
+  else if (f_clk >= 2000000)
     spic_cfg.frequency = RIOTEE_SPIC_FREQUENCY_M2;
-  else if (f_clk > 1000000)
+  else if (f_clk >= 1000000)
     spic_cfg.frequency = RIOTEE_SPIC_FREQUENCY_M1;
-  else if (f_clk > 500000)
+  else if (f_clk >= 500000)
     spic_cfg.frequency = RIOTEE_SPIC_FREQUENCY_K500;
-  else if (f_clk > 250000)
+  else if (f_clk >= 250000)
     spic_cfg.frequency = RIOTEE_SPIC_FREQUENCY_K250;
   else
     spic_cfg.frequency = RIOTEE_SPIC_FREQUENCY_K125;
