@@ -4,7 +4,7 @@ Our Solar Shield plugs into the Riotee Board's headers. It has four small solar 
 
 ## Features & Specifications
 
-- 4x AnySolar KXOB25x03F solar panels
+- 4x AnySolar KXOB25-03x4F solar panels
 - DIP switch for selectively connecting 1, 3, or 4 panels in parallel
 
 ## Resources
